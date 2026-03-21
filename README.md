@@ -19,7 +19,7 @@ I'm a PhD researcher. I've spent years training my brain to hold enormous amount
 
 Then it didn't.
 
-Memory started slipping. Not dramatically — no diagnosis, no crisis — just the slow, creeping realization that the mental budget was getting empty, and things were falling through the cracks. I'd forget what I'd read. Lose track of conversations. Start projects I'd already started. Feel constantly behind, constantly overwhelmed.
+Memory started slipping. Not dramatically — no diagnosis, no crisis — just the slow, creeping realization that the mental budget was getting empty, and things were falling through the cracks. I'd forget what I'd read. Lose track of conversations.  Feel constantly behind, constantly overwhelmed.
 
 I started looking for solutions. I found a lot of Obsidian + Claude setups online. They were mostly clever note-capture tools, glorified search engines for your second brain. Useful. But not what I needed.
 
@@ -148,37 +148,21 @@ Meta/              Vault config, agent messages, health reports
 
 ## Quick start
 
-### 1. Install the plugin
+### 1. Install
 
-**Option A — Plugin install (recommended):**
-
-Open Claude Code and type:
-
-```
-/plugin install obsidian-vault-crew
-```
-
-That's it. All 10 agents are now available.
-
-**Option B — Load from GitHub:**
+Clone this repo into your Claude Code skills directory:
 
 ```bash
-git clone https://github.com/gnekt/obsidian-vault-crew.git
-claude --plugin-dir /path/to/obsidian-vault-crew
+# Navigate to your Claude Code skills folder
+cd ~/.claude/skills/
+
+# Clone the Vault Crew
+git clone https://github.com/user/obsidian-vault-crew.git
 ```
-
-**Option C — Manual skill copy (fallback):**
-
-```bash
-git clone https://github.com/gnekt/obsidian-vault-crew.git
-cp -r obsidian-vault-crew/skills/* ~/.claude/skills/
-```
-
-> **Not comfortable with the terminal?** Ask a tech-savvy friend — it takes 30 seconds. Or see the [step-by-step guide](docs/getting-started.md) with screenshots and explanations.
 
 ### 2. Connect your vault
 
-Open Claude Code and navigate to your Obsidian vault folder (or tell Claude where it is).
+Open Claude Code in Cowork mode and mount your Obsidian vault folder.
 
 ### 3. Initialize
 
@@ -261,9 +245,7 @@ All other agents work with just your local Obsidian vault.
 
 ```
 obsidian-vault-crew/
-├── .claude-plugin/
-│   └── plugin.json                Plugin manifest
-├── CLAUDE.md                       Installation & development guide
+├── plugin.json                     Plugin manifest
 ├── README.md                       You are here
 ├── CONTRIBUTING.md                 How to contribute
 ├── docs/
