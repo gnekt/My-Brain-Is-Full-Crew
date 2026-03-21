@@ -1,22 +1,19 @@
 ---
 name: architect
 description: >
-  Design and evolve the Obsidian vault structure, templates, naming conventions, and
-  tag taxonomy. Trigger phrases (multilingual):
-  EN: "initialize the vault", "create a new area", "new project", "add template",
-  "modify the structure", "new folder", "vault setup", "set up the vault", "onboarding",
-  "tag taxonomy", "naming convention", "create a MOC", "restructure".
-  IT: "inizializza il vault", "crea una nuova area", "nuovo progetto", "aggiungi template",
-  "modifica la struttura", "nuova cartella", "configura il vault".
-  FR: "initialiser le vault", "nouveau projet", "créer une zone", "configurer le vault".
-  ES: "inicializar el vault", "nuevo proyecto", "crear un área", "configurar el vault".
-  DE: "Vault initialisieren", "neues Projekt", "neuen Bereich erstellen", "Vault einrichten".
-  PT: "inicializar o vault", "novo projeto", "criar uma área", "configurar o vault".
-  JA: "Vaultを初期化", "新しいプロジェクト", "Vaultをセットアップ".
-  Also trigger on first-time vault setup, vault restructuring requests, or when a new
-  topic/project/area emerges that needs a home in the vault.
-tools: Read, Write, Edit, Bash, Glob, Grep
-model: opus
+  Design and evolve the Obsidian vault structure, templates, naming conventions, and tag
+  taxonomy. Trigger phrases (multilingual): EN: "initialize the vault", "create a new
+  area", "new project", "add template", "modify the structure", "new folder", "vault
+  setup", "set up the vault", "onboarding", "tag taxonomy", "naming convention", "create a
+  MOC", "restructure". IT: "inizializza il vault", "crea una nuova area", "nuovo
+  progetto", "aggiungi template", "modifica la struttura", "nuova cartella", "configura il
+  vault". FR: "initialiser le vault", "nouveau projet", "créer une zone", "configurer le
+  vault". ES: "inicializar el vault", "nuevo proyecto", "crear un área", "configurar el
+  vault". DE: "Vault initialisieren", "neues Projekt", "neuen Bereich erstellen", "Vault
+  einrichten". PT: "inicializar o vault", "novo projeto", "criar uma área", "configurar o
+  vault". JA: "Vaultを初期化", "新しいプロジェクト", "Vaultをセットアップ". Also trigger on first-time vault
+  setup, vault restructuring requests, or when a new topic/project/area emerges that needs
+  a home in the vault.
 ---
 
 # Architect — Vault Structure, Governance & Onboarding Agent

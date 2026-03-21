@@ -126,7 +126,18 @@ This is a tool for self-care and personal organization. If you fork it, please k
 You talk to Claude  →  The right agent activates  →  Your vault gets updated
 ```
 
-The Crew is a **Claude Code plugin**. Each crew member is a **subagent** — an isolated AI with its own system prompt, tool restrictions, and model. You point Claude Code at your Obsidian vault folder, and from that moment on, you manage everything through conversation. No GUI, no drag-and-drop, no manual file management.
+Each crew member is an isolated AI with its own system prompt, tool restrictions, and model assignment. You clone the repo into your vault, run a setup script, and from that moment on you manage everything through conversation. No GUI, no drag-and-drop, no manual file management.
+
+### Works on both Claude Code CLI and Claude Code Desktop (Cowork)
+
+The installer sets up **two parallel formats** so the Crew works everywhere:
+
+| Format | Location | Used by |
+|--------|----------|---------|
+| **Subagents** | `.claude/agents/` | Claude Code CLI (`claude` in terminal) |
+| **Skills** | `.claude/skills/` | Claude Code Desktop / Cowork |
+
+You don't need to choose — `launchme.sh` installs both automatically. Same agents, same behavior, same prompts. The only difference is the format Claude reads them in.
 
 Your vault follows a hybrid **PARA + Zettelkasten** structure:
 
@@ -148,37 +159,33 @@ Meta/              Vault config, agent messages, health reports
 
 ## Quick start
 
-### 1. Install the plugin
+> **Prerequisite**: You need [Claude Code](https://claude.ai/code) with a Claude Pro, Max, or Team subscription, and [Obsidian](https://obsidian.md) (free).
 
-> **Prerequisite**: You need [Claude Code](https://claude.ai/code) with a Claude Pro, Max, or Team subscription.
+### 1. Create your Obsidian vault
 
-#### Desktop app (no terminal needed)
+Open Obsidian and create a new vault (or use an existing one).
 
-1. Download the [latest release](https://github.com/gnekt/My-Brain-Is-Full-Crew/archive/refs/heads/main.zip) and unzip it
-2. Open **Claude Code Desktop**
-3. Go to **Customize** → **Personal plugins** → click **+**
-4. Click **Load local plugin** and select the unzipped folder
-5. Done — all 10 agents are ready
-
-#### Terminal (CLI)
+### 2. Clone the repo inside your vault
 
 ```bash
+cd /path/to/your-vault
 git clone https://github.com/gnekt/My-Brain-Is-Full-Crew.git
-mkdir -p ~/.claude/agents
-cp My-Brain-Is-Full-Crew/agents/*.md ~/.claude/agents/
 ```
 
-All 10 agents are now permanently available every time you use Claude Code.
+### 3. Run the installer
 
-> **Never used a terminal before?** See the [step-by-step guide for beginners](docs/getting-started.md) — it walks you through everything, or just show this page to a tech-savvy friend. It takes 30 seconds.
+```bash
+cd My-Brain-Is-Full-Crew
+bash scripts/launchme.sh
+```
 
-### 2. Open Claude Code in your vault folder
+The script asks a couple of questions and copies the agents into your vault's `.claude/` directory. That's it — when Claude Code is open in your vault folder, the agents activate automatically. When you're in any other project, they don't.
 
-Open Claude Code and point it at your Obsidian vault folder. This is important — the agents need to run from inside the vault.
+> **Never used a terminal before?** See the [step-by-step guide for beginners](docs/getting-started.md) — it walks you through everything, or just show this page to a tech-savvy friend. It takes 60 seconds.
 
-### 3. Initialize
+### 4. Initialize
 
-Say this to Claude:
+Open Claude Code **inside your vault folder** and say:
 
 > **"Initialize my vault"**
 
@@ -189,14 +196,9 @@ The **Architect** will start a friendly onboarding conversation:
 3. **Health setup** *(optional)* — Physical profile for the Food Coach, preferences for the Wellness Guide
 4. **Integrations** — Gmail and Google Calendar connections
 
-After onboarding, the Architect:
-- Creates your entire vault folder structure
-- Saves your profile to `Meta/user-profile.md`
-- **Installs the selected agents into `.claude/agents/` inside your vault** — so they only activate when you're in this folder, never in other projects
-- Creates `.mcp.json` in your vault root (if you enabled Gmail or Calendar)
-- Leaves you a personalized welcome note
+After onboarding, the Architect creates your entire vault folder structure, saves your profile, leaves you a welcome note, and you're ready to go.
 
-### 4. Start using it
+### 5. Start using it
 
 | You say | What happens |
 |---------|-------------|
@@ -246,9 +248,21 @@ The **Postman** agent requires:
 - **Gmail** MCP connector — to read and process your inbox
 - **Google Calendar** MCP connector — to import events and manage your schedule
 
-Both are pre-configured in the plugin's `.mcp.json` — if you install the plugin via Desktop or `--plugin-dir`, they're ready to go. You just need to authorize them when prompted.
+The `launchme.sh` script offers to set up `.mcp.json` in your vault automatically. You just need to authorize them when prompted by Claude Code.
 
 All other agents work with just your local Obsidian vault — no integrations needed.
+
+### Updating
+
+After pulling new changes from the repo:
+
+```bash
+cd /path/to/your-vault/My-Brain-Is-Full-Crew
+git pull
+bash scripts/updateme.sh
+```
+
+Only changed files are updated. Your vault notes are never touched.
 
 ---
 
@@ -263,41 +277,48 @@ All other agents work with just your local Obsidian vault — no integrations ne
 ## Project structure
 
 ```
-my-brain-is-full-crew/
-├── .claude-plugin/
-│   └── plugin.json                Plugin manifest
-├── .mcp.json                       MCP servers (Gmail, Google Calendar)
-├── CLAUDE.md                       Installation & development guide
-├── README.md                       You are here
-├── CONTRIBUTING.md                 How to contribute
-├── agents/                         The 10 subagents
-│   ├── architect.md                Vault setup & onboarding
-│   ├── scribe.md                   Text capture & note creation
-│   ├── sorter.md                   Inbox triage & filing
-│   ├── seeker.md                   Search & knowledge retrieval
-│   ├── connector.md                Knowledge graph & link analysis
-│   ├── librarian.md                Vault health & maintenance
-│   ├── transcriber.md              Audio & meeting transcription
-│   ├── postman.md                  Email & calendar integration
-│   ├── food-coach.md               Nutrition coaching (opt-in)
-│   └── wellness-guide.md           Mental health support (opt-in)
-├── docs/
-│   ├── getting-started.md          Step-by-step setup guide (non-technical)
-│   ├── examples.md                 Real-world usage examples
-│   └── agents/                     Deep-dive into each agent
-│       ├── architect.md
-│       ├── scribe.md
-│       ├── sorter.md
-│       ├── seeker.md
-│       ├── connector.md
-│       ├── librarian.md
-│       ├── transcriber.md
-│       ├── postman.md
-│       ├── food-coach.md
-│       └── wellness-guide.md
-└── references/
-    ├── agents.md                   Agent registry (for agents to read)
-    └── inter-agent-messaging.md    Communication protocol
+My-Brain-Is-Full-Crew/               ← cloned inside your vault
+├── agents/                          The 10 subagents
+│   ├── architect.md                   Vault setup & onboarding
+│   ├── scribe.md                      Text capture & note creation
+│   ├── sorter.md                      Inbox triage & filing
+│   ├── seeker.md                      Search & knowledge retrieval
+│   ├── connector.md                   Knowledge graph & link analysis
+│   ├── librarian.md                   Vault health & maintenance
+│   ├── transcriber.md                 Audio & meeting transcription
+│   ├── postman.md                     Email & calendar integration
+│   ├── food-coach.md                  Nutrition coaching (opt-in)
+│   └── wellness-guide.md              Mental health support (opt-in)
+├── skills/                          Auto-generated skills (for Cowork/Desktop)
+│   └── {name}/SKILL.md               One per agent, same content
+├── references/                      Shared agent documentation
+├── scripts/
+│   ├── launchme.sh                    First-time installer
+│   ├── updateme.sh                    Post-pull updater
+│   └── generate-skills.py             Converts agents → skills
+├── docs/                            User-facing documentation
+│   ├── getting-started.md             Step-by-step setup guide
+│   ├── examples.md                    Real-world usage examples
+│   └── agents/                        Deep-dive into each agent
+├── .mcp.json                        MCP servers (Gmail, Google Calendar)
+├── .claude-plugin/plugin.json       Plugin manifest (for --plugin-dir)
+├── LICENSE
+├── README.md                        You are here
+└── CONTRIBUTING.md
+```
+
+After running `launchme.sh`, your vault looks like:
+
+```
+your-vault/
+├── .claude/
+│   ├── agents/          ← crew subagents (Claude Code CLI)
+│   ├── skills/          ← crew skills (Claude Code Desktop / Cowork)
+│   └── references/      ← shared docs
+├── CLAUDE.md            ← project instructions
+├── .mcp.json            ← Gmail + Calendar (if enabled)
+├── My-Brain-Is-Full-Crew/  ← the repo (for updates)
+└── ... your Obsidian notes
 ```
 
 ---

@@ -1,6 +1,6 @@
 {
   "name": "my-brain-is-full-crew",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A crew of 10 AI agents that run your Obsidian vault like a team of personal assistants — capturing notes, triaging your inbox, managing your calendar and email, tracking your nutrition, supporting your mental health, and keeping everything connected. Works in any language.",
   "author": {
     "name": "@gnekt (Christian Di Maio)",
@@ -32,6 +32,5 @@
     "productivity",
     "multilingual",
     "cowork"
-  ],
-  "agents": "./agents/"
+  ]
 }

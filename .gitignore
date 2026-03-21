@@ -1,10 +1,10 @@
 # Build artifacts
 dist/
-scripts/
+scripts/build.sh
 logs/
 # macOS
 .DS_Store
 **/.DS_Store
-
+Test-SecondBrain/
 # Dev config
 .claude/settings.local.json
