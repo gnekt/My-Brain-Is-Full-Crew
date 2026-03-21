@@ -1,84 +1,109 @@
 # Contributing to Obsidian Vault Crew
 
-First of all: thank you. This project exists because of a personal need, and it will grow because of shared ones.
+Thank you for your interest in making the Vault Crew better. This project was born from personal need, and it grows through shared ones.
 
 ---
 
 ## Ways to contribute
 
-### Translate a skill into your language
-
-This is probably the most impactful thing you can do.
-
-Each skill lives in `skills/<agent-name>/SKILL.md`. The files are currently in Italian with English trigger descriptions. To add a language:
-
-1. Fork the repo
-2. Create `skills/<agent-name>/SKILL.<lang>.md` (e.g., `SKILL.es.md`, `SKILL.fr.md`, `SKILL.de.md`)
-3. Translate the skill content — keep the structure, adapt the trigger phrases, idioms, and cultural references to your language
-4. Open a PR with the title: `[lang] Add <language> translation for <agent-name>`
-
-Don't worry about making it perfect. A rough translation that works for native speakers is infinitely more useful than no translation.
-
-### Propose a new crew member
-
-Have an idea for a new agent? Open an issue with:
-
-- **Name** (and Italian equivalent, for consistency)
-- **Role** — what problem does it solve?
-- **Triggers** — when should it activate?
-- **Vault integration** — which folders does it read/write?
-- **Inter-agent messages** — which other agents should it communicate with?
-
-### Improve an existing skill
+### Improve an existing agent
 
 Found that an agent behaves weirdly, gives poor results, or misses edge cases?
 
 1. Open an issue describing the problem with a concrete example
-2. Or directly submit a PR with the improvement
+2. Or submit a PR with the improvement
+
+Agent skill files live in `skills/<agent-name>/SKILL.md`. The plugin manifest is at `.claude-plugin/plugin.json`. All skills are written in English — agents automatically respond in the user's language.
+
+To test your changes locally:
+```bash
+claude --plugin-dir ./
+```
+
+### Propose a new crew member
+
+Have an idea for an 11th agent? Open an issue with:
+
+- **Name** — both a descriptive English name and a short codename
+- **Role** — what problem does it solve?
+- **Triggers** — when should it activate? (include phrases in multiple languages)
+- **Vault integration** — which folders does it read/write?
+- **Inter-agent messages** — which other agents should it communicate with?
+- **Why it matters** — what gap in the current crew does it fill?
+
+### Add usage examples
+
+Real-world examples of how you use the Crew help everyone. Add them to `docs/examples.md` or share them in an issue.
 
 ### Report a bug
 
-Open an issue. Include:
+Open an issue with:
 - What you asked the agent to do
 - What it actually did
-- What you expected it to do
+- What you expected
 - Your vault structure (roughly) if relevant
 
 ---
 
 ## Skill file structure
 
-Each skill follows this pattern:
+Each skill file follows this format:
 
 ```yaml
 ---
-name: <agent-name>
+name: <agent-codename>
 description: >
   One paragraph description used for agent triggering.
-  Include Italian (or relevant language) trigger phrases here.
+  Include trigger phrases in multiple languages (English, Italian, French,
+  Spanish, German, Portuguese) for maximum discoverability.
 metadata:
   version: "x.x.x"
   agent-role: "<Display Name>"
 ---
 
-# <Agent Name> — <Subtitle>
+# <Display Name> — <Subtitle>
 
-[Agent instructions follow]
+[Agent instructions in English]
 ```
 
-The `description` field is used by Claude to decide *when* to activate the agent. Make sure trigger phrases are natural and match how a real user would actually speak.
+### Key rules for skill files
+
+1. **Write in English** — All skill instructions are in English. Agents respond in the user's language automatically.
+2. **Multilingual triggers** — The `description` field should include natural trigger phrases in at least English and Italian, ideally more languages.
+3. **Read user profile** — Agents should read `Meta/user-profile.md` for personalization. Never hardcode personal data.
+4. **Inter-agent messaging** — Every agent must include the messaging protocol section. See `references/inter-agent-messaging.md`.
+5. **Conservative by default** — Agents never delete, always archive. They ask before making structural decisions.
 
 ---
 
 ## Inter-agent messaging
 
-Agents communicate through `Meta/agent-messages.md` in the vault. The protocol is documented in `references/inter-agent-messaging.md`. If your new agent needs to communicate with existing ones, follow that protocol.
+Agents communicate through `Meta/agent-messages.md` in the user's vault. The protocol is documented in `references/inter-agent-messaging.md`. If your new or improved agent needs to communicate with existing ones, follow that protocol.
 
 ---
 
-## Philosophy to keep in mind
+## Agent names
 
-This project is built for people who are already overwhelmed. Contributions should make things **simpler**, not more complex. When in doubt, ask: *does this make life easier for someone who's barely keeping it together?*
+| Skill folder | Agent name | Role |
+|-------------|-----------|------|
+| `architect` | Architect | Vault Structure & Setup |
+| `scribe` | Scribe | Text Capture |
+| `sorter` | Sorter | Inbox Triage |
+| `seeker` | Seeker | Search & Retrieval |
+| `connector` | Connector | Knowledge Graph |
+| `librarian` | Librarian | Vault Maintenance |
+| `transcriber` | Transcriber | Audio & Transcription |
+| `postman` | Postman | Email & Calendar |
+| `food-coach` | Food Coach | Nutrition & Diet |
+| `wellness-guide` | Wellness Guide | Mental Health |
+
+---
+
+## Philosophy
+
+This project is built for people who are already overwhelmed. Contributions should make things **simpler**, not more complex.
+
+When in doubt, ask: *"Does this make life easier for someone who's barely keeping it together?"*
 
 If yes, it belongs here.
 

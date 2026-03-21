@@ -1,6 +1,15 @@
-# 🧠 Obsidian Vault Crew
+<p align="center">
+  <img src="https://img.shields.io/badge/Agents-10-blueviolet?style=for-the-badge" alt="10 Agents" />
+  <img src="https://img.shields.io/badge/Language-Any-success?style=for-the-badge" alt="Any Language" />
+  <img src="https://img.shields.io/badge/Platform-Obsidian%20%2B%20Claude-blue?style=for-the-badge" alt="Obsidian + Claude" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License" />
+</p>
 
-**A team of AI agents that manage your Obsidian vault — so your brain doesn't have to.**
+# My Brain Is Full - Crew
+
+### A team of 10 AI agents that manage your Obsidian vault — so your brain doesn't have to.
+
+You talk. They organize, file, connect, search, transcribe, triage your email, plan your meals, and support your mental health. In any language.
 
 ---
 
@@ -10,7 +19,7 @@ I'm a PhD researcher. I've spent years training my brain to hold enormous amount
 
 Then it didn't.
 
-Memory started slipping. Not dramatically — no diagnosis, no crisis — just the slow, creeping realization that the mental RAM was getting full, and things were falling through the cracks. I'd forget what I'd read. Lose track of conversations. Start projects I'd already started. Feel constantly behind, constantly overwhelmed.
+Memory started slipping. Not dramatically — no diagnosis, no crisis — just the slow, creeping realization that the mental budget was getting empty, and things were falling through the cracks. I'd forget what I'd read. Lose track of conversations. Start projects I'd already started. Feel constantly behind, constantly overwhelmed.
 
 I started looking for solutions. I found a lot of Obsidian + Claude setups online. They were mostly clever note-capture tools, glorified search engines for your second brain. Useful. But not what I needed.
 
@@ -22,38 +31,19 @@ So I built this.
 
 ## What makes this different
 
-Most Obsidian + AI tools are **for people who already have their life together** and want to optimize. This one is for people who are **drowning** and need a lifeline.
-
-A few things that set this apart:
+Most "AI + Obsidian" tools are built for **people who already have their life together** and want to optimize. This one is for people who are **drowning** and need a lifeline.
 
 **1. The chat IS the interface.**
 I don't browse Obsidian. I don't drag files around. I don't maintain complex folder structures manually. I just talk to Claude. Everything else happens automatically.
 
 **2. It's not just knowledge management.**
-The Crew includes a **personal nutritionist** (because my physical health was falling apart too) and a **mental health support agent** trained in CBT, ACT, and Mindfulness (because the two things are connected). These aren't gimmicks — they're agents with real depth that communicate with each other.
+The Crew includes a **personal food coach** (because my physical health was falling apart too) and a **mental health support agent** trained in CBT, ACT, and Mindfulness (because the two things are connected). These aren't gimmicks — they're agents with real depth that communicate with each other.
 
 **3. It speaks your language — literally.**
-Initial skills are in Italian because that's my native language. The system is designed for non-native English speakers. You shouldn't need to think in English to manage your brain. Multi-language support is a first-class feature, not an afterthought.
+The system works in any language. You shouldn't need to think in English to manage your brain. Just talk in Italian, French, German, Spanish, Japanese — whatever feels natural. The agents match you.
 
 **4. The agents talk to each other.**
-When the nutritionist notices you're stress-eating, it sends a message to the therapist. When the transcription agent processes a meeting, it flags follow-up tasks for the inbox manager. It's a crew, not a collection of isolated tools.
-
----
-
-## Meet the Crew
-
-| Agent | Role | What it does |
-|-------|------|------|
-| 📝 **Scriba** | Text capture | Turns your messy, fast-typed thoughts into clean Obsidian notes |
-| 📥 **Smistatore** | Inbox triage | Empties your inbox every evening, routes notes to the right place |
-| 🔍 **Cercatore** | Search & retrieval | Finds anything in your vault, answers questions with citations |
-| 🏛️ **Architetto** | Vault structure | Designs your folder system, templates, and naming conventions |
-| 🔗 **Connettore** | Knowledge graph | Finds missing links between notes, kills orphan notes |
-| 📚 **Bibliotecario** | Weekly maintenance | Runs vault health checks, fixes broken links, merges duplicates |
-| 🎤 **Trascrittore** | Transcription | Turns audio recordings and raw transcripts into structured meeting notes |
-| 📬 **Postino** | Gmail + Calendar | Processes your inbox and calendar into the vault |
-| 🥗 **Dietologo** | Nutrition coach | Personal nutritionist — meal plans, shopping lists, progress tracking |
-| 🧘 **Psicoterapeuta** | Mental health support | CBT + ACT + Mindfulness support — for when your brain needs a hand |
+When the food coach notices you're stress-eating, it sends a message to the wellness guide. When the transcription agent processes a meeting, it flags follow-up tasks for the inbox manager. It's a crew, not a collection of isolated tools.
 
 ---
 
@@ -69,51 +59,193 @@ If you've ever thought *"I need to get organized, but I'm too exhausted to get o
 
 ---
 
+## Important disclaimers
+
+### I'm not an expert
+
+Let me be upfront: **I am not a Claude Code expert.** I'm a PhD researcher who needed help and built something that works for me. This project is an accumulation of personal needs, not a polished product from someone who knows all the best practices.
+
+The code might not be optimal. The prompts might not be perfect. The architecture might make a seasoned Claude developer cringe. **And that's okay.** I'm sharing this because I believe it can help other people in my same situation, not because I think it's the definitive way to do things.
+
+If you know Claude Code better than I do — and chances are you do — **please contribute.** Every PR is welcome. Every suggestion, every critique, every improvement. I want this to get better, and I know it will get better faster with help from people who actually know what they're doing.
+
+### On the health and wellness agents
+
+> **This needs to be crystal clear, so I'm going to say it plainly.**
+
+The **Food Coach** and **Wellness Guide** agents are **AI-generated output. Nothing more.** They are not medical professionals. They are not licensed therapists. They are not dietitians. They are language models following instructions I wrote based on my own personal needs.
+
+**I take absolutely no responsibility for the output of these agents.** Specifically:
+
+- The Food Coach agent **does not provide medical advice.** Its meal plans, calorie calculations, and dietary suggestions are AI-generated and may be inaccurate, incomplete, or inappropriate for your specific health situation. **Always consult a real doctor or registered dietitian** before making changes to your diet, especially if you have medical conditions.
+
+- The Wellness Guide agent **does not provide therapy.** It applies techniques from CBT, ACT, and Mindfulness based on publicly available frameworks, but it is **not a substitute for professional mental health care.** It cannot diagnose anything. It should never be your only source of support. **If you are in crisis, contact a real mental health professional or emergency service immediately.**
+
+- The health agents are designed as **personal wellness companions** — think of them as a structured journal with suggestions, not as healthcare providers. They were built because I personally needed help tracking my nutrition and processing my thoughts between therapy sessions. They helped me. They might help you. But they come with **zero guarantees.**
+
+- **No warranty, no liability.** This is an open-source project provided "as is". I am not responsible for any decisions you make based on the output of any agent in this system. Use your own judgment. Consult real professionals for real health decisions.
+
+Both health agents are **opt-in** during onboarding. You can use the Vault Crew purely for knowledge management if you prefer.
+
+### General disclaimer
+
+This project is provided **as is, with no warranty of any kind.** I don't guarantee that it works correctly, that it won't lose your notes, or that the agents will behave as described in every situation. It's a personal project that I'm sharing openly. Use it at your own risk, back up your vault, and **please open an issue** if something goes wrong so we can fix it together.
+
+### On forks and misuse
+
+This project was built to help people. That's it. It's meant to support overwhelmed individuals in organizing their lives, their health, and their mental wellbeing.
+
+**I take no responsibility for forks, modifications, or derivative works** that use this code for purposes other than its original intent. If someone takes this project and repurposes it to manipulate, deceive, harm, or exploit people in any way — that's on them, not on me. I explicitly condemn any use of this work for malicious purposes, including but not limited to: unauthorized data collection, psychological manipulation, impersonation of medical or mental health professionals, or any form of exploitation.
+
+This is a tool for self-care and personal organization. If you fork it, please keep it that way.
+
+---
+
+## The Crew
+
+| # | Agent | Role | Superpower |
+|---|-------|------|------------|
+| 1 | **Architect** | Vault Structure & Setup | Designs your entire vault, runs onboarding, sets the rules everyone follows |
+| 2 | **Scribe** | Text Capture | Transforms your messy, typo-filled, stream-of-consciousness dumps into clean notes |
+| 3 | **Sorter** | Inbox Triage | Empties your inbox every evening — routes every note to its perfect home |
+| 4 | **Seeker** | Search & Intelligence | Finds anything in your vault, synthesizes answers across notes with citations |
+| 5 | **Connector** | Knowledge Graph | Discovers hidden links between your notes — even ones you'd never think of |
+| 6 | **Librarian** | Vault Maintenance | Weekly health checks, deduplication, broken link repair, growth analytics |
+| 7 | **Transcriber** | Audio & Meetings | Turns recordings and transcripts into rich, structured meeting notes |
+| 8 | **Postman** | Email & Calendar | Bridges Gmail and Google Calendar with your vault — deadline radar, meeting prep |
+| 9 | **Food Coach** | Diet & Wellness | Personal nutrition coach — meal plans, grocery lists, progress tracking, motivation |
+| 10 | **Wellness Guide** | Mental Health Support | CBT + ACT + Mindfulness — burnout, anxiety, rumination, grounding, sleep |
+
+> **The agents talk to each other.** When the Food Coach notices stress-eating patterns, it flags the Wellness Guide. When the Transcriber processes a meeting, it alerts the Sorter. When the Postman finds emails about a new project, it tells the Architect to create a folder. It's a crew, not a collection of isolated tools.
+
+---
+
 ## How it works
 
-The plugin runs inside **Claude's Cowork mode**. You connect it to your Obsidian vault folder, and you interact entirely through chat. No GUI, no drag-and-drop, no manual file management.
-
 ```
-You → Claude chat → Agent picks up your intent → Does the work → Updates your vault
+You talk to Claude  →  The right agent activates  →  Your vault gets updated
 ```
 
-The vault structure is a hybrid **PARA + Zettelkasten** system:
+The Vault Crew runs inside **Claude Code's Cowork mode**. You point it at your Obsidian vault folder, and from that moment on, you manage everything through conversation. No GUI, no drag-and-drop, no manual file management.
+
+Your vault follows a hybrid **PARA + Zettelkasten** structure:
 
 ```
-00-Inbox/       → Everything new lands here first
-01-Projects/    → Active projects with deadlines
-02-Areas/       → Ongoing responsibilities (including Health)
-03-Resources/   → Reference material
-04-Archive/     → Completed / historical content
-05-People/      → Personal CRM
-06-Meetings/    → Meeting notes
-07-Daily/       → Daily notes
-MOC/            → Maps of Content (thematic indexes)
-Templates/      → Obsidian templates
-Meta/           → Vault health, agent messages
+00-Inbox/          Capture everything here first
+01-Projects/       Active projects with deadlines
+02-Areas/          Ongoing responsibilities (including Health)
+03-Resources/      Reference material, guides, how-tos
+04-Archive/        Completed or historical content
+05-People/         Your personal CRM
+06-Meetings/       Timestamped meeting notes
+07-Daily/          Daily notes and journals
+MOC/               Maps of Content — thematic indexes
+Templates/         Obsidian note templates
+Meta/              Vault config, agent messages, health reports
 ```
 
 ---
 
-## Getting started
+## Quick start
 
-1. Install the plugin in Claude's Cowork mode
-2. Mount your Obsidian vault folder
-3. Say **"inizializza il vault"** (or "initialize the vault") — the Architetto sets everything up
-4. Start dumping thoughts — paste text for the Scriba, upload audio for the Trascrittore
-5. Say **"smista la inbox"** at the end of the day
-6. Say **"review settimanale"** once a week
-7. Connect Gmail and Google Calendar to activate the Postino
+### 1. Install the plugin
+
+**Option A — Plugin install (recommended):**
+
+Open Claude Code and type:
+
+```
+/plugin install obsidian-vault-crew
+```
+
+That's it. All 10 agents are now available.
+
+**Option B — Load from GitHub:**
+
+```bash
+git clone https://github.com/gnekt/obsidian-vault-crew.git
+claude --plugin-dir /path/to/obsidian-vault-crew
+```
+
+**Option C — Manual skill copy (fallback):**
+
+```bash
+git clone https://github.com/gnekt/obsidian-vault-crew.git
+cp -r obsidian-vault-crew/skills/* ~/.claude/skills/
+```
+
+> **Not comfortable with the terminal?** Ask a tech-savvy friend — it takes 30 seconds. Or see the [step-by-step guide](docs/getting-started.md) with screenshots and explanations.
+
+### 2. Connect your vault
+
+Open Claude Code and navigate to your Obsidian vault folder (or tell Claude where it is).
+
+### 3. Initialize
+
+Say this to Claude:
+
+> **"Initialize my vault"**
+
+The **Architect** will start a friendly onboarding conversation:
+
+1. **Who are you?** — Name, language, role, what brought you here
+2. **What do you need?** — Which agents to activate, which areas of life to manage
+3. **Health setup** *(optional)* — Physical profile for the Food Coach, preferences for the Wellness Guide
+4. **Integrations** — Gmail and Google Calendar connections
+
+After onboarding, the Architect creates your entire vault structure, saves your profile, and hands you a personalized welcome note.
+
+### 4. Start using it
+
+| You say | What happens |
+|---------|-------------|
+| *"Save this: meeting with Marco about the Q3 budget, he wants the report by Friday"* | **Scribe** captures it as a clean note with tasks, wikilinks, and deadline |
+| *"Triage my inbox"* | **Sorter** files everything, updates MOCs, gives you a summary |
+| *"What did we decide about the pricing strategy?"* | **Seeker** searches your vault, synthesizes the answer with source citations |
+| *"Check my email"* | **Postman** scans Gmail, saves important emails, flags deadlines |
+| *"What should I eat this week?"* | **Food Coach** creates a personalized meal plan based on your profile |
+| *"I'm feeling overwhelmed"* | **Wellness Guide** guides you through grounding techniques and helps you decompress |
+| *"Weekly review"* | **Librarian** runs a full vault audit — broken links, duplicates, health score |
+| *"Find connections for my latest note"* | **Connector** discovers hidden links to other notes in your vault |
 
 ---
 
-## Required connectors
+## Works in any language
 
-The **Postino** agent requires two connected services:
-- **Gmail** — to read and process your inbox
-- **Google Calendar** — to import events and manage your schedule
+The Vault Crew is built in English but **responds in whatever language you write in**. Italian, French, Spanish, German, Portuguese, Japanese — just talk, and the agents match you.
 
-Both are bundled with the plugin.
+```
+"Salva questa nota veloce..."          → Scribe responds in Italian
+"Vérifie mon email..."                 → Postman responds in French
+"Was habe ich diese Woche geplant?"    → Food Coach responds in German
+"Check my inbox"                       → Sorter responds in English
+```
+
+No translations to install. No language packs. It just works.
+
+---
+
+## Agent inter-communication
+
+Agents coordinate through a shared message board at `Meta/agent-messages.md`. This creates a lightweight asynchronous coordination layer:
+
+- The **Postman** finds emails about a medical appointment → leaves a message for the **Food Coach**
+- The **Sorter** finds an emotional journal entry → flags it for the **Wellness Guide**
+- The **Transcriber** processes a meeting that introduces a new project → alerts the **Architect**
+- The **Food Coach** notices stress-eating patterns → coordinates with the **Wellness Guide**
+- The **Connector** finds orphan notes → asks the **Librarian** to investigate
+
+No agent works in isolation. The crew is greater than the sum of its parts.
+
+---
+
+## Required integrations
+
+The **Postman** agent requires:
+- **Gmail** MCP connector — to read and process your inbox
+- **Google Calendar** MCP connector — to import events and manage your schedule
+
+All other agents work with just your local Obsidian vault.
 
 ---
 
@@ -125,66 +257,95 @@ Both are bundled with the plugin.
 
 ---
 
-## On the health and mental wellness agents
-
-I want to be transparent about what these agents are and aren't.
-
-The **Dietologo** is a nutrition support tool. It helps with meal planning, shopping lists, calorie awareness, and motivation. It is not a substitute for a dietitian or doctor. If you have medical conditions affecting your diet, please consult a professional.
-
-The **Psicoterapeuta** is a mental health support agent trained in CBT, ACT, and Mindfulness techniques. It is explicitly designed to **support** (not replace) professional therapy. It won't diagnose you. It will listen, help you apply evidence-based techniques, and actively encourage you to bring insights to your real therapist.
-
-I built these because I needed them. They've been genuinely helpful. But they come with the same caveat every responsible tool comes with: if you're in crisis, please reach out to a real human.
-
----
-
-## Languages
-
-Current skills are written in Italian (with English skill descriptions for discoverability). The system is language-aware — agents respond in the language you write in.
-
-The roadmap includes skill variants for other languages. If you want to contribute a translation, see [CONTRIBUTING.md](CONTRIBUTING.md).
-
----
-
-## Structure of this repo
+## Project structure
 
 ```
 obsidian-vault-crew/
-├── plugin.json                  → Plugin manifest
+├── .claude-plugin/
+│   └── plugin.json                Plugin manifest
+├── CLAUDE.md                       Installation & development guide
+├── README.md                       You are here
+├── CONTRIBUTING.md                 How to contribute
+├── docs/
+│   ├── getting-started.md          Step-by-step setup guide (non-technical)
+│   ├── agents/                     Deep-dive into each agent
+│   │   ├── architect.md
+│   │   ├── scribe.md
+│   │   ├── sorter.md
+│   │   ├── seeker.md
+│   │   ├── connector.md
+│   │   ├── librarian.md
+│   │   ├── transcriber.md
+│   │   ├── postman.md
+│   │   ├── food-coach.md
+│   │   └── wellness-guide.md
+│   └── examples.md                 Real-world usage examples
 ├── references/
-│   ├── agents.md                → Agent registry and inter-agent communication
-│   └── inter-agent-messaging.md → Messaging protocol between agents
+│   ├── agents.md                   Agent registry (for agents to read)
+│   └── inter-agent-messaging.md    Communication protocol
 └── skills/
-    ├── architetto/SKILL.md
-    ├── bibliotecario/SKILL.md
-    ├── cercatore/SKILL.md
-    ├── connettore/SKILL.md
-    ├── dietologo/SKILL.md
-    ├── postino/SKILL.md
-    ├── psicoterapeuta/SKILL.md
-    ├── scriba/SKILL.md
-    ├── smistatore/SKILL.md
-    └── trascrittore/SKILL.md
+    ├── architect/SKILL.md          Architect agent
+    ├── scribe/SKILL.md             Scribe agent
+    ├── sorter/SKILL.md             Sorter agent
+    ├── seeker/SKILL.md             Seeker agent
+    ├── connector/SKILL.md          Connector agent
+    ├── librarian/SKILL.md          Librarian agent
+    ├── transcriber/SKILL.md        Transcriber agent
+    ├── postman/SKILL.md            Postman agent
+    ├── food-coach/SKILL.md          Food Coach agent
+    └── wellness-guide/SKILL.md     Wellness Guide agent
 ```
 
 ---
 
-## Contributing
+## Contributing — seriously, please help
 
-This started as a very personal project to fix a very personal problem. But the problems it tries to solve — overwhelm, memory, health, the feeling that you're always behind — are pretty universal.
+This started as one person's survival tool. I'm sharing it because I think it can help others, but **I know it can be much better** — and I need help from people who know Claude Code, prompt engineering, and Obsidian better than I do.
 
-If you:
-- Want to translate skills into your language
-- Have a skill idea (a new crew member)
-- Found a bug or want to improve a skill
+**Every single PR is welcome.** I mean it. If you see something that could be improved — a better prompt structure, a smarter agent behavior, a more elegant architecture — please submit it. I won't be precious about my code. The goal is to help people, not to protect my ego.
 
-...PRs and issues are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md).
+If you want to:
+- **Improve an agent** — make it smarter, add a mode, fix edge cases
+- **Fix my prompts** — if you know better patterns, teach me
+- **Propose a new crew member** — a new agent for a new domain
+- **Report a bug** — something an agent does wrong
+- **Add examples** — share how you use the Crew
+- **Just tell me what I'm doing wrong** — I'll listen
+
+...PRs, issues, and honest feedback are all welcome. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+---
+
+## Philosophy
+
+> *"The best organizational system is the one you actually use."*
+
+The Vault Crew is designed for people who are overwhelmed, not for people who enjoy organizing. Every design decision prioritizes **minimum friction**:
+
+- **Chat is the interface** — no manual file management
+- **Agents handle the boring stuff** — filing, linking, maintaining
+- **Health is not separate from productivity** — your body and mind affect your work
+- **Any language, any time** — your brain shouldn't have to switch languages to stay organized
+- **Conservative by default** — agents never delete, always archive. They ask before making big decisions.
+
+---
+
+## Star this repo
+
+If the Vault Crew helps you — or if you just think it's a cool idea — consider starring this repo. It helps others find it, and it motivates continued development.
 
 ---
 
 ## License
 
-MIT — do whatever you want with it, just don't remove the attribution.
+MIT — use it, modify it, share it. Just keep the attribution.
+
+**THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.** The authors are not liable for any claim, damages, or other liability arising from the use of this software. This includes, without limitation, any health-related advice or output generated by the Food Coach and Wellness Guide agents. See the [MIT License](LICENSE) for full terms.
 
 ---
 
-*Built by a PhD who got tired of forgetting things.*
+<p align="center">
+  <i>Built by someone who got tired of forgetting things.</i>
+  <br><br>
+  <a href="docs/getting-started.md"><strong>Get Started</strong></a> · <a href="docs/examples.md"><strong>Examples</strong></a> · <a href="docs/agents/architect.md"><strong>Meet the Agents</strong></a> · <a href="CONTRIBUTING.md"><strong>Contribute</strong></a>
+</p>

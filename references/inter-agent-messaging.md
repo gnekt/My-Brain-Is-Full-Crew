@@ -8,8 +8,8 @@ This document defines how agents communicate with each other asynchronously thro
 
 Every agent has **two mandatory steps** that wrap every task:
 
-1. **Before starting any task** → read `Meta/agent-messages.md`, check for messages addressed to you, and resolve any pending items first.
-2. **During a task, when encountering uncertainty or problems** → leave a message for the appropriate agent in `Meta/agent-messages.md`.
+1. **Before starting any task** — read `Meta/agent-messages.md`, check for messages addressed to you, and resolve any pending items first.
+2. **During a task, when encountering uncertainty or problems** — leave a message for the appropriate agent in `Meta/agent-messages.md`.
 
 This creates a lightweight coordination layer that lets agents help each other without requiring the user to manually coordinate between them.
 
@@ -17,21 +17,19 @@ This creates a lightweight coordination layer that lets agents help each other w
 
 ## The Message Board File
 
-The file `Meta/agent-messages.md` lives in the vault and is structured as a series of messages, each with a clear header. Agents read it at the start of their session and append to it when they have something to communicate.
-
-### File Location
+### Location
 `Meta/agent-messages.md`
 
-### File Format
+### Format
 
 ```markdown
 # Agent Message Board
 
-<!-- Messages are listed newest-first. Resolved messages are marked ✅ and kept for 7 days, then cleaned up by the Bibliotecario. -->
+<!-- Messages are listed newest-first. Resolved messages are marked with a checkmark and kept for 7 days, then archived by the Librarian. -->
 
 ---
 
-## ⏳ [YYYY-MM-DD] FROM: {{AgentName}} → TO: {{AgentName}}
+## [pending] [YYYY-MM-DD] FROM: {{AgentName}} -> TO: {{AgentName}}
 **Subject**: {{Brief subject line}}
 
 **Context**: {{What I was doing when I encountered this}}
@@ -44,7 +42,7 @@ The file `Meta/agent-messages.md` lives in the vault and is structured as a seri
 
 ---
 
-## ✅ [YYYY-MM-DD] FROM: {{AgentName}} → TO: {{AgentName}} — RESOLVED
+## [resolved] [YYYY-MM-DD] FROM: {{AgentName}} -> TO: {{AgentName}}
 **Subject**: {{Brief subject line}}
 
 **Resolution**: {{What was decided / done}}
@@ -61,11 +59,11 @@ The file `Meta/agent-messages.md` lives in the vault and is structured as a seri
 At the start of **every task**, before doing anything else:
 
 1. Read `Meta/agent-messages.md`
-2. Look for messages with `→ TO: {{YourAgentName}}` that are marked `⏳` (pending)
+2. Look for messages with `-> TO: {{YourAgentName}}` that are marked `[pending]`
 3. For each pending message addressed to you:
    - Read the full message
    - Act on it (make the structural change, answer the question, create the folder, etc.)
-   - Mark the message as resolved by changing `⏳` to `✅` and adding a **Resolution** line
+   - Mark the message as resolved by changing `[pending]` to `[resolved]` and adding a **Resolution** line
 4. Once all your pending messages are resolved, proceed with the user's task
 
 If `Meta/agent-messages.md` doesn't exist yet, create it with the header and an empty state:
@@ -73,7 +71,7 @@ If `Meta/agent-messages.md` doesn't exist yet, create it with the header and an 
 ```markdown
 # Agent Message Board
 
-<!-- Messages are listed newest-first. Resolved messages are marked ✅ and kept for 7 days, then cleaned up by the Bibliotecario. -->
+<!-- Messages are listed newest-first. Resolved messages are marked [resolved] and kept for 7 days, then archived by the Librarian. -->
 
 *(No messages yet)*
 ```
@@ -86,7 +84,7 @@ During your task, if you encounter a situation where:
 - You find a problem that another agent should fix
 - You have a suggestion for improving how something is organized
 
-**→ Append a message to `Meta/agent-messages.md`** addressed to the right agent.
+**Append a message to `Meta/agent-messages.md`** addressed to the right agent.
 
 Always include:
 - **Your name** as sender
@@ -132,49 +130,70 @@ After leaving a message, don't block — continue with the rest of your task. Ei
 
 ---
 
+## Agent Name Reference
+
+Use these names in messages:
+
+| Agent | Use in messages |
+|-------|----------------|
+| Architect | `FROM/TO: Architect` |
+| Scribe | `FROM/TO: Scribe` |
+| Sorter | `FROM/TO: Sorter` |
+| Seeker | `FROM/TO: Seeker` |
+| Connector | `FROM/TO: Connector` |
+| Librarian | `FROM/TO: Librarian` |
+| Transcriber | `FROM/TO: Transcriber` |
+| Postman | `FROM/TO: Postman` |
+| Food Coach | `FROM/TO: Food Coach` |
+| Wellness Guide | `FROM/TO: Wellness Guide` |
+
+---
+
 ## Example Messages
 
-### Example 1: Smistatore → Architetto (structural gap)
+### Example 1: Sorter -> Architect (structural gap)
 
 ```markdown
-## ⏳ [2026-03-20] FROM: Smistatore → TO: Architetto
-**Subject**: Nessuna area per note di "Finanza Personale"
+## [pending] [2026-03-20] FROM: Sorter -> TO: Architect
+**Subject**: No area for "Personal Finance" notes
 
-**Context**: Stavo smistando la inbox e ho trovato 3 note su budget personale, spese mensili e obiettivi di risparmio.
+**Context**: While triaging the inbox, I found 3 notes about personal budgeting, monthly expenses, and savings goals.
 
-**Problem**: Non esiste nessuna cartella in `02-Areas/` dedicata alla finanza personale. Le aree esistenti sono: Engineering, Marketing, Sales, HR. Queste note non appartengono a nessuna di esse.
+**Problem**: No folder exists in `02-Areas/` for personal finance. Existing areas are: Engineering, Marketing, Sales, HR. These notes don't belong to any of them.
 
-**My Proposed Solution**: Creare `02-Areas/Finanza Personale/` con un index.md e un MOC dedicato. Le 3 note potrebbero vivere lì. In alternativa, se la finanza è considerata troppo personale per le "aree di responsabilità", si potrebbe creare una categoria apposita.
+**My Proposed Solution**: Create `02-Areas/Personal Finance/` with an index.md and a dedicated MOC. The 3 notes could live there. Alternatively, if finance is considered too personal for "areas of responsibility", a dedicated category could be created.
 
-**Impact if unresolved**: Ho temporaneamente lasciato le 3 note in `03-Resources/Finance/` come soluzione provvisoria. Se l'Architetto crea l'area dedicata, basterà spostarle.
+**Impact if unresolved**: I temporarily placed the 3 notes in `03-Resources/Finance/` as a provisional solution. If the Architect creates the dedicated area, they can be moved.
 ```
 
-### Example 2: Architetto → Smistatore (risoluzione)
+### Example 2: Resolution
 
 ```markdown
-## ✅ [2026-03-21] FROM: Smistatore → TO: Architetto — RESOLVED
-**Subject**: Nessuna area per note di "Finanza Personale"
+## [resolved] [2026-03-21] FROM: Sorter -> TO: Architect
+**Subject**: No area for "Personal Finance" notes
 
-**Resolution**: Creata `02-Areas/Finanza Personale/` con index.md e `MOC/Finanza Personale.md`. Tag taxonomy aggiornata con `#area/finanza-personale`. Le note in `03-Resources/Finance/` possono essere spostate lì dallo Smistatore nella prossima sessione.
+**Resolution**: Created `02-Areas/Personal Finance/` with index.md and `MOC/Personal Finance.md`. Tag taxonomy updated with `#area/personal-finance`. Notes in `03-Resources/Finance/` can be moved by the Sorter in the next session.
 ```
 
-### Example 3: Connettore → Bibliotecario (problema qualità)
+### Example 3: Food Coach -> Wellness Guide (cross-domain)
 
 ```markdown
-## ⏳ [2026-03-20] FROM: Connettore → TO: Bibliotecario
-**Subject**: 12 note in `01-Projects/Alpha/` senza frontmatter `project` field
+## [pending] [2026-03-20] FROM: Food Coach -> TO: Wellness Guide
+**Subject**: Possible stress-eating pattern detected
 
-**Context**: Stavo analizzando le connessioni nel progetto Alpha e ho scoperto che 12 note non hanno il campo `project:` nel frontmatter, il che le rende invisibili alle query Dataview sul progetto.
+**Context**: During a meal logging session, the user reported eating a large unplanned meal and explicitly connected it to work stress ("I was so stressed about the deadline").
 
-**My Proposed Solution**: Aggiungere `project: "Alpha"` al frontmatter di tutte e 12 le note. Il titolo è abbastanza specifico che il rischio di errore è basso.
+**Problem**: This is the second time this week the user has reported stress-driven eating. This may indicate a pattern worth exploring from a psychological perspective.
 
-**Impact if unresolved**: Le query Dataview sul progetto Alpha restituiscono risultati incompleti. Ho continuato l'analisi ma ho escluso queste note dal report.
+**My Proposed Solution**: In your next session with the user, consider exploring the connection between work stress and eating patterns. ACT-based strategies for sitting with discomfort without turning to food might be helpful.
+
+**Impact if unresolved**: I provided supportive, non-judgmental guidance and a concrete plan for tomorrow's meals. I did not attempt to address the emotional component — that's your domain.
 ```
 
 ---
 
 ## Message Retention Policy
 
-- **⏳ Pending messages**: stay until resolved
-- **✅ Resolved messages**: kept for 7 days, then removed by the Bibliotecario during weekly maintenance
-- **Old resolved messages**: archived to `Meta/agent-message-archive/{{YYYY-MM}}.md` by the Bibliotecario
+- **[pending] messages**: stay until resolved
+- **[resolved] messages**: kept for 7 days, then removed by the Librarian during weekly maintenance
+- **Archived messages**: moved to `Meta/agent-message-archive/{{YYYY-MM}}.md` by the Librarian

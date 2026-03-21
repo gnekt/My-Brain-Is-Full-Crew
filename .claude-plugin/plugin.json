@@ -1,0 +1,37 @@
+{
+  "name": "obsidian-vault-crew",
+  "version": "1.0.0",
+  "description": "A crew of 10 AI agents that run your Obsidian vault like a team of personal assistants — capturing notes, triaging your inbox, managing your calendar and email, tracking your nutrition, supporting your mental health, and keeping everything connected. Works in any language.",
+  "author": {
+    "name": "@gnekt (Christian Di Maio)",
+    "url": "https://github.com/gnekt"
+  },
+  "repository": "https://github.com/gnekt/obsidian-vault-crew",
+  "license": "MIT",
+  "keywords": [
+    "obsidian",
+    "vault",
+    "knowledge-management",
+    "zettelkasten",
+    "PARA",
+    "note-taking",
+    "second-brain",
+    "AI-agents",
+    "claude",
+    "transcription",
+    "gmail",
+    "google-calendar",
+    "email",
+    "nutrition",
+    "diet",
+    "health",
+    "mindfulness",
+    "cbt",
+    "act",
+    "mental-health",
+    "productivity",
+    "multilingual",
+    "cowork"
+  ],
+  "skills": "./skills/"
+}
