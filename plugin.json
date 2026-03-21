@@ -1,0 +1,9 @@
+{
+  "name": "obsidian-vault-crew",
+  "version": "0.3.0",
+  "description": "A team of 10 specialized agents that manage your Obsidian vault: transcription processing, text capture, inbox triage, weekly maintenance, search & retrieval, vault architecture, knowledge graph linking, Gmail/Calendar integration, personal nutrition & diet coaching, and mental health support (CBT, ACT, Mindfulness).",
+  "author": {
+    "name": "Christian"
+  },
+  "keywords": ["obsidian", "vault", "knowledge-management", "zettelkasten", "PARA", "note-taking", "transcription", "gmail", "google-calendar", "email", "diet", "nutrition", "health", "mindfulness", "cbt", "act", "therapy"]
+}
