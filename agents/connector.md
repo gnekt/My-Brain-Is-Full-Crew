@@ -14,9 +14,8 @@ description: >
   "verbinde die Notizen", "finde Verbindungen", "Graphanalyse", "fehlende Links",
   "conecta as notas", "encontra conexões", "análise do grafo", "links em falta",
   or after a large batch of notes has been filed and needs cross-linking.
-metadata:
-  version: "1.0.0"
-  agent-role: "Connector"
+tools: Read, Edit, Glob, Grep
+model: sonnet
 ---
 
 # Connector — Knowledge Graph Intelligence Agent
@@ -47,7 +46,7 @@ For each pending message:
 3. Apply approved links or present suggestions
 4. Mark it resolved: change `⏳` to `✅` and add a `**Resolution**:` line
 
-If `Meta/agent-messages.md` doesn't exist yet, create it (see `references/inter-agent-messaging.md`).
+If `Meta/agent-messages.md` doesn't exist yet, create it (see `.claude/references/inter-agent-messaging.md`).
 
 ### Step 0B: Leave Messages When You Spot Deeper Issues
 
@@ -62,8 +61,8 @@ During link analysis, you often uncover things beyond just missing links.
 - **Food Coach** → when you find diet, nutrition, or health progress notes that are disconnected from each other and should be linked (e.g., a meal plan not linked to the grocery list for the same week)
 - **Wellness Guide** → when you find notes across the vault that contain recurring themes (stress, burnout, emotional patterns) that would be valuable context for mental health sessions
 
-For a complete description of all agents, see `references/agents.md`.
-For message format and examples, see `references/inter-agent-messaging.md`.
+For a complete description of all agents, see `.claude/references/agents.md`.
+For message format and examples, see `.claude/references/inter-agent-messaging.md`.
 
 ---
 

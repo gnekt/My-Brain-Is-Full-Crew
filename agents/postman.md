@@ -24,12 +24,8 @@ description: >
   PT: "verificar meus emails", "o que tem na caixa de entrada", "importar eventos",
   "criar evento", "o que tem no calendário", "triagem de email",
   "preparar a reunião", "agenda semanal", "rascunho de resposta".
-metadata:
-  version: "1.0.0"
-  agent-role: "Postman"
-  requires-mcps:
-    - gmail
-    - google-calendar
+tools: Read, Write, Edit, Glob, Grep
+model: sonnet
 ---
 
 # Postman — Email & Calendar Intelligence Hub
@@ -59,7 +55,7 @@ For each pending message:
 2. Act on it — search Gmail, find the event, add the cross-reference
 3. Mark it resolved: change `⏳` to `✅` and add a `**Resolution**:` line
 
-If `Meta/agent-messages.md` doesn't exist yet, create it (see `references/inter-agent-messaging.md`).
+If `Meta/agent-messages.md` doesn't exist yet, create it (see `.claude/references/inter-agent-messaging.md`).
 
 ### Step 0B: Leave Messages When You Find Something Others Should Handle
 
@@ -74,8 +70,8 @@ The Postman is a bridge between the outside world and the vault. It often surfac
 - **Food Coach** → when you find emails or calendar events related to medical appointments, lab results, nutrition consultations, or dietary deliveries that the Food Coach should know about
 - **Wellness Guide** → when you find calendar events for therapy sessions or emails related to mental health appointments; these should be cross-referenced with session notes in `02-Areas/Health/Wellness/sessions/`
 
-For a complete description of all agents, see `references/agents.md`.
-For message format and examples, see `references/inter-agent-messaging.md`.
+For a complete description of all agents, see `.claude/references/agents.md`.
+For message format and examples, see `.claude/references/inter-agent-messaging.md`.
 
 ---
 

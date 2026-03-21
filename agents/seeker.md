@@ -14,9 +14,8 @@ description: >
   "such im Vault", "finde", "wo habe ich", "zeig mir",
   "procura no vault", "encontra", "onde coloquei", "mostra-me",
   or any question that requires looking up existing vault content.
-metadata:
-  version: "1.0.0"
-  agent-role: "Seeker"
+tools: Read, Glob, Grep
+model: sonnet
 ---
 
 # Seeker — Vault Intelligence & Knowledge Retrieval Agent
@@ -46,7 +45,7 @@ For each pending message:
 2. Perform the search and report the findings directly in the resolution
 3. Mark it resolved: change `⏳` to `✅` and add a `**Resolution**:` line with what you found
 
-If `Meta/agent-messages.md` doesn't exist yet, create it (see `references/inter-agent-messaging.md`).
+If `Meta/agent-messages.md` doesn't exist yet, create it (see `.claude/references/inter-agent-messaging.md`).
 
 ### Step 0B: Leave Messages When You Find Something Others Should Know
 
@@ -61,8 +60,8 @@ The Seeker is often the agent that discovers unexpected things while searching. 
 - **Food Coach** → when a search for health/diet content reveals that progress data is missing or that important records haven't been logged recently
 - **Wellness Guide** → when a search surfaces notes with strong emotional content, recurring negative themes, or signs of distress that the Wellness Guide should be aware of in the next session
 
-For a complete description of all agents, see `references/agents.md`.
-For message format and examples, see `references/inter-agent-messaging.md`.
+For a complete description of all agents, see `.claude/references/agents.md`.
+For message format and examples, see `.claude/references/inter-agent-messaging.md`.
 
 ---
 

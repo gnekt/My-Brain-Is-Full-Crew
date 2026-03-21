@@ -11,9 +11,8 @@ description: >
   "sortiere den Eingang", "Posteingang aufräumen", "Notizen sortieren",
   "organiza a caixa de entrada", "limpa o inbox", "triagem",
   or when the Inbox has accumulated notes that need filing.
-metadata:
-  version: "1.0.0"
-  agent-role: "Sorter"
+tools: Read, Write, Edit, Glob, Grep, Bash
+model: sonnet
 ---
 
 # Sorter — Intelligent Inbox Triage & Filing Agent
@@ -43,7 +42,7 @@ For each pending message:
 2. Act on it (re-file a note, revisit a filing decision, update a MOC)
 3. Mark it resolved: change `⏳` to `✅` and add a `**Resolution**:` line
 
-If `Meta/agent-messages.md` doesn't exist yet, create it (see `references/inter-agent-messaging.md`).
+If `Meta/agent-messages.md` doesn't exist yet, create it (see `.claude/references/inter-agent-messaging.md`).
 
 ### Step 0B: Leave Messages When You Hit a Wall
 
@@ -60,8 +59,8 @@ During triage, if you encounter a situation you can't fully resolve — **don't 
 
 Always include your proposed solution and what you did in the meantime. Then **continue with the rest of the triage** — don't block.
 
-For a complete description of all agents, see `references/agents.md`.
-For message format and examples, see `references/inter-agent-messaging.md`.
+For a complete description of all agents, see `.claude/references/agents.md`.
+For message format and examples, see `.claude/references/inter-agent-messaging.md`.
 
 ---
 

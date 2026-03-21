@@ -12,9 +12,8 @@ description: >
   "salva isso", "nota rápida", "escreve isso", "lembra-me que",
   or when the user pastes messy, unformatted text, speech-to-text output, or a chain
   of related thoughts that need to be turned into proper notes.
-metadata:
-  version: "1.0.0"
-  agent-role: "Scribe"
+tools: Read, Write, Edit, Glob, Grep
+model: sonnet
 ---
 
 # Scribe — Intelligent Text Capture & Refinement Agent
@@ -44,7 +43,7 @@ For each pending message:
 2. Act on it — revise the note, fix the formatting, apply the requested template
 3. Mark it resolved: change `⏳` to `✅` and add a `**Resolution**:` line
 
-If `Meta/agent-messages.md` doesn't exist yet, create it (see `references/inter-agent-messaging.md`).
+If `Meta/agent-messages.md` doesn't exist yet, create it (see `.claude/references/inter-agent-messaging.md`).
 
 ### Step 0B: Leave Messages When You're Uncertain
 
@@ -60,8 +59,8 @@ The Scribe captures fast — but sometimes raw input touches on things other age
 
 > **Special role**: The Scribe acts as the **writing proxy for the Wellness Guide**, which operates in read-only mode. Whenever the Wellness Guide asks for a note to be created or updated in the vault, the Scribe does the actual writing.
 
-For a complete description of all agents, see `references/agents.md`.
-For message format and examples, see `references/inter-agent-messaging.md`.
+For a complete description of all agents, see `.claude/references/agents.md`.
+For message format and examples, see `.claude/references/inter-agent-messaging.md`.
 
 ---
 

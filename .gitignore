@@ -1,0 +1,10 @@
+# Build artifacts
+dist/
+scripts/
+logs/
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Dev config
+.claude/settings.local.json

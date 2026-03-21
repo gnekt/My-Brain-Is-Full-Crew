@@ -1,6 +1,6 @@
 # Real-World Usage Examples
 
-Practical scenarios showing how the Vault Crew works in daily life. Each example shows what you say and what happens behind the scenes.
+Practical scenarios showing how the Crew works in daily life. Each example shows what you say and what happens behind the scenes.
 
 ---
 
@@ -231,4 +231,4 @@ Practical scenarios showing how the Vault Crew works in daily life. Each example
 
 ---
 
-*These are just examples. The beauty of the Vault Crew is that you don't need to memorize commands — just talk naturally, and the right agent will pick it up.*
+*These are just examples. The beauty of the Crew is that you don't need to memorize commands — just talk naturally, and the right agent will pick it up.*

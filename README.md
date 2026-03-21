@@ -85,7 +85,7 @@ The **Food Coach** and **Wellness Guide** agents are **AI-generated output. Noth
 
 - **No warranty, no liability.** This is an open-source project provided "as is". I am not responsible for any decisions you make based on the output of any agent in this system. Use your own judgment. Consult real professionals for real health decisions.
 
-Both health agents are **opt-in** during onboarding. You can use the Vault Crew purely for knowledge management if you prefer.
+Both health agents are **opt-in** during onboarding. You can use the Crew purely for knowledge management if you prefer.
 
 ### General disclaimer
 
@@ -126,7 +126,7 @@ This is a tool for self-care and personal organization. If you fork it, please k
 You talk to Claude  →  The right agent activates  →  Your vault gets updated
 ```
 
-The Vault Crew runs inside **Claude Code's Cowork mode**. You point it at your Obsidian vault folder, and from that moment on, you manage everything through conversation. No GUI, no drag-and-drop, no manual file management.
+The Crew is a **Claude Code plugin**. Each crew member is a **subagent** — an isolated AI with its own system prompt, tool restrictions, and model. You point Claude Code at your Obsidian vault folder, and from that moment on, you manage everything through conversation. No GUI, no drag-and-drop, no manual file management.
 
 Your vault follows a hybrid **PARA + Zettelkasten** structure:
 
@@ -148,21 +148,33 @@ Meta/              Vault config, agent messages, health reports
 
 ## Quick start
 
-### 1. Install
+### 1. Install the plugin
 
-Clone this repo into your Claude Code skills directory:
+> **Prerequisite**: You need [Claude Code](https://claude.ai/code) with a Claude Pro, Max, or Team subscription.
+
+#### Desktop app (no terminal needed)
+
+1. Download the [latest release](https://github.com/gnekt/My-Brain-Is-Full-Crew/archive/refs/heads/main.zip) and unzip it
+2. Open **Claude Code Desktop**
+3. Go to **Customize** → **Personal plugins** → click **+**
+4. Click **Load local plugin** and select the unzipped folder
+5. Done — all 10 agents are ready
+
+#### Terminal (CLI)
 
 ```bash
-# Navigate to your Claude Code skills folder
-cd ~/.claude/skills/
-
-# Clone the Vault Crew
-git clone https://github.com/user/obsidian-vault-crew.git
+git clone https://github.com/gnekt/My-Brain-Is-Full-Crew.git
+mkdir -p ~/.claude/agents
+cp My-Brain-Is-Full-Crew/agents/*.md ~/.claude/agents/
 ```
 
-### 2. Connect your vault
+All 10 agents are now permanently available every time you use Claude Code.
 
-Open Claude Code in Cowork mode and mount your Obsidian vault folder.
+> **Never used a terminal before?** See the [step-by-step guide for beginners](docs/getting-started.md) — it walks you through everything, or just show this page to a tech-savvy friend. It takes 30 seconds.
+
+### 2. Open Claude Code in your vault folder
+
+Open Claude Code and point it at your Obsidian vault folder. This is important — the agents need to run from inside the vault.
 
 ### 3. Initialize
 
@@ -177,7 +189,12 @@ The **Architect** will start a friendly onboarding conversation:
 3. **Health setup** *(optional)* — Physical profile for the Food Coach, preferences for the Wellness Guide
 4. **Integrations** — Gmail and Google Calendar connections
 
-After onboarding, the Architect creates your entire vault structure, saves your profile, and hands you a personalized welcome note.
+After onboarding, the Architect:
+- Creates your entire vault folder structure
+- Saves your profile to `Meta/user-profile.md`
+- **Installs the selected agents into `.claude/agents/` inside your vault** — so they only activate when you're in this folder, never in other projects
+- Creates `.mcp.json` in your vault root (if you enabled Gmail or Calendar)
+- Leaves you a personalized welcome note
 
 ### 4. Start using it
 
@@ -196,7 +213,7 @@ After onboarding, the Architect creates your entire vault structure, saves your 
 
 ## Works in any language
 
-The Vault Crew is built in English but **responds in whatever language you write in**. Italian, French, Spanish, German, Portuguese, Japanese — just talk, and the agents match you.
+The Crew is built in English but **responds in whatever language you write in**. Italian, French, Spanish, German, Portuguese, Japanese — just talk, and the agents match you.
 
 ```
 "Salva questa nota veloce..."          → Scribe responds in Italian
@@ -229,7 +246,9 @@ The **Postman** agent requires:
 - **Gmail** MCP connector — to read and process your inbox
 - **Google Calendar** MCP connector — to import events and manage your schedule
 
-All other agents work with just your local Obsidian vault.
+Both are pre-configured in the plugin's `.mcp.json` — if you install the plugin via Desktop or `--plugin-dir`, they're ready to go. You just need to authorize them when prompted.
+
+All other agents work with just your local Obsidian vault — no integrations needed.
 
 ---
 
@@ -244,38 +263,41 @@ All other agents work with just your local Obsidian vault.
 ## Project structure
 
 ```
-obsidian-vault-crew/
-├── plugin.json                     Plugin manifest
+my-brain-is-full-crew/
+├── .claude-plugin/
+│   └── plugin.json                Plugin manifest
+├── .mcp.json                       MCP servers (Gmail, Google Calendar)
+├── CLAUDE.md                       Installation & development guide
 ├── README.md                       You are here
 ├── CONTRIBUTING.md                 How to contribute
+├── agents/                         The 10 subagents
+│   ├── architect.md                Vault setup & onboarding
+│   ├── scribe.md                   Text capture & note creation
+│   ├── sorter.md                   Inbox triage & filing
+│   ├── seeker.md                   Search & knowledge retrieval
+│   ├── connector.md                Knowledge graph & link analysis
+│   ├── librarian.md                Vault health & maintenance
+│   ├── transcriber.md              Audio & meeting transcription
+│   ├── postman.md                  Email & calendar integration
+│   ├── food-coach.md               Nutrition coaching (opt-in)
+│   └── wellness-guide.md           Mental health support (opt-in)
 ├── docs/
 │   ├── getting-started.md          Step-by-step setup guide (non-technical)
-│   ├── agents/                     Deep-dive into each agent
-│   │   ├── architect.md
-│   │   ├── scribe.md
-│   │   ├── sorter.md
-│   │   ├── seeker.md
-│   │   ├── connector.md
-│   │   ├── librarian.md
-│   │   ├── transcriber.md
-│   │   ├── postman.md
-│   │   ├── food-coach.md
-│   │   └── wellness-guide.md
-│   └── examples.md                 Real-world usage examples
-├── references/
-│   ├── agents.md                   Agent registry (for agents to read)
-│   └── inter-agent-messaging.md    Communication protocol
-└── skills/
-    ├── architect/SKILL.md          Architect agent
-    ├── scribe/SKILL.md             Scribe agent
-    ├── sorter/SKILL.md             Sorter agent
-    ├── seeker/SKILL.md             Seeker agent
-    ├── connector/SKILL.md          Connector agent
-    ├── librarian/SKILL.md          Librarian agent
-    ├── transcriber/SKILL.md        Transcriber agent
-    ├── postman/SKILL.md            Postman agent
-    ├── food-coach/SKILL.md          Food Coach agent
-    └── wellness-guide/SKILL.md     Wellness Guide agent
+│   ├── examples.md                 Real-world usage examples
+│   └── agents/                     Deep-dive into each agent
+│       ├── architect.md
+│       ├── scribe.md
+│       ├── sorter.md
+│       ├── seeker.md
+│       ├── connector.md
+│       ├── librarian.md
+│       ├── transcriber.md
+│       ├── postman.md
+│       ├── food-coach.md
+│       └── wellness-guide.md
+└── references/
+    ├── agents.md                   Agent registry (for agents to read)
+    └── inter-agent-messaging.md    Communication protocol
 ```
 
 ---
@@ -302,7 +324,7 @@ If you want to:
 
 > *"The best organizational system is the one you actually use."*
 
-The Vault Crew is designed for people who are overwhelmed, not for people who enjoy organizing. Every design decision prioritizes **minimum friction**:
+The Crew is designed for people who are overwhelmed, not for people who enjoy organizing. Every design decision prioritizes **minimum friction**:
 
 - **Chat is the interface** — no manual file management
 - **Agents handle the boring stuff** — filing, linking, maintaining
@@ -314,7 +336,7 @@ The Vault Crew is designed for people who are overwhelmed, not for people who en
 
 ## Star this repo
 
-If the Vault Crew helps you — or if you just think it's a cool idea — consider starring this repo. It helps others find it, and it motivates continued development.
+If the Crew helps you — or if you just think it's a cool idea — consider starring this repo. It helps others find it, and it motivates continued development.
 
 ---
 

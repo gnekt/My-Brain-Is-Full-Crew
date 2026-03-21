@@ -1,4 +1,4 @@
-# Getting Started with Obsidian Vault Crew
+# Getting Started with My Brain Is Full - Crew
 
 A step-by-step guide for setting up your AI-powered vault — no technical background required.
 
@@ -59,53 +59,52 @@ Don't worry if this feels like a lot — the Architect agent will remind you abo
 
 1. Go to [claude.ai/code](https://claude.ai/code) and follow the instructions to install Claude Code
 2. You need a **Claude Pro**, **Max**, or **Team** subscription
-3. Once installed, you should be able to open a terminal and type `claude` to start it
-
-> **Not sure what a terminal is?** It's the black window where you type commands. On Mac, search for "Terminal" in Spotlight. On Windows, search for "Command Prompt" or "PowerShell". On Linux, you already know.
+3. You can use either the **Desktop app** or the **CLI** (command-line interface)
 
 ---
 
-## Step 3: Install the Vault Crew plugin
+## Step 3: Install the Crew
 
-You have three options — pick whichever feels most comfortable:
+Choose the method that feels most comfortable:
 
-### Option A: Plugin install (easiest)
+### Method A: Desktop app (recommended — no terminal needed)
 
-1. Open Claude Code (type `claude` in your terminal)
-2. Type this command:
+1. Download the plugin: go to [github.com/gnekt/My-Brain-Is-Full-Crew](https://github.com/gnekt/My-Brain-Is-Full-Crew), click the green **Code** button, then **Download ZIP**
+2. Unzip the downloaded file (double-click it)
+3. Open **Claude Code Desktop**
+4. Go to **Customize** (or **Personalizza**) in the sidebar
+5. Under **Personal plugins**, click the **+** button
+6. Click **Load local plugin**
+7. Select the unzipped folder
+8. Done! All 10 agents are loaded
 
-```
-/plugin install obsidian-vault-crew
-```
+> The Gmail and Google Calendar connections for the Postman agent are pre-configured in the plugin — you'll be prompted to authorize them when you first use email features.
 
-3. Done! All 10 agents are now available.
+### Method B: Terminal (for CLI users)
 
-### Option B: Load from GitHub
-
-1. Open your terminal and run:
-
-```bash
-git clone https://github.com/gnekt/obsidian-vault-crew.git
-```
-
-2. Then start Claude Code pointing to the plugin:
+Open your terminal and type these 3 commands, pressing Enter after each one:
 
 ```bash
-claude --plugin-dir /path/to/obsidian-vault-crew
+git clone https://github.com/gnekt/My-Brain-Is-Full-Crew.git
 ```
 
-(Replace `/path/to/` with wherever you cloned the repo)
-
-### Option C: Manual copy (fallback)
-
-If the above don't work, copy the skill files directly:
+This downloads the project to your computer. Then:
 
 ```bash
-git clone https://github.com/gnekt/obsidian-vault-crew.git
-cp -r obsidian-vault-crew/skills/* ~/.claude/skills/
+mkdir -p ~/.claude/agents
 ```
 
-> **Not comfortable with the terminal?** Ask a tech-savvy friend to help — it takes 30 seconds. Just show them this page.
+This creates the folder where Claude Code looks for agents (if it doesn't exist already). Finally:
+
+```bash
+cp My-Brain-Is-Full-Crew/agents/*.md ~/.claude/agents/
+```
+
+This copies all 10 agents into that folder. **Done!** The agents are now permanently available every time you use Claude Code.
+
+> **Note for CLI users:** This installs only the agents. To also get Gmail/Calendar integration for the Postman, either load as a full plugin with `claude --plugin-dir /path/to/My-Brain-Is-Full-Crew`, or manually configure Gmail and Google Calendar MCP servers.
+
+> **Something went wrong?** The most common issue is that `git` isn't installed. On Mac, the terminal will prompt you to install it automatically. On Windows, download it from [git-scm.com](https://git-scm.com). If you're stuck, just show this page to a tech-savvy friend — it takes 30 seconds.
 
 ---
 
@@ -193,7 +192,7 @@ The **Wellness Guide** guides you through grounding techniques.
 
 ## Step 7: Build daily habits
 
-The Vault Crew works best with simple daily routines:
+The Crew works best with simple daily routines:
 
 ### Morning (2 minutes)
 > "Check my calendar for today" — see what's ahead
@@ -215,7 +214,7 @@ The Vault Crew works best with simple daily routines:
 ## Troubleshooting
 
 ### "The agent doesn't seem to activate"
-Make sure the plugin is installed correctly. Try `/plugin` to check if `obsidian-vault-crew` appears in your installed plugins. If you used the manual copy method, verify the skill files are in `~/.claude/skills/`. Try saying the trigger phrase differently — agents understand natural language in multiple languages.
+Make sure the plugin is installed correctly. Try `/plugin` to check if `my-brain-is-full-crew` appears in your installed plugins. If you used the manual copy method, verify the agent files are in `~/.claude/agents/`. Try saying the trigger phrase differently — agents understand natural language in multiple languages.
 
 ### "Gmail/Calendar isn't working"
 The Postman needs Gmail and Google Calendar MCP connectors configured in Claude Code. Check your MCP settings.
@@ -224,9 +223,7 @@ The Postman needs Gmail and Google Calendar MCP connectors configured in Claude 
 The Architect customizes the structure based on your onboarding answers. If you opted out of health agents, for example, the Health folder won't be created.
 
 ### "How do I update to a new version?"
-If you installed via plugin: `/plugin update obsidian-vault-crew`
-If you cloned from GitHub: `cd /path/to/obsidian-vault-crew && git pull`
-If you copied manually: re-copy the skills folder.
+Run the same 3 commands from Step 3 again — the new files will overwrite the old ones. If you still have the cloned folder, you can also run `cd My-Brain-Is-Full-Crew && git pull` and then re-copy.
 
 ### "An agent did something weird"
 Open an issue on GitHub with:

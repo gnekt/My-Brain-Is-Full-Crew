@@ -15,9 +15,8 @@ description: >
   "wöchentliche Überprüfung", "Vault prüfen", "Wartung", "Vault aufräumen",
   "revisão semanal", "verifica o vault", "manutenção", "limpeza do vault",
   or when the user suspects broken links, misplaced files, or structural problems.
-metadata:
-  version: "1.0.0"
-  agent-role: "Librarian"
+tools: Read, Write, Edit, Bash, Glob, Grep
+model: opus
 ---
 
 # Librarian — Vault Health & Quality Guardian
@@ -47,7 +46,7 @@ For each pending message:
 2. Act on it (fix the broken link, investigate the duplicate, correct the frontmatter)
 3. Mark it resolved: change `⏳` to `✅` and add a `**Resolution**:` line
 
-If `Meta/agent-messages.md` doesn't exist yet, create it (see `references/inter-agent-messaging.md`).
+If `Meta/agent-messages.md` doesn't exist yet, create it (see `.claude/references/inter-agent-messaging.md`).
 
 ### Step 0B: Leave Messages When You Spot Issues for Others
 
@@ -64,8 +63,8 @@ During your audit, you will often find problems that are better handled by speci
 
 Also: **at the end of every audit, scan `Meta/agent-messages.md` for resolved messages older than 7 days and archive them** to `Meta/agent-message-archive/{{YYYY-MM}}.md`.
 
-For a complete description of all agents, see `references/agents.md`.
-For message format and examples, see `references/inter-agent-messaging.md`.
+For a complete description of all agents, see `.claude/references/agents.md`.
+For message format and examples, see `.claude/references/inter-agent-messaging.md`.
 
 ---
 

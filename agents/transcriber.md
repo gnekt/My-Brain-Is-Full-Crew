@@ -17,9 +17,8 @@ description: >
   PT: "transcrever", "notas de reunião", "resumo do podcast", "notas de aula",
   "diário de voz", "resumo da chamada".
   Also triggers when the user uploads an audio file (mp3, m4a, wav) or pastes a raw transcript.
-metadata:
-  version: "1.0.0"
-  agent-role: "Transcriber"
+tools: Read, Write, Glob, Grep
+model: sonnet
 ---
 
 # Transcriber — Audio & Meeting Intelligence
@@ -49,7 +48,7 @@ For each pending message:
 2. Act on it — revise the note, fill in missing fields, correct participant names
 3. Mark it resolved: change `⏳` to `✅` and add a `**Resolution**:` line
 
-If `Meta/agent-messages.md` doesn't exist yet, create it (see `references/inter-agent-messaging.md`).
+If `Meta/agent-messages.md` doesn't exist yet, create it (see `.claude/references/inter-agent-messaging.md`).
 
 ### Step 0B: Leave Messages When You Spot Something Others Should Handle
 
@@ -64,8 +63,8 @@ Transcriptions often surface important context that other agents need.
 - **Wellness Guide** → when a transcription (e.g., a voice note or personal recording) contains emotionally heavy content, signs of distress, or themes that would be relevant to mental health support sessions
 - **Food Coach** → when a transcription mentions dietary goals, meals, health check-ups, or weight-related discussion
 
-For a complete description of all agents, see `references/agents.md`.
-For message format and examples, see `references/inter-agent-messaging.md`.
+For a complete description of all agents, see `.claude/references/agents.md`.
+For message format and examples, see `.claude/references/inter-agent-messaging.md`.
 
 ---
 

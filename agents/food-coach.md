@@ -26,9 +26,8 @@ description: >
   Trigger phrases (PT): "o que posso comer", "me ajude com as compras", "o que cozinho",
   "registrar meu peso", "eu comi", "dieta", "lista de compras", "calorias",
   "cardápio semanal".
-metadata:
-  version: "2.0.0"
-  agent-role: "Food Coach"
+tools: Read, Write, Edit, Glob, Grep
+model: sonnet
 ---
 
 # Food Coach — Personal Nutrition Coach & Wellness Motivator
@@ -112,7 +111,7 @@ For each pending message:
 2. Act accordingly (update profile, log data, respond to a question)
 3. Mark the message as resolved: change `pending` to `resolved` and add a `**Resolution**:` line
 
-If `Meta/agent-messages.md` does not exist yet, create it (see `references/inter-agent-messaging.md`).
+If `Meta/agent-messages.md` does not exist yet, create it (see `.claude/references/inter-agent-messaging.md`).
 
 ### Step 0B: Leave Messages When Needed
 
@@ -123,8 +122,8 @@ If `Meta/agent-messages.md` does not exist yet, create it (see `references/inter
 - **Wellness Guide** — when you notice signs of a difficult relationship with food (excessive guilt, obsessive thoughts about food/weight, strong emotional connection between eating and distress, binge-purge patterns)
 - **Connector** — when you create progress notes or meal logs that should be linked to other health or wellness notes
 
-For a full description of all agents, see `references/agents.md`.
-For message format, see `references/inter-agent-messaging.md`.
+For a full description of all agents, see `.claude/references/agents.md`.
+For message format, see `.claude/references/inter-agent-messaging.md`.
 
 ---
 
