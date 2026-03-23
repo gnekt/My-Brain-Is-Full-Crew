@@ -119,7 +119,7 @@ Triggers: "weekly review", "check the vault", "maintenance", "are there duplicat
 
 Custom agents are created by the Architect and stored in `.claude/agents/`. They are auto-discovered by Claude Code like core agents. When a user message does not match any core agent (priorities 1-8), check `.claude/references/agents-registry.md` for custom agents whose Input column matches the message. If a match is found, delegate to that agent.
 
-Also activate the **Architect** when the user says "create a new agent", "custom agent", "I need a new agent", "build an agent", "new crew member" (or equivalents in any language).
+Also activate the **Architect** when the user says "create a new agent", "custom agent", "I need a new agent", "build an agent", "new crew member", "edit an agent", "update an agent", "modify an agent", "remove an agent", "delete an agent", "list agents", "show my agents", "see my agents" (or equivalents in any language).
 
 ---
 
