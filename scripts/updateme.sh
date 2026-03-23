@@ -113,30 +113,39 @@ for agent in "$REPO_DIR/agents/"*.md; do
   fi
 done
 
-# ── Update references ───────────────────────────────────────────────────────
-REF_COUNT=0
-mkdir -p "$VAULT_DIR/.claude/references"
-for ref in "$REPO_DIR/references/"*.md; do
-  name="$(basename "$ref")"
-  if ! diff -q "$ref" "$VAULT_DIR/.claude/references/$name" >/dev/null 2>&1; then
-    cp "$ref" "$VAULT_DIR/.claude/references/"
-    info "Updated reference: $name"
-    REF_COUNT=$((REF_COUNT + 1))
-  fi
-done
-
 # ── Deprecate removed references ──────────────────────────────────────────
+# Read the old manifest before rewriting, same logic as agents.
+REF_MANIFEST="$VAULT_DIR/.claude/references/.core-manifest"
 for vault_ref in "$VAULT_DIR/.claude/references/"*.md; do
   [[ -f "$vault_ref" ]] || continue
   name="$(basename "$vault_ref")"
   [[ -f "$REPO_DIR/references/$name" ]] && continue
   [[ "$name" == *"-DEPRECATED"* ]] && continue
+  # Skip user-created references: only deprecate if listed in the manifest
+  if [[ -f "$REF_MANIFEST" ]] && ! grep -qxF "$name" "$REF_MANIFEST"; then
+    continue
+  fi
   deprecated_name="${name%.md}-DEPRECATED.md"
+  [[ -f "$VAULT_DIR/.claude/references/$deprecated_name" ]] && continue
   mv "$vault_ref" "$VAULT_DIR/.claude/references/$deprecated_name"
   { echo "########"; echo "DEPRECATED DO NOT USE"; echo "########"; echo ""; cat "$VAULT_DIR/.claude/references/$deprecated_name"; } > "$VAULT_DIR/.claude/references/$deprecated_name.tmp"
   mv "$VAULT_DIR/.claude/references/$deprecated_name.tmp" "$VAULT_DIR/.claude/references/$deprecated_name"
   warn "Deprecated reference: $name -> $deprecated_name"
   DEPRECATED_COUNT=$((DEPRECATED_COUNT + 1))
+done
+
+# ── Update references and rewrite manifest ────────────────────────────────
+REF_COUNT=0
+mkdir -p "$VAULT_DIR/.claude/references"
+: > "$VAULT_DIR/.claude/references/.core-manifest"
+for ref in "$REPO_DIR/references/"*.md; do
+  name="$(basename "$ref")"
+  basename "$ref" >> "$VAULT_DIR/.claude/references/.core-manifest"
+  if ! diff -q "$ref" "$VAULT_DIR/.claude/references/$name" >/dev/null 2>&1; then
+    cp "$ref" "$VAULT_DIR/.claude/references/"
+    info "Updated reference: $name"
+    REF_COUNT=$((REF_COUNT + 1))
+  fi
 done
 
 # ── Regenerate and update skills ───────────────────────────────────────────

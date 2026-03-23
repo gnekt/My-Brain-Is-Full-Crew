@@ -120,7 +120,11 @@ success "Copied $AGENT_COUNT agents"
 # ── Copy references ─────────────────────────────────────────────────────────
 info "Creating .claude/references/ in vault..."
 mkdir -p "$VAULT_DIR/.claude/references"
-cp "$REPO_DIR/references/"*.md "$VAULT_DIR/.claude/references/"
+: > "$VAULT_DIR/.claude/references/.core-manifest"
+for ref in "$REPO_DIR/references/"*.md; do
+  cp "$ref" "$VAULT_DIR/.claude/references/"
+  basename "$ref" >> "$VAULT_DIR/.claude/references/.core-manifest"
+done
 success "Copied references"
 
 # ── Generate and copy skills (for Cowork/Desktop) ───────────────────────────
