@@ -43,7 +43,7 @@ When a message matches multiple agents, activate the one with the highest priori
 | 6 | **sorter** | Inbox triage, filing, note sorting |
 | 7 | **connector** | Links between notes, graph, MOCs, relationships, cross-linking |
 | 8 | **librarian** | Maintenance, duplicates, broken links, audit, cleanup |
-| 9+ | **custom agents** | Any agent created via the Architect. Check `agents-registry.md` for triggers and capabilities. Custom agents always have lower priority than core 8. |
+| 9+ | **custom agents** | Any agent created via the Architect. Check `.claude/references/agents-registry.md` for triggers and capabilities. Custom agents always have lower priority than core 8. |
 
 ---
 
@@ -117,7 +117,7 @@ Triggers: "weekly review", "check the vault", "maintenance", "are there duplicat
 
 ## 9. CUSTOM AGENTS
 
-Custom agents are created by the Architect and stored in `.claude/agents/`. They are auto-discovered by Claude Code like core agents. When a user message does not match any core agent (priorities 1-8), check `references/agents-registry.md` for custom agents whose Input column matches the message. If a match is found, delegate to that agent.
+Custom agents are created by the Architect and stored in `.claude/agents/`. They are auto-discovered by Claude Code like core agents. When a user message does not match any core agent (priorities 1-8), check `.claude/references/agents-registry.md` for custom agents whose Input column matches the message. If a match is found, delegate to that agent.
 
 Also activate the **Architect** when the user says "create a new agent", "custom agent", "I need a new agent", "build an agent", "new crew member" (or equivalents in any language).
 
