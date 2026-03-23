@@ -60,6 +60,32 @@ if [[ "$CONFIRM" =~ ^[Nn]$ ]]; then
   [[ -d "$VAULT_DIR" ]] || die "Directory not found: $VAULT_DIR"
 fi
 
+# ── Check for existing installation ───────────────────────────────────────
+echo ""
+EXISTING=0
+if [[ -d "$VAULT_DIR/.claude" ]]; then EXISTING=1; fi
+if [[ -f "$VAULT_DIR/CLAUDE.md" ]]; then EXISTING=1; fi
+
+if [[ $EXISTING -eq 1 ]]; then
+  warn "An existing installation was detected:"
+  [[ -d "$VAULT_DIR/.claude" ]] && warn "  .claude/ directory exists"
+  [[ -f "$VAULT_DIR/CLAUDE.md" ]] && warn "  CLAUDE.md exists"
+  echo ""
+  echo -e "   ${BOLD}The installer needs to overwrite these files.${NC}"
+  echo -e "   ${DIM}Custom agents in .claude/agents/ will NOT be deleted.${NC}"
+  echo -e "   ${DIM}Your vault notes are never touched.${NC}"
+  echo ""
+  echo -e "   ${BOLD}c)${NC} Continue (overwrite core files, keep custom agents)"
+  echo -e "   ${BOLD}q)${NC} Quit"
+  read -r -p "   > " OVERWRITE_ANSWER
+  if [[ ! "$OVERWRITE_ANSWER" =~ ^[Cc]$ ]]; then
+    echo ""
+    info "Installation cancelled."
+    echo ""
+    exit 0
+  fi
+fi
+
 # ── Copy agents ─────────────────────────────────────────────────────────────
 echo ""
 info "Creating .claude/agents/ in vault..."

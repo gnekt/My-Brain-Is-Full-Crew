@@ -45,6 +45,22 @@ echo -e "${BOLD}║  My Brain Is Full - Crew :: Update       ║${NC}"
 echo -e "${BOLD}╚══════════════════════════════════════════╝${NC}"
 echo ""
 
+# ── Confirm overwrite ────────────────────────────────────────────────────
+echo -e "${BOLD}This will overwrite core agent files, references, and CLAUDE.md.${NC}"
+echo -e "   ${DIM}Custom agents in .claude/agents/ will NOT be touched.${NC}"
+echo -e "   ${DIM}Your vault notes are never touched.${NC}"
+echo ""
+echo -e "   ${BOLD}c)${NC} Continue"
+echo -e "   ${BOLD}q)${NC} Quit"
+read -r -p "   > " UPDATE_ANSWER
+if [[ ! "$UPDATE_ANSWER" =~ ^[Cc]$ ]]; then
+  echo ""
+  info "Update cancelled."
+  echo ""
+  exit 0
+fi
+echo ""
+
 # ── Update agents ───────────────────────────────────────────────────────────
 AGENT_COUNT=0
 for agent in "$REPO_DIR/agents/"*.md; do
