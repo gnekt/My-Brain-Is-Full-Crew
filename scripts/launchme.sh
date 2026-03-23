@@ -97,11 +97,12 @@ if [[ $EXISTING -eq 1 && -f "$OLD_MANIFEST" ]]; then
     vault_file="$VAULT_DIR/.claude/agents/$old_name"
     [[ -f "$vault_file" ]] || continue
     deprecated_name="${old_name%.md}-DEPRECATED.md"
-    [[ -f "$VAULT_DIR/.claude/agents/$deprecated_name" ]] && continue
-    mv "$vault_file" "$VAULT_DIR/.claude/agents/$deprecated_name"
-    { echo "########"; echo "DEPRECATED DO NOT USE"; echo "########"; echo ""; cat "$VAULT_DIR/.claude/agents/$deprecated_name"; } > "$VAULT_DIR/.claude/agents/$deprecated_name.tmp"
-    mv "$VAULT_DIR/.claude/agents/$deprecated_name.tmp" "$VAULT_DIR/.claude/agents/$deprecated_name"
-    warn "Deprecated stale agent: $old_name -> $deprecated_name"
+    mkdir -p "$VAULT_DIR/.claude/deprecated"
+    [[ -f "$VAULT_DIR/.claude/deprecated/$deprecated_name" ]] && continue
+    mv "$vault_file" "$VAULT_DIR/.claude/deprecated/$deprecated_name"
+    { echo "########"; echo "DEPRECATED DO NOT USE"; echo "########"; echo ""; cat "$VAULT_DIR/.claude/deprecated/$deprecated_name"; } > "$VAULT_DIR/.claude/deprecated/$deprecated_name.tmp"
+    mv "$VAULT_DIR/.claude/deprecated/$deprecated_name.tmp" "$VAULT_DIR/.claude/deprecated/$deprecated_name"
+    warn "Deprecated stale agent: $old_name -> deprecated/$deprecated_name"
   done < "$OLD_MANIFEST"
 fi
 

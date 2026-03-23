@@ -79,13 +79,14 @@ for vault_agent in "$VAULT_DIR/.claude/agents/"*.md; do
     continue
   fi
   deprecated_name="${name%.md}-DEPRECATED.md"
+  mkdir -p "$VAULT_DIR/.claude/deprecated"
   # Skip if already deprecated in a previous run
-  [[ -f "$VAULT_DIR/.claude/agents/$deprecated_name" ]] && continue
-  mv "$vault_agent" "$VAULT_DIR/.claude/agents/$deprecated_name"
+  [[ -f "$VAULT_DIR/.claude/deprecated/$deprecated_name" ]] && continue
+  mv "$vault_agent" "$VAULT_DIR/.claude/deprecated/$deprecated_name"
   # Prepend deprecation header
-  { echo "########"; echo "DEPRECATED DO NOT USE"; echo "########"; echo ""; cat "$VAULT_DIR/.claude/agents/$deprecated_name"; } > "$VAULT_DIR/.claude/agents/$deprecated_name.tmp"
-  mv "$VAULT_DIR/.claude/agents/$deprecated_name.tmp" "$VAULT_DIR/.claude/agents/$deprecated_name"
-  warn "Deprecated agent: $name -> $deprecated_name"
+  { echo "########"; echo "DEPRECATED DO NOT USE"; echo "########"; echo ""; cat "$VAULT_DIR/.claude/deprecated/$deprecated_name"; } > "$VAULT_DIR/.claude/deprecated/$deprecated_name.tmp"
+  mv "$VAULT_DIR/.claude/deprecated/$deprecated_name.tmp" "$VAULT_DIR/.claude/deprecated/$deprecated_name"
+  warn "Deprecated agent: $name -> deprecated/$deprecated_name"
   DEPRECATED_COUNT=$((DEPRECATED_COUNT + 1))
   # Remove deprecated agent from manifest
   if [[ -f "$MANIFEST" ]]; then
@@ -126,11 +127,12 @@ for vault_ref in "$VAULT_DIR/.claude/references/"*.md; do
     continue
   fi
   deprecated_name="${name%.md}-DEPRECATED.md"
-  [[ -f "$VAULT_DIR/.claude/references/$deprecated_name" ]] && continue
-  mv "$vault_ref" "$VAULT_DIR/.claude/references/$deprecated_name"
-  { echo "########"; echo "DEPRECATED DO NOT USE"; echo "########"; echo ""; cat "$VAULT_DIR/.claude/references/$deprecated_name"; } > "$VAULT_DIR/.claude/references/$deprecated_name.tmp"
-  mv "$VAULT_DIR/.claude/references/$deprecated_name.tmp" "$VAULT_DIR/.claude/references/$deprecated_name"
-  warn "Deprecated reference: $name -> $deprecated_name"
+  mkdir -p "$VAULT_DIR/.claude/deprecated"
+  [[ -f "$VAULT_DIR/.claude/deprecated/$deprecated_name" ]] && continue
+  mv "$vault_ref" "$VAULT_DIR/.claude/deprecated/$deprecated_name"
+  { echo "########"; echo "DEPRECATED DO NOT USE"; echo "########"; echo ""; cat "$VAULT_DIR/.claude/deprecated/$deprecated_name"; } > "$VAULT_DIR/.claude/deprecated/$deprecated_name.tmp"
+  mv "$VAULT_DIR/.claude/deprecated/$deprecated_name.tmp" "$VAULT_DIR/.claude/deprecated/$deprecated_name"
+  warn "Deprecated reference: $name -> deprecated/$deprecated_name"
   DEPRECATED_COUNT=$((DEPRECATED_COUNT + 1))
 done
 
