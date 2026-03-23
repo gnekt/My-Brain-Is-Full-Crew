@@ -89,7 +89,8 @@ for vault_agent in "$VAULT_DIR/.claude/agents/"*.md; do
   DEPRECATED_COUNT=$((DEPRECATED_COUNT + 1))
   # Remove deprecated agent from manifest
   if [[ -f "$MANIFEST" ]]; then
-    grep -vxF "$name" "$MANIFEST" > "$MANIFEST.tmp" && mv "$MANIFEST.tmp" "$MANIFEST"
+    grep -vxF "$name" "$MANIFEST" > "$MANIFEST.tmp" || true
+    mv "$MANIFEST.tmp" "$MANIFEST"
   fi
 done
 
