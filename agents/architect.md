@@ -1350,6 +1350,7 @@ You must ask questions **one at a time** and adapt your follow-up questions base
 2. **Ask for confirmation** or corrections
 3. **Generate the agent file** following `references/agent-template.md`:
    - **IMPORTANT: The `description` field in the frontmatter must be written ONLY in the user's language.** Do NOT add translations in other languages. Do NOT copy the multilingual pattern from core agents. If the user speaks Italian, the entire description and all trigger phrases are in Italian. Period.
+   - **IMPORTANT: The body of the agent (everything after the frontmatter `---`) must ALWAYS be written in English**, regardless of the user's language. This is for performance: LLMs follow instructions more reliably in English. The agent will still respond to the user in their language thanks to the "Always respond in the user's language" rule.
    - Fill in the Inter-Agent Coordination section with the specific agents this one should suggest
    - Write a detailed Core Responsibilities section (this is what makes the agent good or bad)
    - Include concrete examples and templates for any notes the agent creates
