@@ -92,8 +92,10 @@ info "Creating .claude/agents/ in vault..."
 mkdir -p "$VAULT_DIR/.claude/agents"
 
 AGENT_COUNT=0
+: > "$VAULT_DIR/.claude/agents/.core-manifest"
 for agent in "$REPO_DIR/agents/"*.md; do
   cp "$agent" "$VAULT_DIR/.claude/agents/"
+  basename "$agent" >> "$VAULT_DIR/.claude/agents/.core-manifest"
   AGENT_COUNT=$((AGENT_COUNT + 1))
 done
 success "Copied $AGENT_COUNT agents"

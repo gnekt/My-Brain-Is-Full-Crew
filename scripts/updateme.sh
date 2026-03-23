@@ -63,8 +63,10 @@ echo ""
 
 # ── Update agents ───────────────────────────────────────────────────────────
 AGENT_COUNT=0
+: > "$VAULT_DIR/.claude/agents/.core-manifest"
 for agent in "$REPO_DIR/agents/"*.md; do
   name="$(basename "$agent")"
+  basename "$agent" >> "$VAULT_DIR/.claude/agents/.core-manifest"
   if [[ -f "$VAULT_DIR/.claude/agents/$name" ]]; then
     if ! diff -q "$agent" "$VAULT_DIR/.claude/agents/$name" >/dev/null 2>&1; then
       cp "$agent" "$VAULT_DIR/.claude/agents/"
@@ -79,14 +81,10 @@ for agent in "$REPO_DIR/agents/"*.md; do
 done
 
 # ── Deprecate removed core agents ─────────────────────────────────────────
-# Core agents are the ones that exist in the repo's agents/ folder.
-# If a file in .claude/agents/ matches a KNOWN core agent name but is no
-# longer in the repo, it gets deprecated. Custom agents are never touched.
-CORE_AGENT_NAMES=""
-for agent in "$REPO_DIR/agents/"*.md; do
-  CORE_AGENT_NAMES="$CORE_AGENT_NAMES $(basename "$agent")"
-done
-
+# Only deprecate agents that were previously installed as core agents.
+# The .core-manifest file (written by launchme/updateme) records which files
+# are core. Custom agents are never in the manifest, so they're never touched.
+MANIFEST="$VAULT_DIR/.claude/agents/.core-manifest"
 DEPRECATED_COUNT=0
 for vault_agent in "$VAULT_DIR/.claude/agents/"*.md; do
   [[ -f "$vault_agent" ]] || continue
@@ -95,12 +93,10 @@ for vault_agent in "$VAULT_DIR/.claude/agents/"*.md; do
   [[ -f "$REPO_DIR/agents/$name" ]] && continue
   # Skip if already deprecated
   [[ "$name" == *"-DEPRECATED"* ]] && continue
-  # Skip custom agents: only deprecate files that were previously a core agent
-  # We check if the file does NOT contain custom agent markers
-  # Simple heuristic: if the file was not in any previous version of CORE_AGENT_NAMES,
-  # it's a custom agent. Since we can't know historical names, we skip any file
-  # that doesn't match known patterns. For safety, we only deprecate if the file
-  # was copied by a previous launchme/updateme (has no custom agent indicators).
+  # Skip custom agents: only deprecate if listed in the manifest
+  if [[ -f "$MANIFEST" ]] && ! grep -qxF "$name" "$MANIFEST"; then
+    continue
+  fi
   deprecated_name="${name%.md}-DEPRECATED.md"
   mv "$vault_agent" "$VAULT_DIR/.claude/agents/$deprecated_name"
   # Prepend deprecation header
@@ -108,6 +104,10 @@ for vault_agent in "$VAULT_DIR/.claude/agents/"*.md; do
   mv "$VAULT_DIR/.claude/agents/$deprecated_name.tmp" "$VAULT_DIR/.claude/agents/$deprecated_name"
   warn "Deprecated agent: $name -> $deprecated_name"
   DEPRECATED_COUNT=$((DEPRECATED_COUNT + 1))
+  # Remove deprecated agent from manifest
+  if [[ -f "$MANIFEST" ]]; then
+    grep -vxF "$name" "$MANIFEST" > "$MANIFEST.tmp" && mv "$MANIFEST.tmp" "$MANIFEST"
+  fi
 done
 
 # ── Update references ───────────────────────────────────────────────────────
