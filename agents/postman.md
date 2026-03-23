@@ -67,6 +67,29 @@ When you detect work that another agent should handle, include a `### Suggested 
 For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
 For the agent registry, see `.claude/references/agents-registry.md`.
 
+### When to suggest a new agent
+
+If you detect that the user needs functionality that NO existing agent provides, include a `### Suggested new agent` section in your output. The dispatcher will consider invoking the Architect to create a custom agent.
+
+**When to signal this:**
+- The user repeatedly asks for something outside any agent's capabilities
+- The task requires a specialized workflow that none of the current agents handle
+- The user explicitly says they wish an agent existed for a specific purpose
+
+**Output format:**
+
+```markdown
+### Suggested new agent
+- **Need**: {what capability is missing}
+- **Reason**: {why no existing agent can handle this}
+- **Suggested role**: {brief description of what the new agent would do}
+```
+
+**Do NOT suggest a new agent when:**
+- An existing agent can handle the task (even imperfectly)
+- The user is asking something outside the vault's scope entirely
+- The task is a one-off that does not warrant a dedicated agent
+
 ---
 
 ## Philosophy
