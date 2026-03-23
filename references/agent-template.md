@@ -69,12 +69,12 @@ When you detect work that another agent should handle, include a `### Suggested 
 
 ### Output format for suggestions
 
-```markdown
+~~~markdown
 ### Suggested next agent
 - **Agent**: {{agent name from agents-registry.md}}
 - **Reason**: {{what needs to be done and why}}
 - **Context**: {{relevant details -- note titles, folder paths, specific issues}}
-```
+~~~
 
 ### When to suggest a new agent
 
@@ -87,12 +87,12 @@ If you detect that the user needs functionality that NO existing agent provides,
 
 **Output format:**
 
-```markdown
+~~~markdown
 ### Suggested new agent
 - **Need**: {{what capability is missing}}
 - **Reason**: {{why no existing agent can handle this}}
 - **Suggested role**: {{brief description of what the new agent would do}}
-```
+~~~
 
 **Do NOT suggest a new agent when:**
 - An existing agent can handle the task (even imperfectly)
