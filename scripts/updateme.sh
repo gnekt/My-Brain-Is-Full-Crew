@@ -177,10 +177,10 @@ fi
 
 # ── Summary ─────────────────────────────────────────────────────────────────
 echo ""
-if [[ $AGENT_COUNT -eq 0 && $REF_COUNT -eq 0 && $DEPRECATED_COUNT -eq 0 && -z "$CLAUDE_MD_UPDATED" ]]; then
+if [[ $AGENT_COUNT -eq 0 && $REF_COUNT -eq 0 && $SKILL_COUNT -eq 0 && $DEPRECATED_COUNT -eq 0 && -z "$CLAUDE_MD_UPDATED" ]]; then
   success "Everything is already up to date!"
 else
-  success "Updated $AGENT_COUNT agent(s) and $REF_COUNT reference(s)"
+  success "Updated $AGENT_COUNT agent(s), $SKILL_COUNT skill(s), and $REF_COUNT reference(s)"
   if [[ $DEPRECATED_COUNT -gt 0 ]]; then
     warn "Deprecated $DEPRECATED_COUNT file(s) no longer in the project"
   fi
