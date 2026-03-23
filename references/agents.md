@@ -117,3 +117,29 @@ All agents read `Meta/user-profile.md` for personalization. This file is created
 | "This came from a meeting recording" | Transcriber |
 
 **How agents coordinate**: Agents do NOT communicate directly. When an agent detects work for another agent, it includes a `### Suggested next agent` section in its output. The dispatcher reads this and decides whether to chain the next agent. See `.claude/references/agent-orchestration.md` for the full protocol.
+
+---
+
+## Custom Agents
+
+Custom agents are created by the Architect and live in `.claude/agents/` alongside the core agents. They follow the same conventions: YAML frontmatter, multilingual triggers, inter-agent coordination sections, and dispatcher-driven orchestration.
+
+For the definitive list of all agents (core + custom) with capabilities, inputs, outputs, and status, see `.claude/references/agents-registry.md`.
+
+### How Custom Agents Coordinate
+
+Custom agents participate in the same orchestration protocol as core agents:
+- They include `### Suggested next agent` sections when they detect work for other agents
+- They include `### Suggested new agent` sections when they detect missing capabilities
+- The dispatcher chains them like any other agent, subject to the same anti-recursion rules
+- They count toward the max depth of 3 agents per user request
+
+### Creating a Custom Agent
+
+Say "create a new agent" or "I need a custom agent" to start the process. The Architect will guide you through a conversation to define the agent's purpose, triggers, permissions, and coordination rules.
+
+### Managing Custom Agents
+
+- "Edit my custom agent X" -> the Architect modifies it
+- "Remove custom agent X" -> the Architect deactivates it (with user confirmation)
+- "List all agents" -> shows core 8 + any custom agents

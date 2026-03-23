@@ -33,4 +33,27 @@ The registry is designed to grow: custom agents (see Issue #12) are added as new
 1. **Dispatcher** reads the `Input` column to match user messages to agents
 2. **Dispatcher** reads `Output` + `Capabilities` of other agents to decide if chaining is needed after an agent returns
 3. **Agents** reference this file when suggesting next agents in their output
-4. **Custom agents** (Issue #12) are added as new rows — no code changes needed
+4. **Custom agents** are added as new rows by the Architect during the custom agent creation flow
+
+---
+
+## Custom Agents
+
+Custom agents are created by the Architect through a conversational flow with the user. They follow the exact same schema as core agents and are added as new rows in the Registry table above.
+
+### How Custom Agents Are Added
+
+1. The user asks the Architect to create a new agent (or an existing agent suggests one via `### Suggested new agent`)
+2. The Architect conducts a detailed conversation to understand requirements
+3. The Architect generates the agent file in `.claude/agents/`, adds a row to the Registry table above, and updates `agents.md`
+4. Claude Code auto-discovers the new agent from its frontmatter
+
+### Naming Rules
+
+- Custom agent names must be lowercase, hyphens only (e.g., `habit-tracker`, `recipe-manager`)
+- Names must NOT conflict with core agent names: architect, scribe, sorter, seeker, connector, librarian, transcriber, postman
+- Names should be descriptive and concise (1-2 words)
+
+### Priority
+
+Custom agents always have lower routing priority than the 8 core agents. The dispatcher checks custom agents only when no core agent matches the user's message. Among custom agents, the dispatcher uses the Input column to find the best match

@@ -51,6 +51,21 @@ Multiple suggestions are allowed — list them all. The dispatcher prioritizes a
 - **Context**: There are now 8 notes under this topic but no MOC in MOC/ folder.
 ```
 
+### Suggesting a New Agent
+
+When an agent detects that the user needs functionality that no existing agent provides, it can suggest creating a new custom agent:
+
+```markdown
+### Suggested new agent
+- **Need**: {what capability is missing}
+- **Reason**: {why no existing agent can handle this}
+- **Suggested role**: {brief description of what the new agent would do}
+```
+
+The dispatcher reads this and may invoke the **Architect** to start the custom agent creation flow. This is NOT automatic. The dispatcher should confirm with the user first:
+
+> "The [agent] noticed you might benefit from a custom agent for [need]. Would you like me to create one?"
+
 ---
 
 ## Dispatcher Decision Logic
@@ -60,7 +75,8 @@ After each agent returns, the dispatcher:
 1. **Reads the output** — looks for `### Suggested next agent` sections
 2. **Consults `agents-registry.md`** — validates the suggested agent exists and is `active`
 3. **Checks the call chain** — is this agent already in the chain? Is max depth reached?
-4. **Decides**: invoke next agent OR return results to user
+4. **Checks for `### Suggested new agent`** -- if present, asks the user if they want the Architect to create a custom agent
+5. **Decides**: invoke next agent OR return results to user
 
 The dispatcher can also chain agents **without an explicit suggestion** if the output clearly matches another agent's capabilities (e.g., notes created → Sorter might be needed).
 
@@ -85,6 +101,19 @@ Every user request has a **call chain** — the ordered list of agents invoked s
 If the dispatcher would need a 4th agent, it:
 - Returns the current results to the user
 - Includes a summary of what was deferred: _"The Connector also detected 5 orphan notes that need linking — you can say 'connect the notes' to handle that."_
+
+---
+
+## Custom Agent Lifecycle
+
+Custom agents are created by the Architect and stored in `.claude/agents/`. They participate fully in the orchestration system:
+
+1. **Creation**: the Architect creates the agent file, adds a row to `agents-registry.md`, and updates `agents.md`
+2. **Discovery**: Claude Code auto-discovers the agent from its frontmatter in `.claude/agents/`
+3. **Routing**: the dispatcher checks `agents-registry.md` for custom agents when no core agent matches
+4. **Chaining**: custom agents can suggest (and be suggested by) any other agent, following the same protocol
+5. **Maintenance**: the Librarian audits custom agents during vault health checks. For every row in agents-registry.md with status=active, the corresponding file must exist in `.claude/agents/`
+6. **Deletion**: only the Architect can remove a custom agent (with user confirmation). The agent file is deleted, and the registry row is set to `disabled`
 
 ---
 
