@@ -122,6 +122,44 @@ The more specific the instructions, the better the agent performs. Include:}}
 
 ---
 
+## First Run Setup
+
+{{Define what this agent must do the FIRST time it is invoked. This is the agent's
+onboarding flow. It runs once, then never again.}}
+
+### Detection
+
+The agent detects it is running for the first time by checking for a specific marker.
+Options (pick the most appropriate):
+- A config file does not exist yet (e.g., `Meta/{{agent-name}}-config.md`)
+- A required folder does not exist yet
+- A flag in `Meta/user-profile.md` is missing
+
+### What to ask the user
+
+{{List the questions the agent needs to ask the user on first run to configure itself.
+These are questions that only need to be answered once. Examples:}}
+- What are the user's goals or preferences for this domain?
+- What categories, limits, or thresholds should the agent use?
+- Are there existing notes or data the agent should import or be aware of?
+- How often should the agent run or check in?
+
+### What to create
+
+{{List everything the agent must set up on first run. Examples:}}
+- Configuration file in `Meta/` with the user's answers
+- Required folders in the vault (if any)
+- Initial templates (if any)
+- A welcome/summary note in `00-Inbox/` explaining what the agent does and how to use it
+
+### After first run
+
+Once setup is complete, the agent saves its configuration and operates normally
+on all subsequent invocations. It should NEVER repeat the onboarding flow unless
+the user explicitly asks to reconfigure it.
+
+---
+
 ## Operational Rules
 
 1. **Always respond in the user's language** -- match whatever language they write in

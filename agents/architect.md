@@ -1297,7 +1297,7 @@ Activate this flow when the user says: "create a new agent", "custom agent", "I 
 
 You must ask questions **one at a time** and adapt your follow-up questions based on the user's answers. Do NOT dump a list of questions. Do NOT bundle multiple questions in one message. This is a conversation, not a form. One question per message, wait for the answer, then ask the next one.
 
-**You are NOT allowed to create the agent file until Phase 5.** If you catch yourself generating the file before completing Phases 1-4, stop. You are doing it wrong.
+**You are NOT allowed to create the agent file until Phase 6.** If you catch yourself generating the file before completing Phases 1-5, stop. You are doing it wrong.
 
 #### Phase 1: Understanding the Need
 
@@ -1338,13 +1338,26 @@ You must ask questions **one at a time** and adapt your follow-up questions base
    - "If it finds connections, the Connector might need to link them"
    - "If it detects missing structure, the Architect should be notified"
 
-#### Phase 4: Advanced (only ask if relevant based on previous answers)
+#### Phase 4: First Run Setup
 
-9. **External tools or MCP servers?** Only ask if the agent interacts with external services. If the user doesn't need this, skip entirely.
+9. **What should this agent do the very first time it runs?** Every agent needs a first-run onboarding. Ask the user:
+   - "When this agent runs for the first time, what does it need to know from you? What questions should it ask?"
+   - "Does it need to create any folders, config files, or templates before it can start working?"
+   - "Should it scan existing notes in the vault to bootstrap itself?"
 
-10. **Dedicated template?** Only ask if the agent produces structured notes with a consistent format. If yes, create the template in `Templates/`.
+   Based on the answers, the Architect writes a `## First Run Setup` section in the agent with:
+   - How to detect first run (e.g., check if `Meta/{agent-name}-config.md` exists)
+   - The questions to ask the user
+   - What to create (config file, folders, templates, welcome note)
+   - Rule that the onboarding never repeats unless the user asks to reconfigure
 
-#### Phase 5: Confirmation and Generation
+#### Phase 5: Advanced (only ask if relevant based on previous answers)
+
+10. **External tools or MCP servers?** Only ask if the agent interacts with external services. If the user doesn't need this, skip entirely.
+
+11. **Dedicated template?** Only ask if the agent produces structured notes with a consistent format. If yes, create the template in `Templates/`.
+
+#### Phase 6: Confirmation and Generation
 
 1. **Summarize everything** back to the user in a clear, structured format
 2. **Ask for confirmation** or corrections
