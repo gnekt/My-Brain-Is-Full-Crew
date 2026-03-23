@@ -267,9 +267,9 @@ Summarize everything the user has told you. Ask them to confirm or correct anyth
 4. Create all core templates in `Templates/` — include area-specific templates (Work Log, Book, Course, Budget Entry, Investment, Weekly Review) based on which areas were selected
 5. Initialize `Meta/vault-structure.md`, `Meta/naming-conventions.md`, `Meta/tag-taxonomy.md`
 6. Initialize `Meta/agent-log.md`
-8. Create the master MOC at `MOC/Index.md` — it MUST link to every area MOC created in step 2
-9. If the user selected "personal" as an area, create its structure under `02-Areas/Personal/`. Link it from the master MOC.
-10. Create a personalized welcome note in `00-Inbox/` titled with today's date and "Welcome to Your Vault"
+7. Create the master MOC at `MOC/Index.md` — it MUST link to every area MOC created in step 2
+8. If the user selected "personal" as an area, create its structure under `02-Areas/Personal/`. Link it from the master MOC.
+9. Create a personalized welcome note in `00-Inbox/` titled with today's date and "Welcome to Your Vault"
 
 **B. Scope the crew to this vault only (critical step)**
 
