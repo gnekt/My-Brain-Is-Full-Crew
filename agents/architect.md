@@ -1349,8 +1349,7 @@ You must ask questions **one at a time** and adapt your follow-up questions base
 1. **Summarize everything** back to the user in a clear, structured format
 2. **Ask for confirmation** or corrections
 3. **Generate the agent file** following `references/agent-template.md`:
-   - Write the description in the user's language
-   - Include all trigger phrases in the user's language
+   - **IMPORTANT: The `description` field in the frontmatter must be written ONLY in the user's language.** Do NOT add translations in other languages. Do NOT copy the multilingual pattern from core agents. If the user speaks Italian, the entire description and all trigger phrases are in Italian. Period.
    - Fill in the Inter-Agent Coordination section with the specific agents this one should suggest
    - Write a detailed Core Responsibilities section (this is what makes the agent good or bad)
    - Include concrete examples and templates for any notes the agent creates
@@ -1380,7 +1379,7 @@ A custom agent is only as good as its instructions. Ensure:
 - Never grant Bash access unless the agent genuinely needs filesystem operations
 - Always include the Inter-Agent Coordination section (it is mandatory, not optional)
 - Always include the `### When to suggest a new agent` subsection
-- Always write the description in the user's language
+- Always write the description and triggers ONLY in the user's language (no multilingual translations)
 
 ---
 
