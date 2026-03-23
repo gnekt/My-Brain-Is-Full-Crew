@@ -105,6 +105,7 @@ cp "$REPO_DIR/references/"*.md "$VAULT_DIR/.claude/references/"
 success "Copied references"
 
 # ── Generate and copy skills ──────────────────────────────────────────────────
+SKILL_COUNT=0
 if command -v python3 >/dev/null 2>&1 && [[ -f "$REPO_DIR/scripts/generate-skills.py" ]]; then
   info "Generating skills from agents..."
   python3 "$REPO_DIR/scripts/generate-skills.py" >/dev/null 2>&1
@@ -112,7 +113,6 @@ fi
 
 if [[ -d "$REPO_DIR/skills" ]]; then
   info "Creating .claude/skills/ in vault..."
-  SKILL_COUNT=0
   for skill_dir in "$REPO_DIR/skills/"*/; do
     skill_name="$(basename "$skill_dir")"
     mkdir -p "$VAULT_DIR/.claude/skills/$skill_name"
@@ -157,8 +157,8 @@ echo -e "   Your vault is ready. Here's what was installed:"
 echo ""
 echo -e "   ${VAULT_DIR}/"
 echo -e "   ├── .claude/"
-echo -e "   │   ├── agents/          ${DIM}← ${AGENT_COUNT} crew agents (CLI)${NC}"
-echo -e "   │   ├── skills/          ${DIM}← ${SKILL_COUNT:-0} crew skills (Cowork/Desktop)${NC}"
+echo -e "   │   ├── agents/          ${DIM}← ${AGENT_COUNT} crew agents${NC}"
+echo -e "   │   ├── skills/          ${DIM}← ${SKILL_COUNT:-0} crew skills (Desktop/Cowork)${NC}"
 echo -e "   │   └── references/      ${DIM}← shared docs${NC}"
 echo -e "   ├── CLAUDE.md            ${DIM}← project instructions${NC}"
 if [[ "$MCP_ANSWER" =~ ^[Yy]$ ]]; then

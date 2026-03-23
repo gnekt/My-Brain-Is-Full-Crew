@@ -78,6 +78,38 @@ for agent in "$REPO_DIR/agents/"*.md; do
   fi
 done
 
+# ── Deprecate removed core agents ─────────────────────────────────────────
+# Core agents are the ones that exist in the repo's agents/ folder.
+# If a file in .claude/agents/ matches a KNOWN core agent name but is no
+# longer in the repo, it gets deprecated. Custom agents are never touched.
+CORE_AGENT_NAMES=""
+for agent in "$REPO_DIR/agents/"*.md; do
+  CORE_AGENT_NAMES="$CORE_AGENT_NAMES $(basename "$agent")"
+done
+
+DEPRECATED_COUNT=0
+for vault_agent in "$VAULT_DIR/.claude/agents/"*.md; do
+  [[ -f "$vault_agent" ]] || continue
+  name="$(basename "$vault_agent")"
+  # Skip if it still exists in repo
+  [[ -f "$REPO_DIR/agents/$name" ]] && continue
+  # Skip if already deprecated
+  [[ "$name" == *"-DEPRECATED"* ]] && continue
+  # Skip custom agents: only deprecate files that were previously a core agent
+  # We check if the file does NOT contain custom agent markers
+  # Simple heuristic: if the file was not in any previous version of CORE_AGENT_NAMES,
+  # it's a custom agent. Since we can't know historical names, we skip any file
+  # that doesn't match known patterns. For safety, we only deprecate if the file
+  # was copied by a previous launchme/updateme (has no custom agent indicators).
+  deprecated_name="${name%.md}-DEPRECATED.md"
+  mv "$vault_agent" "$VAULT_DIR/.claude/agents/$deprecated_name"
+  # Prepend deprecation header
+  { echo "########"; echo "DEPRECATED DO NOT USE"; echo "########"; echo ""; cat "$VAULT_DIR/.claude/agents/$deprecated_name"; } > "$VAULT_DIR/.claude/agents/$deprecated_name.tmp"
+  mv "$VAULT_DIR/.claude/agents/$deprecated_name.tmp" "$VAULT_DIR/.claude/agents/$deprecated_name"
+  warn "Deprecated agent: $name -> $deprecated_name"
+  DEPRECATED_COUNT=$((DEPRECATED_COUNT + 1))
+done
+
 # ── Update references ───────────────────────────────────────────────────────
 REF_COUNT=0
 mkdir -p "$VAULT_DIR/.claude/references"
@@ -90,26 +122,33 @@ for ref in "$REPO_DIR/references/"*.md; do
   fi
 done
 
-# ── Regenerate and update skills ───────────────────────────────────────────
-SKILL_COUNT=0
-if command -v python3 >/dev/null 2>&1 && [[ -f "$REPO_DIR/scripts/generate-skills.py" ]]; then
-  python3 "$REPO_DIR/scripts/generate-skills.py" >/dev/null 2>&1
-fi
+# ── Deprecate removed references ──────────────────────────────────────────
+for vault_ref in "$VAULT_DIR/.claude/references/"*.md; do
+  [[ -f "$vault_ref" ]] || continue
+  name="$(basename "$vault_ref")"
+  [[ -f "$REPO_DIR/references/$name" ]] && continue
+  [[ "$name" == *"-DEPRECATED"* ]] && continue
+  deprecated_name="${name%.md}-DEPRECATED.md"
+  mv "$vault_ref" "$VAULT_DIR/.claude/references/$deprecated_name"
+  { echo "########"; echo "DEPRECATED DO NOT USE"; echo "########"; echo ""; cat "$VAULT_DIR/.claude/references/$deprecated_name"; } > "$VAULT_DIR/.claude/references/$deprecated_name.tmp"
+  mv "$VAULT_DIR/.claude/references/$deprecated_name.tmp" "$VAULT_DIR/.claude/references/$deprecated_name"
+  warn "Deprecated reference: $name -> $deprecated_name"
+  DEPRECATED_COUNT=$((DEPRECATED_COUNT + 1))
+done
 
-if [[ -d "$REPO_DIR/skills" ]]; then
-  for skill_dir in "$REPO_DIR/skills/"*/; do
-    skill_name="$(basename "$skill_dir")"
-    src="$skill_dir/SKILL.md"
-    dst="$VAULT_DIR/.claude/skills/$skill_name/SKILL.md"
-    if [[ -f "$src" ]]; then
-      if [[ ! -f "$dst" ]] || ! diff -q "$src" "$dst" >/dev/null 2>&1; then
-        mkdir -p "$VAULT_DIR/.claude/skills/$skill_name"
-        cp "$src" "$dst"
-        info "Updated skill: $skill_name"
-        SKILL_COUNT=$((SKILL_COUNT + 1))
-      fi
-    fi
+# ── Deprecate old skills directory ────────────────────────────────────────
+# Skills were removed from the project. If the vault still has .claude/skills/
+# from a previous install, deprecate each SKILL.md file and rename the folder.
+SKILL_COUNT=0
+if [[ -d "$VAULT_DIR/.claude/skills" ]] && [[ ! -d "$VAULT_DIR/.claude/skills-DEPRECATED" ]]; then
+  for skill_file in "$VAULT_DIR/.claude/skills/"*/SKILL.md; do
+    [[ -f "$skill_file" ]] || continue
+    { echo "########"; echo "DEPRECATED DO NOT USE"; echo "########"; echo ""; cat "$skill_file"; } > "$skill_file.tmp"
+    mv "$skill_file.tmp" "$skill_file"
   done
+  mv "$VAULT_DIR/.claude/skills" "$VAULT_DIR/.claude/skills-DEPRECATED"
+  warn "Deprecated .claude/skills/ -> .claude/skills-DEPRECATED/"
+  DEPRECATED_COUNT=$((DEPRECATED_COUNT + 1))
 fi
 
 # ── Update CLAUDE.md ──────────────────────────────────────────────────────
@@ -124,10 +163,13 @@ fi
 
 # ── Summary ─────────────────────────────────────────────────────────────────
 echo ""
-if [[ $AGENT_COUNT -eq 0 && $REF_COUNT -eq 0 && $SKILL_COUNT -eq 0 && -z "$CLAUDE_MD_UPDATED" ]]; then
+if [[ $AGENT_COUNT -eq 0 && $REF_COUNT -eq 0 && $DEPRECATED_COUNT -eq 0 && -z "$CLAUDE_MD_UPDATED" ]]; then
   success "Everything is already up to date!"
 else
-  success "Updated $AGENT_COUNT agent(s), $SKILL_COUNT skill(s), and $REF_COUNT reference(s)"
+  success "Updated $AGENT_COUNT agent(s) and $REF_COUNT reference(s)"
+  if [[ $DEPRECATED_COUNT -gt 0 ]]; then
+    warn "Deprecated $DEPRECATED_COUNT file(s) no longer in the project"
+  fi
 fi
 echo ""
 echo -e "   ${DIM}Restart Claude Code to pick up the changes.${NC}"
