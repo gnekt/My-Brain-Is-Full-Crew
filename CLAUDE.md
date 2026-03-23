@@ -4,15 +4,17 @@
 
 ## ABSOLUTE CONSTRAINT: ONLY agents from THIS project
 
-Your 8 agents are auto-loaded from `.claude/agents/` at session start. Claude Code already knows them — it reads their `description` field and full system prompt.
+Your 8 core agents are auto-loaded from `.claude/agents/` at session start. Claude Code already knows them — it reads their `description` field and full system prompt.
 
-The ONLY agents you may use are these 8:
+The 8 core agents are:
 
 `architect`, `scribe`, `sorter`, `seeker`, `connector`, `librarian`, `transcriber`, `postman`
 
+Custom agents created by the Architect are also valid. Check `.claude/references/agents-registry.md` for the full list of active agents (core + custom).
+
 **NEVER USE:**
 - External plugins, third-party tools, skills, or MCP servers not defined here
-- Any agent, plugin, or system that is not one of the 8 listed above
+- Any agent, plugin, or system that is not defined in this project's `.claude/agents/` directory
 - If something is not defined in this project's files, **IT DOES NOT EXIST**
 
 ## How to delegate
@@ -41,6 +43,7 @@ When a message matches multiple agents, activate the one with the highest priori
 | 6 | **sorter** | Inbox triage, filing, note sorting |
 | 7 | **connector** | Links between notes, graph, MOCs, relationships, cross-linking |
 | 8 | **librarian** | Maintenance, duplicates, broken links, audit, cleanup |
+| 9+ | **custom agents** | Any agent created via the Architect. Check `agents-registry.md` for triggers and capabilities. Custom agents always have lower priority than core 8. |
 
 ---
 
@@ -112,6 +115,14 @@ Triggers: "weekly review", "check the vault", "maintenance", "are there duplicat
 
 ---
 
+## 9. CUSTOM AGENTS
+
+Custom agents are created by the Architect and stored in `.claude/agents/`. They are auto-discovered by Claude Code like core agents. When a user message does not match any core agent (priorities 1-8), check `references/agents-registry.md` for custom agents whose Input column matches the message. If a match is found, delegate to that agent.
+
+Also activate the **Architect** when the user says "create a new agent", "custom agent", "I need a new agent", "build an agent", "new crew member" (or equivalents in any language).
+
+---
+
 ## Multi-agent routing
 
 The dispatcher is a **reactive multi-router**. After invoking an agent, analyze its output before responding to the user:
@@ -121,6 +132,7 @@ The dispatcher is a **reactive multi-router**. After invoking an agent, analyze 
 3. Did the agent find notes that need linking? → Consider **Connector**
 4. Did the agent produce notes that need cleanup? → Consider **Librarian**
 5. Did the agent include a `### Suggested next agent` section? → Validate and consider it
+6. Did the agent include a `### Suggested new agent` section? → Ask the user if they want the **Architect** to create a custom agent for the detected need
 
 Consult `.claude/references/agents-registry.md` to validate suggestions and match output to agent capabilities.
 
