@@ -1,16 +1,25 @@
+<h1 align="center">🧠 My Brain Is Full — Crew</h1>
+
 <p align="center">
-  <img src="https://img.shields.io/badge/Agents-8%2B-blueviolet?style=for-the-badge" alt="8+ Agents" />
-  <img src="https://img.shields.io/badge/Language-Any-success?style=for-the-badge" alt="Any Language" />
-  <img src="https://img.shields.io/badge/Platform-Obsidian%20%2B%20Claude-blue?style=for-the-badge" alt="Obsidian + Claude" />
-  <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License" />
-  <a href="https://discord.gg/EUnQmABw8s"><img src="https://img.shields.io/badge/Discord-Join%20Community-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Discord" /></a>
+  <strong>A team of 8+ AI agents that manage your Obsidian vault<br>so your brain doesn't have to.</strong>
 </p>
 
-# My Brain Is Full - Crew
+<p align="center">
+  You talk. They organize, file, connect, search, transcribe, and triage your email. In any language.
+</p>
 
-### A team of 8+ AI agents that manage your Obsidian vault so your brain doesn't have to.
+<p align="center">
+  <a href="https://discord.gg/EUnQmABw8s">
+    <img src="https://img.shields.io/badge/💬_Join_the_Community-Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Join Discord" />
+  </a>
+</p>
 
-You talk. They organize, file, connect, search, transcribe, and triage your email. In any language.
+<p align="center">
+  <img src="https://img.shields.io/badge/Agents-8%2B-blueviolet?style=flat-square" alt="8+ Agents" />
+  <img src="https://img.shields.io/badge/Language-Any-success?style=flat-square" alt="Any Language" />
+  <img src="https://img.shields.io/badge/Platform-Obsidian%20%2B%20Claude-blue?style=flat-square" alt="Obsidian + Claude" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow?style=flat-square" alt="MIT License" />
+</p>
 
 ---
 
@@ -49,8 +58,8 @@ The crew ships with 8 agents. But your life isn't generic, and your system shoul
 | Your problem | Your agent |
 |---|---|
 | *"I can only spend 300 euros a month on groceries and I keep losing track"* | **budget-tracker**: monitors spending notes, flags when you're close to the limit |
-| *"I never remember to journal before bed"* | **journaler**: targeted questions every evening, builds a gratitude archive |
-| *"I read 20 papers a week and forget all of them"* | **paper-reader**: extracts key findings, links to related papers, builds a literature MOC |
+| *"My partner says I dress like a raccoon that fell into a donation bin"* | **wardrobe-coach**: tracks what you own, suggests outfits from your notes, and gently stops you from wearing that shirt again |
+| *"I keep buying the same thing at IKEA because I forget what I already have at home"* | **home-inventory**: catalogs what you own room by room, saves you from your third identical cutting board |
 | *"I keep starting side projects and abandoning them"* | **project-pulse**: weekly check-in on all active projects, flags stale ones |
 | *"I have three freelance clients and I mix up their deadlines"* | **client-tracker**: aggregates deadlines per client from notes and calendar |
 
