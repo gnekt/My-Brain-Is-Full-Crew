@@ -1,7 +1,7 @@
 # Terms of Use
 
 **My Brain Is Full - Crew**
-**Last updated: 2026-03-22**
+**Last updated: 2026-03-23**
 
 By using this software, you agree to the following terms. If you do not agree, do not use the software.
 
@@ -151,6 +151,7 @@ This includes, without limitation, liability for:
 - Any consequence of using this software with a model other than Anthropic's Claude
 - Loss or corruption of data in your vault
 - Violations of data protection law arising from your use of the software
+- Any action taken by custom agents created by the user (Section 9)
 - Any indirect, incidental, special, consequential, or punitive damages
 - Loss of profits, data, goodwill, or other intangible losses
 
@@ -164,19 +165,39 @@ The author explicitly condemns any use of this software or its derivatives for: 
 
 ---
 
-## 9. Governing Law
+## 9. Custom Agents
+
+This software allows users to create custom AI agents through the Architect agent. Custom agents are user-generated prompt configurations stored in the user's vault.
+
+**By creating and using custom agents, you explicitly acknowledge and accept that:**
+
+a) Custom agents are **entirely your creation and your responsibility**. The author of this software has no involvement in their design, behavior, or output.
+
+b) The author **provides no warranty whatsoever** on the functionality, accuracy, safety, or reliability of any custom agent you create, regardless of whether the Architect agent assisted in generating the agent file.
+
+c) You are **solely responsible** for everything your custom agents do, including but not limited to: what data they read, what notes they create, what files they modify, what information they process, and any consequences of their actions.
+
+d) Custom agents are subject to the same limitations described in Section 5 (AI-Generated Output and Model Limitations). They produce **stochastic, probabilistic output** that may be inaccurate, incomplete, or misleading.
+
+e) The author **accepts no liability** for any harm, data loss, privacy violation, or any other adverse outcome resulting from the use of custom agents, whether directly or indirectly.
+
+f) If you share your custom agents with others (through forks, exports, or any other means), Section 8 (Forks, Modifications, and Derivative Works) applies in full. You become responsible for the shared agent's behavior.
+
+---
+
+## 10. Governing Law
 
 These terms are governed by and construed in accordance with the laws of the jurisdiction in which the author resides, without regard to conflict of law principles. Any disputes arising from these terms or the use of the software shall be subject to the exclusive jurisdiction of the courts of that jurisdiction.
 
 ---
 
-## 10. Changes to These Terms
+## 11. Changes to These Terms
 
 The author reserves the right to modify these terms at any time. Changes will be reflected in the `Last updated` date at the top of this document. Continued use of the software after changes constitutes acceptance of the updated terms.
 
 ---
 
-## 11. Acceptance
+## 12. Acceptance
 
 By using this software (including by running the installer, loading the plugin, or interacting with any agent), **you confirm that you have read, understood, and agree to these Terms of Use**.
 

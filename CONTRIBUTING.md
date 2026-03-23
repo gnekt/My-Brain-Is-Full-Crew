@@ -20,9 +20,11 @@ To test your changes locally:
 claude --plugin-dir ./
 ```
 
-### Propose a new crew member
+### Propose a new core crew member
 
-Have an idea for a 9th agent? Open an issue with:
+> **Note**: Users can create custom agents directly within their vault by saying "create a new agent" in Claude Code. The Architect handles the entire process. The section below is for proposing new *core* agents that ship with the project.
+
+Have an idea for a new core agent? Open an issue with:
 
 - **Name**: both a descriptive English name and a short codename
 - **Role**: what problem does it solve?
@@ -90,6 +92,21 @@ model: sonnet
 ## Inter-agent coordination
 
 Agents coordinate through a dispatcher-driven orchestration system. When an agent detects work for another agent, it includes a `### Suggested next agent` section in its output. The dispatcher reads this and chains the next agent automatically. The protocol is documented in `references/agent-orchestration.md` and the agent registry is at `references/agents-registry.md`. If your new or improved agent needs to coordinate with existing ones, follow that protocol.
+
+---
+
+## Custom agents vs. core agents
+
+**Custom agents** are created by users within their own vault using the Architect agent. They live in the user's `.claude/agents/` directory and are personal to that vault. Custom agents:
+- Are created through a conversational flow with the Architect
+- Follow the same file structure and conventions as core agents
+- Participate in the dispatcher's routing and orchestration system
+- Have lower priority than core agents
+- Are tracked in `references/agents-registry.md` and `references/agents.md`
+
+**Core agents** ship with the project and are maintained by contributors. To propose a new core agent, open an issue (see above).
+
+If your custom agent solves a problem that many users would benefit from, consider proposing it as a core agent!
 
 ---
 

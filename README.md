@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/Agents-8-blueviolet?style=for-the-badge" alt="8 Agents" />
+  <img src="https://img.shields.io/badge/Agents-8%2B-blueviolet?style=for-the-badge" alt="8+ Agents" />
   <img src="https://img.shields.io/badge/Language-Any-success?style=for-the-badge" alt="Any Language" />
   <img src="https://img.shields.io/badge/Platform-Obsidian%20%2B%20Claude-blue?style=for-the-badge" alt="Obsidian + Claude" />
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License" />
@@ -8,7 +8,7 @@
 
 # My Brain Is Full - Crew
 
-### A team of 8 AI agents that manage your Obsidian vault so your brain doesn't have to.
+### A team of 8+ AI agents that manage your Obsidian vault so your brain doesn't have to.
 
 You talk. They organize, file, connect, search, transcribe, and triage your email. In any language.
 
@@ -42,6 +42,21 @@ The system works in any language. You shouldn't need to think in English to mana
 
 **3. The agents coordinate through a dispatcher.**
 When the transcription agent processes a meeting and discovers a new project, the dispatcher automatically chains the Architect to create the folder structure. It's a crew, not a collection of isolated tools.
+
+**4. 8 agents are just the starting point. Build your own.**
+The crew ships with 8 agents. But your life isn't generic, and your system shouldn't be either. Say "create a new agent" and the Architect walks you through a conversation to design one from scratch. No code, no config files, no templates to edit. You describe what you need, it builds it.
+
+| Your problem | Your agent |
+|---|---|
+| *"I can only spend 300 euros a month on groceries and I keep losing track"* | **budget-tracker**: monitors spending notes, flags when you're close to the limit |
+| *"I never remember to journal before bed"* | **journaler**: targeted questions every evening, builds a gratitude archive |
+| *"I read 20 papers a week and forget all of them"* | **paper-reader**: extracts key findings, links to related papers, builds a literature MOC |
+| *"I keep starting side projects and abandoning them"* | **project-pulse**: weekly check-in on all active projects, flags stale ones |
+| *"I have three freelance clients and I mix up their deadlines"* | **client-tracker**: aggregates deadlines per client from notes and calendar |
+
+Custom agents coordinate with the core crew, get discovered automatically by Claude Code, and respond in your language. They just solve the problems that are specific to **your** life.
+
+> **Your custom agents, your responsibility.** Custom agents are created by you and run on your data. The project provides no warranty on their behavior. See [Terms of Use](TERMS_OF_USE.md).
 
 ---
 
