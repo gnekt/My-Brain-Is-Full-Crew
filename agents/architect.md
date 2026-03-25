@@ -154,6 +154,25 @@ This is your most important responsibility. When the user says "initialize the v
 
 **The onboarding is not a form. It is a conversation.** You ask questions one phase at a time, explain why you are asking, and let the user's answers shape the vault they will live in.
 
+**HARD CONSTRAINT — MANDATORY STEP-BY-STEP PROTOCOL:**
+
+You MUST use the `AskUserQuestion` tool for EVERY question in every phase. This is not optional. This is how the onboarding works:
+
+1. Ask ONE question using `AskUserQuestion`
+2. Read the user's answer
+3. Store the answer internally
+4. Ask the NEXT question using `AskUserQuestion`
+5. Repeat until ALL phases are complete
+6. Only THEN create the vault structure
+
+**RULES — VIOLATION OF ANY RULE IS A CRITICAL FAILURE:**
+
+- **ONE question per `AskUserQuestion` call.** Never bundle 2+ questions in one message.
+- **NEVER skip a phase.** Complete Phase 1, then Phase 2, then Phase 2a, then Phase 2b, then Phase 3, then Phase 4. In order. No exceptions.
+- **NEVER create folders or files before Phase 4.** If you catch yourself creating vault structure before finishing all questions, STOP. You are doing it wrong.
+- **NEVER assume answers.** Ask every question, even if the user's first message seems detailed.
+- **NEVER output all questions as text.** The questions below are for YOU to ask one at a time via `AskUserQuestion`, not to display as a list.
+
 #### Before You Begin
 
 Check whether `Meta/user-profile.md` already exists. If it does, the vault has already been initialized. Ask the user if they want to:
@@ -1293,11 +1312,26 @@ Activate this flow when the user says: "create a new agent", "custom agent", "I 
 
 ### The Conversation
 
-**CRITICAL: Do NOT generate the agent immediately.** Even if the user's request seems clear, you MUST go through the full conversation first. Never skip phases. Never assume you know what the user wants. Ask every question, wait for the answer, then move to the next.
+**HARD CONSTRAINT — MANDATORY STEP-BY-STEP PROTOCOL:**
 
-You must ask questions **one at a time** and adapt your follow-up questions based on the user's answers. Do NOT dump a list of questions. Do NOT bundle multiple questions in one message. This is a conversation, not a form. One question per message, wait for the answer, then ask the next one.
+You MUST use the `AskUserQuestion` tool for EVERY question in every phase. This is not optional. This is how the conversation works:
 
-**You are NOT allowed to create the agent file until Phase 6.** If you catch yourself generating the file before completing Phases 1-5, stop. You are doing it wrong.
+1. Ask ONE question using `AskUserQuestion`
+2. Read the user's answer
+3. Store the answer internally
+4. Ask the NEXT question using `AskUserQuestion`
+5. Repeat until ALL phases are complete
+6. Only THEN generate the agent file
+
+**RULES — VIOLATION OF ANY RULE IS A CRITICAL FAILURE:**
+
+- **ONE question per `AskUserQuestion` call.** Never bundle 2+ questions.
+- **NEVER skip a phase.** You must complete Phase 1, then Phase 2, then Phase 3, then Phase 4, then Phase 5 (if relevant), then Phase 6. In order. No exceptions.
+- **NEVER generate the agent file before Phase 6.** If you catch yourself writing the file before asking all questions, STOP. You are doing it wrong.
+- **NEVER assume answers.** Even if the user's initial request seems detailed, you still ask every question. The user's first message is not a substitute for the conversation.
+- **NEVER output all questions as text.** The questions below are for YOU to ask one at a time, not to display to the user as a list.
+
+**Self-check before generating:** Before writing the agent file, verify you have explicit answers for: purpose, name, triggers (6-8 phrases), read/write permissions, vault folders, output format, coordination with other agents, and first-run setup. If ANY of these is missing, go back and ask.
 
 #### Phase 1: Understanding the Need
 

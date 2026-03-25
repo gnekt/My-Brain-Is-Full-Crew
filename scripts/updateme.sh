@@ -185,12 +185,12 @@ for ref in "$REPO_DIR/references/"*.md; do
     if ! diff -q "$ref" "$vault_copy" >/dev/null 2>&1; then
       cp "$ref" "$vault_copy"
 
-      # Re-insert custom table rows into the registry table (before the --- after the table)
+      # Re-insert custom table rows into the registry table (after the last table row)
       if [[ -n "$custom_table_rows" ]]; then
-        # Find the last core agent row (| postman |) and insert custom rows after it
-        last_core_line=$(grep -n "^| postman " "$vault_copy" | tail -1 | cut -d: -f1)
-        if [[ -n "$last_core_line" ]]; then
-          { head -n "$last_core_line" "$vault_copy"; printf "%s" "$custom_table_rows"; tail -n +"$((last_core_line + 1))" "$vault_copy"; } > "$vault_copy.tmp"
+        # Find the last table row (any line starting with |) — avoids hard-coding a specific agent name
+        last_table_line=$(grep -n "^|" "$vault_copy" | tail -1 | cut -d: -f1)
+        if [[ -n "$last_table_line" ]]; then
+          { head -n "$last_table_line" "$vault_copy"; printf "%s" "$custom_table_rows"; tail -n +"$((last_table_line + 1))" "$vault_copy"; } > "$vault_copy.tmp"
           mv "$vault_copy.tmp" "$vault_copy"
         fi
       fi
