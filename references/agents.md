@@ -95,8 +95,8 @@ All agents read `Meta/user-profile.md` for personalization. This file is created
 
 **Role**: Email & Calendar Intelligence
 **Agent file**: `postman.md`
-**Requires**: Gmail MCP connector, Google Calendar MCP connector
-**Responsibilities**: Scans Gmail for actionable emails, imports Google Calendar events, creates calendar events. Handles VIP filtering and contact enrichment.
+**Requires**: Google Workspace CLI (`gws`) for full read/write access, or MCP connectors (read-only fallback). See `docs/gws-setup-guide.md`.
+**Responsibilities**: Scans Gmail for actionable emails, archives/deletes/labels emails, imports Google Calendar events, creates calendar events. Handles VIP filtering and contact enrichment.
 **Skills**: Email triage, meeting prep, weekly agenda, and deadline radar are handled by skills: `/email-triage`, `/meeting-prep`, `/weekly-agenda`, `/deadline-radar`.
 **Contact when**: Important information may have arrived by email. Meeting notes should be cross-referenced with calendar events. An event needs to be created from a note.
 

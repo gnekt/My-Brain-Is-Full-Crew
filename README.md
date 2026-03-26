@@ -355,11 +355,9 @@ No agent works in isolation. The crew is greater than the sum of its parts.
 
 ## Required integrations
 
-The **Postman** agent (and its related skills: `/email-triage`, `/meeting-prep`, `/weekly-agenda`, `/deadline-radar`) requires:
-- **Gmail** MCP connector (to read and process your inbox)
-- **Google Calendar** MCP connector (to import events and manage your schedule)
-
-The `launchme.sh` script offers to set up `.mcp.json` in your vault automatically. You just need to authorize them when prompted by Claude Code.
+The **Postman** agent (and its related skills: `/email-triage`, `/meeting-prep`, `/weekly-agenda`, `/deadline-radar`) requires one of:
+- **Google Workspace CLI** (`gws`) — full read/write access: search, read, archive, delete, label, send emails; create/update/delete calendar events. See [`docs/gws-setup-guide.md`](docs/gws-setup-guide.md) for setup.
+- **MCP connectors** (read-only fallback) — `launchme.sh` offers to set up `.mcp.json` automatically. Limited to reading emails and calendar events, plus draft creation.
 
 All other agents and skills work with just your local Obsidian vault. No integrations needed.
 
@@ -420,7 +418,7 @@ My-Brain-Is-Full-Crew/               ← cloned inside your vault
 │   ├── getting-started.md             Step-by-step setup guide
 │   ├── examples.md                    Real-world usage examples
 │   └── agents/                        Deep-dive into each agent
-├── .mcp.json                        MCP servers (Gmail, Google Calendar)
+├── .mcp.json                        MCP servers — read-only fallback (see docs/gws-setup-guide.md for full access)
 ├── .claude-plugin/plugin.json       Plugin manifest (for --plugin-dir)
 ├── LICENSE
 ├── README.md                        You are here
@@ -436,7 +434,7 @@ your-vault/
 │   ├── skills/          ← specialized multi-step skills
 │   └── references/      ← shared docs
 ├── CLAUDE.md            ← project instructions (dispatcher routing)
-├── .mcp.json            ← Gmail + Calendar (if enabled)
+├── .mcp.json            ← Gmail + Calendar read-only fallback (if enabled)
 ├── My-Brain-Is-Full-Crew/  ← the repo (for updates)
 └── ... your Obsidian notes
 ```

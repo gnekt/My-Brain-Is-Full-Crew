@@ -329,9 +329,13 @@ If they don't exist, create them from scratch using Write:
 - `.claude/references/agent-orchestration.md` — the inter-agent coordination protocol (dispatcher-driven)
 - `.claude/references/agents-registry.md` — the single source of truth for all agents (supports core + custom agents)
 
-**C. MCP configuration (if integrations enabled)**
+**C. Email & Calendar integration (if integrations enabled)**
 
-If the user opted into Gmail or Google Calendar during Phase 3, create `.mcp.json` at the vault root:
+If the user opted into Gmail or Google Calendar during Phase 3, explain the two options:
+
+1. **Google Workspace CLI (`gws`)** — recommended, full read/write access (search, archive, delete, label, send emails; create/update/delete events). Point the user to `My-Brain-Is-Full-Crew/docs/gws-setup-guide.md` for setup instructions.
+
+2. **MCP connectors** — simpler setup, read-only (plus draft creation). Create `.mcp.json` at the vault root:
 
 ```bash
 cat > .mcp.json << 'EOF'
@@ -1033,11 +1037,13 @@ Add area-specific tags (e.g., `#area/finance`, `#budget`, `#investment`).
 
 ---
 
-## MCP Configuration
+## Email & Calendar Integration
 
-If the user opted into Gmail or Google Calendar during Phase 3, create `.mcp.json` at the vault root.
+If the user opted into Gmail or Google Calendar during Phase 3, explain the two options:
 
-If only Gmail was selected, omit the Google Calendar entry and vice versa. The format is:
+1. **Google Workspace CLI (`gws`)** — recommended, full read/write access. Point the user to `My-Brain-Is-Full-Crew/docs/gws-setup-guide.md`.
+
+2. **MCP connectors** — simpler setup, read-only fallback. Create `.mcp.json` at the vault root:
 
 ```json
 {
@@ -1053,6 +1059,8 @@ If only Gmail was selected, omit the Google Calendar entry and vice versa. The f
   }
 }
 ```
+
+If only Gmail was selected, omit the Google Calendar entry and vice versa.
 
 ---
 

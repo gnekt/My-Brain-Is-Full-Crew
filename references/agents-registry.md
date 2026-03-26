@@ -17,7 +17,7 @@ The registry is designed to grow: custom agents (see Issue #12) are added as new
 | connector | Knowledge Graph & Link Analysis | Add/edit wikilinks, analyze graph structure, discover connections, bridge notes | Link analysis, "find connections", graph health, serendipity requests | New wikilinks added, graph health score, connection maps, bridge notes | active |
 | librarian | Vault Health & Quality Assurance | Detect/merge duplicates, fix broken links, audit frontmatter, growth analytics. Full Bash access. | Maintenance, audit, cleanup, health check, duplicate detection | Health reports, fixed links, merged duplicates, consistency reports | active |
 | transcriber | Audio & Meeting Intelligence | Process transcriptions into structured notes, extract action items, speaker detection | Audio recordings, transcriptions, meeting notes, lecture/podcast processing | Structured meeting/lecture notes in `00-Inbox/` with action items, decisions, topics | active |
-| postman | Email & Calendar Intelligence | Read Gmail, search emails, read/create calendar events, draft replies. Uses MCP connectors. | Email triage, calendar queries, deadline tracking, meeting prep, VIP filtering | Email summaries saved as notes in `00-Inbox/`, calendar events created, deadline reports | active |
+| postman | Email & Calendar Intelligence | Read/archive/delete Gmail, search emails, read/create/update calendar events, draft and send replies. Uses Google Workspace CLI (`gws`) via Bash, with MCP as read-only fallback. | Email triage, calendar queries, deadline tracking, meeting prep, VIP filtering | Email summaries saved as notes in `00-Inbox/`, calendar events created, deadline reports | active |
 
 ---
 

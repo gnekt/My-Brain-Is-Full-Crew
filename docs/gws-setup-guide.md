@@ -141,7 +141,7 @@ gws gmail users messages list --params '{"userId": "me", "maxResults": 3}'
 Test Calendar access:
 
 ```bash
-gws calendar events list --params '{"calendarId": "primary", "timeMin": "{{use any recent date, e.g. start of current month}}T00:00:00Z", "maxResults": 3}'
+gws calendar events list --params '{"calendarId": "primary", "timeMin": "2026-03-01T00:00:00Z", "maxResults": 3}'
 ```
 
 Both should return JSON results.

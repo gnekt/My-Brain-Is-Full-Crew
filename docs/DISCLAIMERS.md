@@ -76,7 +76,7 @@ This is a tool for self-care and personal organization. If you fork it, please k
 
 **This software is designed exclusively for personal, private use on your own data.**
 
-This project can access your Gmail inbox and Google Calendar through MCP connectors, and saves content from those sources as notes inside your local Obsidian vault. **You are solely responsible for ensuring that your use of this software complies with all applicable privacy and data protection laws**, including but not limited to:
+This project can access your Gmail inbox and Google Calendar through the Google Workspace CLI (`gws`) or MCP connectors, and saves content from those sources as notes inside your local Obsidian vault. **You are solely responsible for ensuring that your use of this software complies with all applicable privacy and data protection laws**, including but not limited to:
 
 - The **EU General Data Protection Regulation (GDPR)**, Regulation (EU) 2016/679
 - The **California Consumer Privacy Act (CCPA)**

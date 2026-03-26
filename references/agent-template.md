@@ -31,6 +31,7 @@ tools: {{tool list}}
 #   Write                   -> Only if the agent CREATES new notes or files
 #   Edit                    -> Only if the agent MODIFIES existing notes or files
 #   Bash                    -> Only if the agent needs filesystem operations (move, rename, mkdir)
+#                              or CLI tool access (e.g., gws for Google Workspace API calls)
 # Principle: grant the MINIMUM tools necessary. Read-only agents should NOT have Write/Edit.
 
 model: sonnet

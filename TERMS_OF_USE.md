@@ -58,7 +58,7 @@ i) **Custom agents are entirely user-created.** The author has no control over, 
 
 ### 4.1. Your Responsibilities
 
-This software can access your Gmail inbox and Google Calendar through MCP connectors, and may save content from those sources as notes inside your local Obsidian vault.
+This software can access your Gmail inbox and Google Calendar through the Google Workspace CLI (`gws`) or MCP connectors, and may save content from those sources as notes inside your local Obsidian vault.
 
 **You are solely responsible for:**
 
