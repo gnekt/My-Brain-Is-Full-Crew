@@ -351,7 +351,7 @@ Check if URLs in notes are still valid (if tools available):
 
 Check if notes follow the expected template for their type:
 
-1. Read expected templates from `{{meta}}/templates/` or infer from vault conventions
+1. Read expected templates from `{{templates}}/` or infer from vault conventions
 2. Compare each note's structure against its type's template
 3. Flag notes missing required sections
 4. Suggest reformatting for non-compliant notes
