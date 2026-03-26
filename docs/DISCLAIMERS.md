@@ -92,3 +92,20 @@ This project can access your Gmail inbox and Google Calendar through the Google 
 **The author provides this software "as is" and accepts no liability whatsoever** for any violation of data protection laws arising from your use of this software, including any fines, penalties, claims, or damages resulting from improper processing of personal data.
 
 **If you are unsure whether your intended use complies with applicable law, do not use the email or calendar features, and consult a qualified legal professional.**
+
+---
+
+## On email and calendar write operations
+
+> **Read this carefully if you enable the Google Workspace CLI (`gws`), which grants the Postman agent full read/write access to your Gmail and Google Calendar.**
+
+With `gws` enabled, the Postman agent can **send emails, archive emails, delete emails, modify labels, and create/modify/delete calendar events** on your behalf. This means:
+
+- **Emails can be sent from your account.** An email sent by the AI is indistinguishable from one you sent yourself. If the AI misunderstands your intent, drafts an inappropriate response, or hallucinates content, that email goes out with your name on it. Always review drafts before confirming.
+- **Emails can be archived or deleted.** You might miss important emails if the AI archives or trashes them prematurely. Check your Trash and Archive regularly.
+- **Calendar events can be created, modified, or deleted.** Incorrect dates, times, or participants could lead to missed meetings or scheduling conflicts.
+- **Adversarial emails are a real risk.** A malicious email could contain text designed to trick the AI into performing actions you didn't intend — sending a reply, forwarding content, deleting messages, or creating events. The software includes defenses against this (prompt-level security rules, mandatory user confirmation), but **no prompt-based defense is 100% reliable.** The AI model is a stochastic system that may not follow safety instructions in all cases.
+
+**The MCP fallback (`.mcp.json`) is read-only by design.** If you want email/calendar access without write risks, use MCP instead of `gws`. MCP can read emails, create drafts, and read calendar events, but it cannot send, archive, delete, or modify anything.
+
+**I built the confirmation gates and security rules to be as strict as I could.** But I'm not a security expert, and prompt-based security has fundamental limits. **Use write access at your own risk, review everything before confirming, and back up anything you can't afford to lose.**
