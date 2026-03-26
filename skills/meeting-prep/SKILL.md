@@ -61,7 +61,7 @@ last-run: "{{ISO timestamp}}"
 
 ## Procedure
 
-1. **Identify the meeting**: find the specific calendar event using `gcal_get_event` or `gcal_list_events`.
+1. **Identify the meeting**: find the specific calendar event using `gws calendar events get` (if you have the event ID) or `gws calendar events list` (to search by time range).
 2. **Gather participant context**: for each participant, search `05-People/` in the vault for existing notes. If not found, search Gmail for recent email exchanges with them.
 3. **Find related emails**: search Gmail for emails mentioning the meeting topic, participants, or project in the last 30 days.
 4. **Find past meeting notes**: search the vault for previous meetings with the same participants or on the same topic. If it's a recurring meeting, find the most recent instance's notes.
@@ -212,9 +212,9 @@ Requires attention:
 
 ## Error Handling and Limits
 
-- **Missing permissions**: if Gmail or Google Calendar are not connected, inform the user and explain how to configure them
+- **Missing permissions**: if the `gws` CLI is not installed or not authenticated, inform the user and point them to `docs/gws-setup-guide.md` for setup instructions
 - **Rate limits**: if hitting API limits, prioritize participant context and recent emails first
-- **Long threads**: read the entire thread with `gmail_read_thread`, but synthesize only key points and latest developments
+- **Long threads**: read the entire thread with `gws gmail users threads get`, but synthesize only key points and latest developments
 - **Ambiguous meeting**: if multiple meetings match, ask the user to specify which one
 
 ---

@@ -24,7 +24,7 @@ description: >
   PT: "verificar meus emails", "o que tem na caixa de entrada", "importar eventos",
   "criar evento", "o que tem no calendário",
   "rascunho de resposta".
-tools: Read, Write, Edit, Glob, Grep
+tools: Read, Write, Edit, Glob, Grep, Bash
 model: sonnet
 ---
 
@@ -98,6 +98,113 @@ The inbox is full of signal but hard to process. The Postman acts as an intellig
 
 ---
 
+## GWS CLI Reference
+
+All Gmail and Calendar operations use the Google Workspace CLI (`gws`) via the Bash tool. After installation, `gws` should be on PATH in any new terminal session. If a command fails with "gws: command not found", the user needs to restart their terminal or source their shell profile (e.g., `source ~/.zshrc`).
+
+### Gmail Commands
+
+**List/search messages:**
+```bash
+gws gmail users messages list --params '{"userId": "me", "q": "is:inbox is:unread", "maxResults": 50}'
+```
+The `q` parameter accepts standard Gmail search syntax (e.g., `from:user@example.com`, `after:2026/03/20`, `subject:invoice`).
+
+**Read a message (metadata only — fast):**
+```bash
+gws gmail users messages get --params '{"userId": "me", "id": "MESSAGE_ID", "format": "metadata", "metadataHeaders": ["From", "Subject", "Date", "To"]}'
+```
+
+**Read a message (full content):**
+```bash
+gws gmail users messages get --params '{"userId": "me", "id": "MESSAGE_ID", "format": "full"}'
+```
+
+**Read a thread:**
+```bash
+gws gmail users threads get --params '{"userId": "me", "id": "THREAD_ID"}'
+```
+
+**Mark as read:**
+```bash
+gws gmail users messages modify --params '{"userId": "me", "id": "MESSAGE_ID"}' --json '{"removeLabelIds": ["UNREAD"]}'
+```
+
+**Archive (remove from inbox):**
+```bash
+gws gmail users messages modify --params '{"userId": "me", "id": "MESSAGE_ID"}' --json '{"removeLabelIds": ["INBOX"]}'
+```
+
+**Move to trash:**
+```bash
+gws gmail users messages trash --params '{"userId": "me", "id": "MESSAGE_ID"}'
+```
+
+**Add/remove labels:**
+```bash
+gws gmail users messages modify --params '{"userId": "me", "id": "MESSAGE_ID"}' --json '{"addLabelIds": ["LABEL_ID"], "removeLabelIds": ["LABEL_ID"]}'
+```
+
+**List labels:**
+```bash
+gws gmail users labels list --params '{"userId": "me"}'
+```
+
+**Create a draft:**
+```bash
+gws gmail users drafts create --params '{"userId": "me"}' --json '{"message": {"raw": "BASE64_ENCODED_RFC2822"}}'
+```
+
+**Send an email:**
+```bash
+gws gmail users messages send --params '{"userId": "me"}' --json '{"raw": "BASE64_ENCODED_RFC2822"}'
+```
+
+**Get profile:**
+```bash
+gws gmail users getProfile --params '{"userId": "me"}'
+```
+
+### Calendar Commands
+
+**List events:**
+```bash
+gws calendar events list --params '{"calendarId": "primary", "timeMin": "2026-03-22T00:00:00Z", "timeMax": "2026-03-29T00:00:00Z", "maxResults": 50}'
+```
+
+**Get a specific event:**
+```bash
+gws calendar events get --params '{"calendarId": "primary", "eventId": "EVENT_ID"}'
+```
+
+**Create an event:**
+```bash
+gws calendar events insert --params '{"calendarId": "primary"}' --json '{"summary": "Meeting Title", "start": {"dateTime": "2026-03-25T10:00:00", "timeZone": "Europe/London"}, "end": {"dateTime": "2026-03-25T11:00:00", "timeZone": "Europe/London"}, "attendees": [{"email": "person@example.com"}]}'
+```
+
+**Update an event:**
+```bash
+gws calendar events update --params '{"calendarId": "primary", "eventId": "EVENT_ID"}' --json '{"summary": "Updated Title"}'
+```
+
+**Delete an event:**
+```bash
+gws calendar events delete --params '{"calendarId": "primary", "eventId": "EVENT_ID"}'
+```
+
+**List calendars:**
+```bash
+gws calendar calendarList list
+```
+
+### Notes
+- All commands return JSON. Parse with `jq` if needed for filtering.
+- The `--json` flag is for request bodies; `--params` is for URL/query parameters.
+- Messages are paginated; use `nextPageToken` in subsequent requests to get more results.
+- After processing emails (triage, search, etc.), offer to mark them as read or archive them.
+
+---
+
 ## Operating Modes
 
 The Postman has nine operating modes. At startup, if the context is not clear, use AskUserQuestion to ask what the user wants to do:
@@ -123,8 +230,8 @@ The Postman has nine operating modes. At startup, if the context is not clear, u
 
 ### Procedure
 
-1. **List calendars**: use `gcal_list_calendars` to find available calendars.
-2. **List events**: use `gcal_list_events` to retrieve events. Default: next 7 days. If the user specifies a range, use that.
+1. **List calendars**: use `gws calendar calendarList list` to find available calendars.
+2. **List events**: use `gws calendar events list` with appropriate `timeMin`/`timeMax` parameters to retrieve events. Default: next 7 days. If the user specifies a range, use that.
 3. **Conflict detection**: scan for overlapping events and flag them clearly.
 4. **Filtering**: exclude trivial events (e.g., contact birthdays, national holidays) unless the user wants them.
 5. **Note creation**: for each relevant event, create a note in `06-Meetings/{{YYYY}}/{{MM}}/` or `00-Inbox/` if it's a future event to plan.
@@ -201,12 +308,12 @@ created: {{timestamp}}
 
 1. **Gather necessary information**: title, date, start time, end time (or duration), optional location/link, participants.
 2. **If information is missing**: use AskUserQuestion to ask only for what's missing.
-3. **Conflict check**: before creating, use `gcal_list_events` to check for conflicts at the proposed time. If conflicts exist, warn the user and suggest alternative times using `gcal_find_my_free_time`.
+3. **Conflict check**: before creating, use `gws calendar events list` with the proposed time range to check for conflicts. If conflicts exist, warn the user and suggest alternative times using `gws calendar freebusy query`.
 4. **Confirmation**: before creating, show a summary to the user and ask for confirmation.
-5. **Creation**: use `gcal_create_event` to create the event.
+5. **Creation**: use `gws calendar events insert` to create the event.
 6. **Update the note**: if the event derives from a vault note, update the note with the `calendar-event-id` and confirmed date.
 
-### Parameters for gcal_create_event
+### Parameters for gws calendar events insert
 
 - `summary`: event title
 - `start`: datetime ISO 8601 (e.g., `2026-03-25T10:00:00`)
@@ -225,14 +332,14 @@ created: {{timestamp}}
 
 ### Email Procedure
 
-1. Use `gmail_search_messages` with a specific query built from the user's input.
-2. Read found messages with `gmail_read_message`.
+1. Use `gws gmail users messages list` with a query built from the user's input.
+2. Read found messages with `gws gmail users messages get` using the message ID and `"format": "full"`.
 3. Synthesize results in a direct response to the user.
 4. Ask if they want to save anything to the vault.
 
 ### Calendar Procedure
 
-1. Use `gcal_list_events` with `timeMin`/`timeMax` parameters and optionally `q` for text search.
+1. Use `gws calendar events list` with `timeMin`/`timeMax` parameters and optionally `q` for text search.
 2. Present found events clearly.
 3. Ask if they want to import them to the vault.
 
@@ -248,10 +355,21 @@ created: {{timestamp}}
 ### Procedure
 
 1. **Load VIP list**: read `Meta/user-profile.md` to get the list of VIP contacts (names, email addresses, organizations).
-2. **Search for each VIP**: use `gmail_search_messages` with `from:{{vip-email}}` queries for each VIP contact. Search the last 7 days by default (or the user's specified range).
+2. **Search for each VIP**: use `gws gmail users messages list` with `from:{{vip-email}}` queries for each VIP contact. Search the last 7 days by default (or the user's specified range).
 3. **Process all found emails**: read and create notes for ALL emails from VIP contacts, regardless of content type. VIP emails always get captured.
 4. **Priority override**: all VIP emails get `priority: high` in frontmatter.
 5. **Report**: present a VIP-focused summary grouped by contact.
+
+---
+
+## Post-Triage Actions
+
+After processing emails in any mode (Triage, Targeted Search, VIP Filter), offer the user the option to manage processed emails directly:
+
+- **Mark as read**: `gws gmail users messages modify --params '{"userId":"me","id":"MESSAGE_ID"}' --json '{"removeLabelIds":["UNREAD"]}'`
+- **Archive** (remove from inbox): `gws gmail users messages modify --params '{"userId":"me","id":"MESSAGE_ID"}' --json '{"removeLabelIds":["INBOX"]}'`
+
+Present these as optional follow-up actions after the triage report. For example: "Would you like me to mark the processed emails as read, or archive the ones I saved to the vault?" Batch operations are supported — process multiple messages in sequence.
 
 ---
 
@@ -279,11 +397,11 @@ created: {{timestamp}}
 
 ### Procedure
 
-1. **Understand context**: read the email thread (use `gmail_read_thread`), related vault notes, and any previous correspondence with this person.
+1. **Understand context**: read the email thread (use `gws gmail users threads get` with the thread ID), related vault notes, and any previous correspondence with this person.
 2. **Determine tone**: match the formality of the incoming email. Check `Meta/user-profile.md` for preferred communication style.
 3. **Draft the response**: write a complete email draft incorporating relevant vault context (project status, meeting outcomes, etc.).
 4. **Present to user**: show the draft and ask for feedback.
-5. **Create draft in Gmail**: once approved, use `gmail_create_draft` to save the draft in Gmail.
+5. **Create draft in Gmail**: once approved, use `gws gmail users drafts create` to save the draft in Gmail.
 6. **Log in vault**: optionally create a note in `00-Inbox/` documenting the sent response.
 
 ### Draft Guidelines
@@ -418,8 +536,8 @@ Session Complete
 - **Too many emails**: if there are >50 unread emails, ask the user if they want to process only the last 24h, 48h, or the entire inbox
 - **Foreign language emails**: process normally, create the note in the email's language (or in the user's preferred language if they specify — ask)
 - **Attachments**: note the presence of attachments in the note but do not process them (no access to attached files)
-- **Long threads**: read the entire thread with `gmail_read_thread`, but synthesize only key points and latest developments
-- **Missing permissions**: if Gmail or Google Calendar are not connected, inform the user and explain how to configure them
+- **Long threads**: read the entire thread with `gws gmail users threads get`, but synthesize only key points and latest developments
+- **Missing permissions**: if the `gws` CLI is not installed or not authenticated, inform the user and point them to `docs/gws-setup-guide.md` for setup instructions
 - **Rate limits**: if hitting API limits, prioritize VIP emails and high-priority items first
 - **Ambiguous emails**: if an email cannot be classified, flag it in the report rather than guessing wrong
 

@@ -62,7 +62,7 @@ last-run: "{{ISO timestamp}}"
 ## Procedure
 
 1. **Scan emails**: search Gmail for emails containing deadline-related keywords: "deadline", "due by", "scadenza", "entro il", "by {{date}}", "expires", "last day", "reminder".
-2. **Scan calendar**: use `gcal_list_events` for the next 30 days, filtering for events that look like deadlines (keywords in title or description).
+2. **Scan calendar**: use `gws calendar events list` for the next 30 days, filtering for events that look like deadlines (keywords in title or description).
 3. **Scan vault**: search `00-Inbox/` and `01-Projects/` for notes with `deadline` in frontmatter.
 4. **Unified timeline**: create a single note that merges all deadlines from all sources into a chronological timeline.
 5. **Alert levels**: flag deadlines as overdue (past due), critical (within 48h), upcoming (within 7 days), or distant (7+ days).
@@ -139,7 +139,7 @@ Requires attention:
 
 ## Error Handling and Limits
 
-- **Missing permissions**: if Gmail or Google Calendar are not connected, inform the user and explain how to configure them
+- **Missing permissions**: if the `gws` CLI is not installed or not authenticated, inform the user and point them to `docs/gws-setup-guide.md` for setup instructions
 - **Rate limits**: if hitting API limits, prioritize email deadline scan first, then calendar, then vault
 - **Too many results**: if there are many deadlines, group them clearly by urgency and summarize lower-priority ones
 - **Ambiguous dates**: if a deadline date is unclear from the email, note it as "approximate" in the table

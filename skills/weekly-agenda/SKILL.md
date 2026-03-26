@@ -61,7 +61,7 @@ last-run: "{{ISO timestamp}}"
 
 ## Procedure
 
-1. **Calendar scan**: use `gcal_list_events` for the current week (Monday to Sunday).
+1. **Calendar scan**: use `gws calendar events list` for the current week (Monday to Sunday).
 2. **Email scan**: search Gmail for emails received in the last 7 days that contain deadlines or action items for this week.
 3. **Vault scan**: search the vault for tasks and deadlines due this week.
 4. **Compile**: create a day-by-day overview combining all sources.
@@ -169,7 +169,7 @@ Requires attention:
 
 ## Error Handling and Limits
 
-- **Missing permissions**: if Gmail or Google Calendar are not connected, inform the user and explain how to configure them
+- **Missing permissions**: if the `gws` CLI is not installed or not authenticated, inform the user and point them to `docs/gws-setup-guide.md` for setup instructions
 - **Rate limits**: if hitting API limits, prioritize calendar events first, then email deadlines
 - **Too many events**: if the week is very busy, summarize rather than listing every detail
 - **Ambiguous timeframe**: if the user doesn't specify which week, default to the current week (Monday to Sunday)
