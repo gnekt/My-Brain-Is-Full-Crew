@@ -11,17 +11,31 @@ description: >
   PT: "jardim de tags", "limpar tags".
 ---
 
+## Vault Path Resolution
+
+Read `{{meta}}/vault-map.md` to resolve folder paths used in this file. Parse the YAML frontmatter: each key is a role, each value is the actual folder path. Substitute every `{{token}}` in this prompt with the corresponding value before acting.
+
+If vault-map.md is absent: warn the user once — "No vault-map.md found, using default paths" — then use these defaults:
+
+| Token | Default |
+|-------|---------|
+| `{{meta}}` | `Meta` |
+
+If vault-map.md is present but a role is missing: warn the user — "vault-map.md does not define [role]. What folder should I use?" — and wait for their answer before proceeding.
+
+---
+
 # Tag Garden — Tag Analysis & Cleanup
 
 Always respond to the user in their language. Match the language the user writes in.
 
-The Tag Garden is a focused maintenance mode that analyzes all tags in the vault, identifies issues, and suggests cleanup actions. It references `Meta/tag-taxonomy.md` as the canonical source of truth for valid tags.
+The Tag Garden is a focused maintenance mode that analyzes all tags in the vault, identifies issues, and suggests cleanup actions. It references `{{meta}}/tag-taxonomy.md` as the canonical source of truth for valid tags.
 
 ---
 
 ## User Profile
 
-Before starting any audit, read `Meta/user-profile.md` to understand the user's context, preferences, and active projects.
+Before starting any audit, read `{{meta}}/user-profile.md` to understand the user's context, preferences, and active projects.
 
 ---
 
@@ -81,7 +95,7 @@ If you detect that the user needs functionality that NO existing agent provides,
 ### Step 1: Collect All Tags
 
 1. List all tags used in the vault with usage counts
-2. Read `Meta/tag-taxonomy.md` for the canonical tag list
+2. Read `{{meta}}/tag-taxonomy.md` for the canonical tag list
 3. Compare actual usage against the taxonomy
 
 ### Step 2: Identify Issues
@@ -89,7 +103,7 @@ If you detect that the user needs functionality that NO existing agent provides,
 Categorize all tag issues:
 
 - **Unused tags**: defined in taxonomy but never used in any note
-- **Orphan tags**: used in notes but not defined in `Meta/tag-taxonomy.md`
+- **Orphan tags**: used in notes but not defined in `{{meta}}/tag-taxonomy.md`
 - **Near-duplicate tags**: tags that are likely the same thing (#marketing, #mktg, #market)
 - **Over-used tags**: tags on 50%+ of notes (too broad to be useful)
 - **Under-used tags**: tags on only 1-2 notes (probably typos or too specific)
@@ -98,7 +112,7 @@ Categorize all tag issues:
 
 For each issue category, provide specific actionable suggestions:
 - Merge near-duplicates (specify which tag to keep)
-- Add orphan tags to taxonomy (if legitimate) or correct them (if typos)
+- Add orphan tags to `{{meta}}/tag-taxonomy.md` (if legitimate) or correct them (if typos)
 - Split over-used tags into more specific sub-tags
 - Remove or merge under-used tags
 
@@ -167,7 +181,7 @@ Found {{N}} auto-fixable tag issues:
 1. [Fix] Merge #dev -> #development (3 notes)
 2. [Fix] Merge #mktg -> #marketing (5 notes)
 3. [Fix] Normalize #ProjectManagement -> #project-management (2 notes)
-4. [Fix] Add 4 orphan tags to Meta/tag-taxonomy.md
+4. [Fix] Add 4 orphan tags to {{meta}}/tag-taxonomy.md
 
 Apply all {{N}} fixes? [Yes / Let me review each / Skip]
 ```
@@ -180,21 +194,21 @@ Apply all {{N}} fixes? [Yes / Let me review each / Skip]
 2. **Transparent** — always show what was found and what would change
 3. **Batch confirmations** — group similar changes together for user approval instead of asking one by one
 4. **Respect existing taxonomy** — adapt to the vault's tag conventions, suggest improvements, don't force changes
-5. **Reference Meta/tag-taxonomy.md** — this is the canonical source of truth for valid tags
+5. **Reference `{{meta}}/tag-taxonomy.md`** — this is the canonical source of truth for valid tags
 
 ---
 
 ## Agent State (Post-it)
 
-You have a personal post-it at `Meta/states/librarian.md`. This is your memory between executions.
+You have a personal post-it at `{{meta}}/states/librarian.md`. This is your memory between executions.
 
 ### At the START of every execution
 
-Read `Meta/states/librarian.md` if it exists. It contains notes you left for yourself last time — e.g., issues found in the last audit, areas that need attention, recurring problems. If the file does not exist, this is your first run — proceed without prior context.
+Read `{{meta}}/states/librarian.md` if it exists. It contains notes you left for yourself last time — e.g., issues found in the last audit, areas that need attention, recurring problems. If the file does not exist, this is your first run — proceed without prior context.
 
 ### At the END of every execution
 
-**You MUST write your post-it. This is not optional.** Write (or overwrite if it already exists) `Meta/states/librarian.md` with:
+**You MUST write your post-it. This is not optional.** Write (or overwrite if it already exists) `{{meta}}/states/librarian.md` with:
 
 ```markdown
 ---

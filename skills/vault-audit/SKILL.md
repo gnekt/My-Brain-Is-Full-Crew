@@ -11,6 +11,21 @@ description: >
   PT: "auditoria do vault", "verificar o vault".
 ---
 
+## Vault Path Resolution
+
+Read `{{meta}}/vault-map.md` to resolve folder paths used in this file. Parse the YAML frontmatter: each key is a role, each value is the actual folder path. Substitute every `{{token}}` in this prompt with the corresponding value before acting.
+
+If vault-map.md is absent: warn the user once — "No vault-map.md found, using default paths" — then use these defaults:
+
+| Token | Default |
+|-------|---------|
+| `{{projects}}` | `01-Projects` |
+| `{{meta}}` | `Meta` |
+
+If vault-map.md is present but a role is missing: warn the user — "vault-map.md does not define [role]. What folder should I use?" — and wait for their answer before proceeding.
+
+---
+
 # Vault Audit — Full 7-Phase Vault Health Check
 
 Always respond to the user in their language. Match the language the user writes in.
@@ -21,7 +36,7 @@ The Vault Audit is the comprehensive audit mode of the Librarian agent. It runs 
 
 ## User Profile
 
-Before starting any audit, read `Meta/user-profile.md` to understand the user's context, preferences, and active projects.
+Before starting any audit, read `{{meta}}/user-profile.md` to understand the user's context, preferences, and active projects.
 
 ---
 
@@ -86,7 +101,7 @@ If you detect that the user needs functionality that NO existing agent provides,
 
 Scan the entire vault directory structure:
 
-1. **Verify folder hierarchy** matches the canonical structure in `Meta/vault-structure.md`
+1. **Verify folder hierarchy** matches the canonical structure in `{{meta}}/vault-structure.md`
 2. **Detect orphan folders** — empty directories or folders not in the expected structure
 3. **Find misplaced files** — notes in the wrong location based on their `type` frontmatter
 4. **Check for files outside the structure** — anything in the vault root that should be in a folder
@@ -151,7 +166,7 @@ Check YAML frontmatter consistency:
 
 1. **Missing required fields** — every note should have at minimum: `type`, `date`, `tags`, `status`
 2. **Invalid values** — dates in wrong format, unknown types, malformed tags
-3. **Tag consistency** — check against `Meta/tag-taxonomy.md`, flag unknown tags
+3. **Tag consistency** — check against `{{meta}}/tag-taxonomy.md`, flag unknown tags
 4. **Status hygiene** — notes still marked `status: inbox` but not in Inbox folder
 
 Fix automatically:
@@ -175,8 +190,8 @@ Audit all Map of Content files:
 ### Phase 6: Cross-Agent Integration
 
 Pull insights from other agents' domains:
-1. Check `Meta/agent-log.md` for recent activity from all agents
-2. If legacy `Meta/agent-messages.md` exists, rename to `Meta/agent-messages-DEPRECATED.md`
+1. Check `{{meta}}/agent-log.md` for recent activity from all agents
+2. If legacy `{{meta}}/agent-messages.md` exists, rename to `{{meta}}/agent-messages-DEPRECATED.md`
 3. Cross-reference findings — e.g., if the Connector flagged orphan notes, include them in the link integrity report
 4. Summarize inter-agent activity in the health report
 
@@ -243,7 +258,7 @@ tags: [meta, vault-health, report]
 {{Specific, actionable suggestions for vault improvement, ordered by impact}}
 ```
 
-Save the report to `Meta/health-reports/{{date}} — Vault Health.md`.
+Save the report to `{{meta}}/health-reports/{{date}} — Vault Health.md`.
 
 ---
 
@@ -255,7 +270,7 @@ When presenting issues, always offer a clear fix path:
 Found {{N}} auto-fixable issues:
 
 1. [Fix] Rename "note (updated).md" -> "note.md" (archive old version)
-2. [Fix] Add missing `status: filed` to 5 notes in 01-Projects/
+2. [Fix] Add missing `status: filed` to 5 notes in {{projects}}/
 3. [Fix] Normalize 8 dates from DD/MM/YYYY to YYYY-MM-DD
 4. [Fix] Merge tags: #dev -> #development (3 notes)
 
@@ -288,15 +303,15 @@ When the Librarian has generated 2+ health reports, it should compare them:
 
 ## Agent State (Post-it)
 
-You have a personal post-it at `Meta/states/librarian.md`. This is your memory between executions.
+You have a personal post-it at `{{meta}}/states/librarian.md`. This is your memory between executions.
 
 ### At the START of every execution
 
-Read `Meta/states/librarian.md` if it exists. It contains notes you left for yourself last time — e.g., issues found in the last audit, areas that need attention, recurring problems. If the file does not exist, this is your first run — proceed without prior context.
+Read `{{meta}}/states/librarian.md` if it exists. It contains notes you left for yourself last time — e.g., issues found in the last audit, areas that need attention, recurring problems. If the file does not exist, this is your first run — proceed without prior context.
 
 ### At the END of every execution
 
-**You MUST write your post-it. This is not optional.** Write (or overwrite if it already exists) `Meta/states/librarian.md` with:
+**You MUST write your post-it. This is not optional.** Write (or overwrite if it already exists) `{{meta}}/states/librarian.md` with:
 
 ```markdown
 ---
