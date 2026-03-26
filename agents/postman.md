@@ -100,7 +100,7 @@ The inbox is full of signal but hard to process. The Postman acts as an intellig
 
 ## GWS CLI Reference
 
-All Gmail and Calendar operations use the Google Workspace CLI (`gws`) via the Bash tool. After installation, `gws` should be on PATH in any new terminal session. If a command fails with "gws: command not found", the user needs to restart their terminal or source their shell profile (e.g., `source ~/.zshrc`).
+All Gmail and Calendar operations use the Google Workspace CLI (`gws`) via the Bash tool. If `gws` is not available, MCP tools (`gmail_*`, `gcal_*`) can still be used as a read-only fallback if configured in `.mcp.json`. After installation, `gws` should be on PATH in any new terminal session. If a command fails with "gws: command not found", the user needs to restart their terminal or source their shell profile (e.g., `source ~/.zshrc`).
 
 ### Gmail Commands
 
@@ -140,9 +140,14 @@ gws gmail users messages modify --params '{"userId": "me", "id": "MESSAGE_ID"}' 
 gws gmail users messages trash --params '{"userId": "me", "id": "MESSAGE_ID"}'
 ```
 
-**Add/remove labels:**
+**Add a label:**
 ```bash
-gws gmail users messages modify --params '{"userId": "me", "id": "MESSAGE_ID"}' --json '{"addLabelIds": ["LABEL_ID"], "removeLabelIds": ["LABEL_ID"]}'
+gws gmail users messages modify --params '{"userId": "me", "id": "MESSAGE_ID"}' --json '{"addLabelIds": ["LABEL_ID_TO_ADD"]}'
+```
+
+**Remove a label:**
+```bash
+gws gmail users messages modify --params '{"userId": "me", "id": "MESSAGE_ID"}' --json '{"removeLabelIds": ["LABEL_ID_TO_REMOVE"]}'
 ```
 
 **List labels:**
@@ -160,6 +165,8 @@ gws gmail users drafts create --params '{"userId": "me"}' --json '{"message": {"
 gws gmail users messages send --params '{"userId": "me"}' --json '{"raw": "BASE64_ENCODED_RFC2822"}'
 ```
 
+> Requires `gmail.send` scope in addition to `gmail.modify`. See `My-Brain-Is-Full-Crew/docs/gws-setup-guide.md`.
+
 **Get profile:**
 ```bash
 gws gmail users getProfile --params '{"userId": "me"}'
@@ -169,7 +176,7 @@ gws gmail users getProfile --params '{"userId": "me"}'
 
 **List events:**
 ```bash
-gws calendar events list --params '{"calendarId": "primary", "timeMin": "2026-03-22T00:00:00Z", "timeMax": "2026-03-29T00:00:00Z", "maxResults": 50}'
+gws calendar events list --params '{"calendarId": "primary", "timeMin": "{{week_start}}T00:00:00Z", "timeMax": "{{week_end}}T00:00:00Z", "maxResults": 50}'
 ```
 
 **Get a specific event:**
@@ -371,6 +378,8 @@ After processing emails in any mode (Triage, Targeted Search, VIP Filter), offer
 
 Present these as optional follow-up actions after the triage report. For example: "Would you like me to mark the processed emails as read, or archive the ones I saved to the vault?" Batch operations are supported — process multiple messages in sequence.
 
+**Confirmation required:** Before running any `gws ... modify` commands, list the message IDs and subjects you intend to modify and get explicit user confirmation. Do not batch-modify emails without the user approving the list first.
+
 ---
 
 ### Mode 6: Deadline Radar
@@ -537,7 +546,7 @@ Session Complete
 - **Foreign language emails**: process normally, create the note in the email's language (or in the user's preferred language if they specify — ask)
 - **Attachments**: note the presence of attachments in the note but do not process them (no access to attached files)
 - **Long threads**: read the entire thread with `gws gmail users threads get`, but synthesize only key points and latest developments
-- **Missing permissions**: if the `gws` CLI is not installed or not authenticated, inform the user and point them to `docs/gws-setup-guide.md` for setup instructions
+- **Missing permissions**: if the `gws` CLI is not installed or not authenticated, inform the user and point them to `My-Brain-Is-Full-Crew/docs/gws-setup-guide.md` for setup instructions
 - **Rate limits**: if hitting API limits, prioritize VIP emails and high-priority items first
 - **Ambiguous emails**: if an email cannot be classified, flag it in the report rather than guessing wrong
 

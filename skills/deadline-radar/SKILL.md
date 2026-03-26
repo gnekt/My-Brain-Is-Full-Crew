@@ -139,7 +139,7 @@ Requires attention:
 
 ## Error Handling and Limits
 
-- **Missing permissions**: if the `gws` CLI is not installed or not authenticated, inform the user and point them to `docs/gws-setup-guide.md` for setup instructions
+- **Missing permissions**: if the `gws` CLI is not installed or not authenticated, inform the user and point them to `My-Brain-Is-Full-Crew/docs/gws-setup-guide.md` for setup instructions
 - **Rate limits**: if hitting API limits, prioritize email deadline scan first, then calendar, then vault
 - **Too many results**: if there are many deadlines, group them clearly by urgency and summarize lower-priority ones
 - **Ambiguous dates**: if a deadline date is unclear from the email, note it as "approximate" in the table

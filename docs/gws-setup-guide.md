@@ -9,7 +9,7 @@ The Anthropic-hosted MCP servers for Gmail and Calendar are read-only (plus draf
 ## Prerequisites
 
 - **Node.js** (v18+) and **npm**
-- **Google Cloud SDK** (`gcloud`) — needed for OAuth setup
+- Optional: **Google Cloud SDK** (`gcloud`) — only needed if you prefer CLI-based project setup instead of the Cloud Console UI
 - A **Google account** (personal Gmail works fine)
 
 ## Step 1: Install the Google Workspace CLI
@@ -110,7 +110,9 @@ gws auth login
 This opens an interactive scope selector. **Deselect everything** and only keep:
 
 - `https://www.googleapis.com/auth/gmail.modify` — read/write/archive/delete emails
-- `https://www.googleapis.com/auth/calendar` — read/write calendar events
+- `https://www.googleapis.com/auth/gmail.send` — send emails and drafts
+- `https://www.googleapis.com/auth/calendar.events` — create/update/delete calendar events
+- `https://www.googleapis.com/auth/calendar.calendarlist.readonly` — list available calendars
 
 Optionally also keep:
 
@@ -139,22 +141,16 @@ gws gmail users messages list --params '{"userId": "me", "maxResults": 3}'
 Test Calendar access:
 
 ```bash
-gws calendar events list --params '{"calendarId": "primary", "timeMin": "2026-01-01T00:00:00Z", "maxResults": 3}'
+gws calendar events list --params '{"calendarId": "primary", "timeMin": "{{use any recent date, e.g. start of current month}}T00:00:00Z", "maxResults": 3}'
 ```
 
 Both should return JSON results.
 
 ## Step 9: Remove MCP servers (optional)
 
-If your `.mcp.json` still has the Anthropic-hosted Gmail/Calendar servers, you can remove them:
+If your `.mcp.json` still has the Anthropic-hosted Gmail/Calendar servers, you can remove them. Remove only the `gmail` and `google-calendar` entries from your `.mcp.json`, leaving any other MCP servers intact.
 
-```json
-{
-  "mcpServers": {}
-}
-```
-
-Or delete `.mcp.json` entirely if it contained only those servers.
+If `.mcp.json` contained only those two servers, you can delete the file entirely.
 
 ## Troubleshooting
 

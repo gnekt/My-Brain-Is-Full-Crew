@@ -54,7 +54,7 @@ last-run: "{{ISO timestamp}}"
 
 ## Procedure
 
-1. **Scan inbox**: use `gws gmail users messages list` with query `is:inbox is:unread` to retrieve unread emails. If there are too many (>30), limit to the last 48h with `after:{{yesterday}}`.
+1. **Scan inbox**: use `gws gmail users messages list` with query `is:inbox is:unread` to retrieve unread emails. If there are too many (>30), limit to the last 48h with `newer_than:2d`.
 2. **Read messages**: for each email use `gws gmail users messages get` (with `"format": "full"`) or `gws gmail users threads get` to read the full content.
 3. **Priority scoring**: for each email, calculate a priority score based on:
    - **Sender importance**: VIP contact (+3), known contact (+2), unknown (+0)
@@ -388,7 +388,7 @@ Email Analytics (if notable):
 - **Foreign language emails**: process normally, create the note in the email's language (or in the user's preferred language if they specify — ask)
 - **Attachments**: note the presence of attachments in the note but do not process them (no access to attached files)
 - **Long threads**: read the entire thread with `gws gmail users threads get`, but synthesize only key points and latest developments
-- **Missing permissions**: if the `gws` CLI is not installed or not authenticated, inform the user and point them to `docs/gws-setup-guide.md` for setup instructions
+- **Missing permissions**: if the `gws` CLI is not installed or not authenticated, inform the user and point them to `My-Brain-Is-Full-Crew/docs/gws-setup-guide.md` for setup instructions
 - **Rate limits**: if hitting API limits, prioritize VIP emails and high-priority items first
 - **Ambiguous emails**: if an email cannot be classified, flag it in the report rather than guessing wrong
 

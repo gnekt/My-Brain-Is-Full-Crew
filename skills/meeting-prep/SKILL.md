@@ -212,7 +212,7 @@ Requires attention:
 
 ## Error Handling and Limits
 
-- **Missing permissions**: if the `gws` CLI is not installed or not authenticated, inform the user and point them to `docs/gws-setup-guide.md` for setup instructions
+- **Missing permissions**: if the `gws` CLI is not installed or not authenticated, inform the user and point them to `My-Brain-Is-Full-Crew/docs/gws-setup-guide.md` for setup instructions
 - **Rate limits**: if hitting API limits, prioritize participant context and recent emails first
 - **Long threads**: read the entire thread with `gws gmail users threads get`, but synthesize only key points and latest developments
 - **Ambiguous meeting**: if multiple meetings match, ask the user to specify which one
