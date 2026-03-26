@@ -169,7 +169,7 @@ Requires attention:
 
 ## Error Handling and Limits
 
-- **Missing permissions**: if the `gws` CLI is not installed or not authenticated, inform the user and point them to `docs/gws-setup-guide.md` for setup instructions
+- **Missing permissions**: if the `gws` CLI is not installed or not authenticated, inform the user and point them to the repo’s `docs/gws-setup-guide.md` setup guide (for example, `My-Brain-Is-Full-Crew/docs/gws-setup-guide.md`) for setup instructions
 - **Rate limits**: if hitting API limits, prioritize calendar events first, then email deadlines
 - **Too many events**: if the week is very busy, summarize rather than listing every detail
 - **Ambiguous timeframe**: if the user doesn't specify which week, default to the current week (Monday to Sunday)
