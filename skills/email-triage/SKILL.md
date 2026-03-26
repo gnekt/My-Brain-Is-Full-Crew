@@ -298,7 +298,7 @@ created: {{timestamp}}
 
 ## Contact Enrichment
 
-When you encounter a person in email who does NOT have a note in `05-People/`:
+When you encounter a person in email who does NOT have a note in `{{people}}/`:
 
 1. **Check first**: search `{{people}}/` for variations of the name.
 2. **If truly new**: create a basic People note in `{{inbox}}/` with information gathered from the email:
