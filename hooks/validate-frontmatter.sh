@@ -45,8 +45,9 @@ if [[ "$FIRST_LINE" == "---" ]]; then
   FRONTMATTER=$(sed -n '2,/^---$/p' "$FILE" | head -n -1)
 
   # ── Check 2: tabs in frontmatter ────────────────────────────────────────
-  if echo "$FRONTMATTER" | grep -qP '\t'; then
-    TAB_LINES=$(echo "$FRONTMATTER" | grep -nP '\t' | head -3)
+  TAB_CHAR="$(printf '\t')"
+  if echo "$FRONTMATTER" | grep -q "$TAB_CHAR"; then
+    TAB_LINES=$(echo "$FRONTMATTER" | grep -n "$TAB_CHAR" | head -3)
     echo "WARNING: Frontmatter in $(basename "$FILE") contains tabs. YAML requires spaces for indentation. Lines with tabs: $TAB_LINES"
     exit 1
   fi

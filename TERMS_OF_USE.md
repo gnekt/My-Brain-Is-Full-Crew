@@ -104,7 +104,7 @@ This software can perform **read and write operations** on your email inbox (Gma
 
 **Read operations**: searching emails, reading email content and threads, listing calendar events, reading event details.
 
-**Write operations** (when the Google Workspace CLI or Hey CLI is installed): archiving emails, deleting/trashing emails, marking emails as read/unread (or seen/unseen in Hey), adding and removing labels, sending emails, replying to threads, creating email drafts, creating calendar events, modifying calendar events, deleting calendar events.
+**Write operations on email** (when the Google Workspace CLI or Hey CLI is installed): archiving emails, deleting/trashing emails, marking emails as read/unread (or seen/unseen in Hey), adding and removing labels, sending emails, replying to threads, creating email drafts. **Write operations on Google Calendar** (when the Google Workspace CLI is installed): creating calendar events, modifying calendar events, deleting calendar events.
 
 ### 4A.2. Risks from Read Operations
 

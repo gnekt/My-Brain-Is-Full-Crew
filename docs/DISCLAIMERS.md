@@ -97,9 +97,9 @@ This project can access your email inbox (Gmail via the Google Workspace CLI or 
 
 ## On email and calendar write operations
 
-> **Read this carefully if you enable the Google Workspace CLI (`gws`) or Hey CLI (`hey`), which grant the Postman agent read/write access to your email and calendar.**
+> **Read this carefully if you enable the Google Workspace CLI (`gws`) or Hey CLI (`hey`), which grant the Postman agent read/write access to your email (and calendar, for GWS).**
 
-With `gws` and/or `hey` enabled, the Postman agent can **send emails, reply to threads, archive emails, delete emails, modify labels, mark as seen/unseen, and create/modify/delete calendar events** on your behalf. This means:
+With `gws` and/or `hey` enabled, the Postman agent can **send emails, reply to threads, archive emails, delete emails, modify labels, and mark as seen/unseen** on your behalf. With `gws` specifically, it can also **create/modify/delete Google Calendar events** (Hey CLI does not operate on Google Calendar). This means:
 
 - **Emails can be sent from your account.** An email sent by the AI is indistinguishable from one you sent yourself. If the AI misunderstands your intent, drafts an inappropriate response, or hallucinates content, that email goes out with your name on it. Always review drafts before confirming.
 - **Emails can be archived or deleted.** You might miss important emails if the AI archives or trashes them prematurely. Check your Trash and Archive regularly.
