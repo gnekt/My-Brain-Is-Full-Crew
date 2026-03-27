@@ -1,8 +1,54 @@
-# Setting Up Google Workspace CLI for the Postman Agent
+# Setting Up Email Backends for the Postman Agent
+
+The Postman agent supports three email backends. You can use one or more:
+
+| Backend | Email Provider | Access Level | Calendar |
+|---------|---------------|-------------|----------|
+| **GWS CLI** (`gws`) | Gmail / Google Workspace | Full read/write | Yes (Google Calendar) |
+| **Hey CLI** (`hey`) | Hey.com | Full read/write | No (Hey has its own productivity tools, not Google Calendar) |
+| **MCP connectors** | Gmail | Read-only + drafts | Read-only (Google Calendar) |
+
+If you have both Gmail and Hey.com, you can use `gws` and `hey` simultaneously. Set your preferred primary backend in `Meta/user-profile.md` with `email_backend: hey` or `email_backend: gws` (default: `gws`).
+
+---
+
+## Option A: Hey CLI (for Hey.com users)
+
+### Step 1: Install Hey CLI
+
+```bash
+# See https://github.com/basecamp/hey-cli for the latest instructions
+gem install hey-cli
+```
+
+### Step 2: Authenticate
+
+```bash
+hey auth login
+```
+
+### Step 3: Verify
+
+```bash
+hey auth status --json
+hey box imbox --json --limit 1
+```
+
+If both return JSON, you're good. The Postman will auto-detect `hey` on PATH.
+
+### Troubleshooting Hey
+
+- **`hey: command not found`**: ensure the gem bin directory is on your PATH. Check with `gem environment` and add `<gem_dir>/bin` to PATH.
+- **Auth expired**: run `hey auth refresh` or `hey auth login`.
+- **General issues**: run `hey doctor` for diagnostics.
+
+---
+
+## Option B: Google Workspace CLI (for Gmail users)
 
 The Postman agent uses the [Google Workspace CLI](https://github.com/googleworkspace/cli) (`gws`) to interact with Gmail and Google Calendar. This gives the agent full read/write access — searching, reading, archiving, deleting, labelling emails, and creating/modifying calendar events.
 
-## Why gws instead of MCP?
+### Why gws instead of MCP?
 
 The Anthropic-hosted MCP servers for Gmail and Calendar are read-only (plus draft creation). They cannot archive, delete, label, or send emails. The Google Workspace CLI wraps the full Google API surface, giving the Postman agent the ability to actually manage your inbox — not just read it.
 

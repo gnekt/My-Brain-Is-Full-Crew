@@ -311,7 +311,7 @@ Key design decisions:
 
 - **Seeker** is search-only (`tools: Read, Glob, Grep`) — it finds information but doesn't modify notes
 - **Architect** and **Librarian** have full access including Bash for structural operations
-- **Postman** uses Gmail and Google Calendar via the Google Workspace CLI (`gws`) for full read/write access, with MCP servers (`.mcp.json`) as a read-only fallback. See `docs/gws-setup-guide.md`
+- **Postman** uses email (Gmail via `gws`, Hey.com via `hey` CLI) and Google Calendar for full read/write access, with MCP servers (`.mcp.json`) as a read-only fallback. See `docs/gws-setup-guide.md` for GWS setup
 - All agents auto-activate based on their `description` field — just talk naturally
 - Agents reference shared docs at `.claude/references/`
 

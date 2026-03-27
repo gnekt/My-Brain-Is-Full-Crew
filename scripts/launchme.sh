@@ -165,11 +165,13 @@ fi
 
 # ── MCP servers (Gmail + Calendar) ──────────────────────────────────────────
 echo ""
-echo -e "${BOLD}Do you use Gmail or Google Calendar?${NC}"
+echo -e "${BOLD}Do you use Gmail, Hey.com, or Google Calendar?${NC}"
 echo -e "   ${DIM}The Postman agent can read your inbox and calendar.${NC}"
+echo -e "   ${DIM}Gmail uses MCP connectors (read-only). For full access, set up GWS CLI later.${NC}"
+echo -e "   ${DIM}Hey.com uses the Hey CLI (install from https://github.com/basecamp/hey-cli).${NC}"
 echo -e "   ${DIM}You can always add this later.${NC}"
 echo ""
-echo -e "   ${BOLD}y)${NC} Yes, set up Gmail + Calendar"
+echo -e "   ${BOLD}y)${NC} Yes, set up Gmail + Calendar (MCP connectors)"
 echo -e "   ${BOLD}n)${NC} No, skip for now"
 if ! read -r -p "   > " MCP_ANSWER 2>/dev/null; then MCP_ANSWER=""; fi
 

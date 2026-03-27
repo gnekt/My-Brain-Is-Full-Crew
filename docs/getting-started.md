@@ -13,7 +13,8 @@ A step-by-step guide for setting up your AI-powered vault. No technical backgrou
 - **Git**: A tool to download the project. On Mac, the terminal will prompt you to install it automatically the first time you use it. On Windows, download it from [git-scm.com](https://git-scm.com).
 
 ### Optional (but recommended)
-- **Gmail account**: If you want the Postman agent to process your emails
+- **Gmail account**: If you want the Postman agent to process your Gmail inbox (via GWS CLI or MCP)
+- **Hey.com account**: If you use Hey for email (via Hey CLI) — works alongside or instead of Gmail
 - **Google Calendar**: If you want calendar integration
 
 ---
@@ -89,7 +90,7 @@ bash scripts/launchme.sh
 
 The script will ask two quick questions:
 1. **Is this your vault folder?** Confirm or enter the correct path
-2. **Do you use Gmail or Google Calendar?** Choose yes to set up the Postman integration
+2. **Do you use Gmail, Hey.com, or Google Calendar?** Choose yes to set up the Postman integration
 
 When it's done, your vault will look like this:
 
@@ -144,8 +145,8 @@ The `/onboarding` skill will kick in and the **Architect** will start a friendly
 - What areas of your life do you want to manage?
 
 ### About integrations (optional)
-- Do you want email triage? (requires Gmail connection)
-- Do you want calendar integration? (requires Google Calendar connection)
+- Do you want email triage? (requires Gmail via GWS/MCP, or Hey.com via Hey CLI)
+- Do you want calendar integration? (requires Google Calendar via GWS/MCP)
 
 After the conversation, the Architect creates your entire vault structure, saves your profile, and leaves you a personalized welcome note.
 
@@ -174,7 +175,7 @@ The **Scribe** detects multiple items and creates separate notes for each.
 ### Check your email
 > "Check my email for anything important"
 
-The `/email-triage` skill scans your Gmail, saves actionable emails, and gives you a summary.
+The `/email-triage` skill scans your inbox (Gmail or Hey.com), saves actionable emails, and gives you a summary.
 
 ### File everything
 > "Triage my inbox"
@@ -212,8 +213,8 @@ The Crew works best with simple daily routines:
 ### "The agent doesn't seem to activate"
 Make sure Claude Code is open inside your vault folder (not a different directory). Verify agent files exist at `.claude/agents/` and skill files at `.claude/skills/` in your vault. Try saying the trigger phrase differently. Agents and skills understand natural language in multiple languages.
 
-### "Gmail/Calendar isn't working"
-The Postman needs Gmail and Google Calendar MCP connectors. Run the installer again (`bash scripts/launchme.sh`) and answer **yes** to the Gmail/Calendar question, or manually copy `.mcp.json` from the repo to your vault root. Then authorize the connection when Claude Code prompts you.
+### "Email/Calendar isn't working"
+The Postman needs at least one email backend: GWS CLI (`gws`), Hey CLI (`hey`), or MCP connectors. For GWS, see `docs/gws-setup-guide.md`. For Hey, install from [github.com/basecamp/hey-cli](https://github.com/basecamp/hey-cli) and run `hey auth login`. For MCP, run the installer again (`bash scripts/launchme.sh`) and answer **yes** to the Gmail/Calendar question, or manually copy `.mcp.json` from the repo to your vault root.
 
 ### "My vault structure looks different from the docs"
 The Architect customizes the structure based on your onboarding answers.

@@ -58,7 +58,7 @@ i) **Custom agents are entirely user-created.** The author has no control over, 
 
 ### 4.1. Your Responsibilities
 
-This software can access your Gmail inbox and Google Calendar through the Google Workspace CLI (`gws`) or MCP connectors, and may save content from those sources as notes inside your local Obsidian vault.
+This software can access your email inbox (Gmail via the Google Workspace CLI or MCP connectors, Hey.com via the Hey CLI) and Google Calendar, and may save content from those sources as notes inside your local Obsidian vault.
 
 **You are solely responsible for:**
 
@@ -100,11 +100,11 @@ The author of this software:
 
 ### 4A.1. Nature of Email and Calendar Access
 
-This software can perform **read and write operations** on your Gmail inbox and Google Calendar, including but not limited to:
+This software can perform **read and write operations** on your email inbox (Gmail and/or Hey.com) and Google Calendar, including but not limited to:
 
 **Read operations**: searching emails, reading email content and threads, listing calendar events, reading event details.
 
-**Write operations** (when the Google Workspace CLI is installed): archiving emails, deleting/trashing emails, marking emails as read/unread, adding and removing labels, sending emails, creating email drafts, creating calendar events, modifying calendar events, deleting calendar events.
+**Write operations** (when the Google Workspace CLI or Hey CLI is installed): archiving emails, deleting/trashing emails, marking emails as read/unread (or seen/unseen in Hey), adding and removing labels, sending emails, replying to threads, creating email drafts, creating calendar events, modifying calendar events, deleting calendar events.
 
 ### 4A.2. Risks from Read Operations
 

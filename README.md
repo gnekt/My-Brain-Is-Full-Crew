@@ -106,7 +106,7 @@ Key points:
 | 5 | **Connector** | Knowledge Graph | Discovers hidden links between your notes, even ones you'd never think of |
 | 6 | **Librarian** | Vault Maintenance | Weekly health checks, deduplication, broken link repair, growth analytics |
 | 7 | **Transcriber** | Audio & Meetings | Turns recordings and transcripts into rich, structured meeting notes |
-| 8 | **Postman** | Email & Calendar | Bridges Gmail and Google Calendar with your vault: deadline radar, meeting prep |
+| 8 | **Postman** | Email & Calendar | Bridges email (Gmail or Hey.com) and Google Calendar with your vault: deadline radar, meeting prep |
 
 > **Agents + Skills = the full system.** Each agent handles quick, reactive tasks. For complex multi-step workflows (like onboarding, email triage, or vault audits), the dispatcher routes to one of **13 specialized skills** that run as guided conversations. See the [Skills](#skills) section below.
 
@@ -356,10 +356,11 @@ No agent works in isolation. The crew is greater than the sum of its parts.
 ## Required integrations
 
 The **Postman** agent (and its related skills: `/email-triage`, `/meeting-prep`, `/weekly-agenda`, `/deadline-radar`) requires one of:
-- **Google Workspace CLI** (`gws`) — full read/write access: search, read, archive, delete, label, send emails; create/update/delete calendar events. See [`docs/gws-setup-guide.md`](docs/gws-setup-guide.md) for setup.
+- **Google Workspace CLI** (`gws`) — full read/write access to Gmail and Google Calendar: search, read, archive, delete, label, send emails; create/update/delete calendar events. See [`docs/gws-setup-guide.md`](docs/gws-setup-guide.md) for setup.
+- **Hey CLI** (`hey`) — for Hey.com accounts. Read/reply/compose emails, leverages Hey's pre-sorted mailboxes (Imbox, Feed, Paper Trail, Reply Later, Set Aside, Bubble Up). Calendar operations still use `gws`. See [Hey CLI](https://github.com/basecamp/hey-cli) for installation.
 - **MCP connectors** (read-only fallback) — `launchme.sh` offers to set up `.mcp.json` automatically. Limited to reading emails and calendar events, plus draft creation.
 
-All other agents and skills work with just your local Obsidian vault. No integrations needed.
+You can use `gws` and `hey` simultaneously if you have both Gmail and Hey.com accounts. All other agents and skills work with just your local Obsidian vault. No integrations needed.
 
 ### Updating
 
