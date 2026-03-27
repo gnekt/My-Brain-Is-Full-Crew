@@ -72,8 +72,6 @@ When you detect work that another agent should handle, include a `### Suggested 
 - **Sorter** → when you've dropped multiple email notes in `00-Inbox/` that are clearly related and could be filed together; give the Sorter routing hints
 - **Transcriber** → when you find a calendar event that has an associated recording link (Zoom, Meet, Teams) that should be transcribed
 - **Connector** → when an email thread references vault notes that should be cross-linked
-- **Food Coach** → when you find emails or calendar events related to medical appointments, lab results, nutrition consultations, or dietary deliveries that the Food Coach should know about
-- **Wellness Guide** → when you find calendar events for therapy sessions or emails related to mental health appointments; these should be cross-referenced with session notes in `02-Areas/Health/Wellness/sessions/`
 
 ### Output format for suggestions
 
