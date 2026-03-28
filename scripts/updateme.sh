@@ -237,6 +237,35 @@ if [[ -d "$REPO_DIR/skills" ]]; then
   done
 fi
 
+# ── Update hooks ──────────────────────────────────────────────────────────
+HOOK_COUNT=0
+if [[ -d "$REPO_DIR/hooks" ]]; then
+  mkdir -p "$VAULT_DIR/.claude/hooks"
+  for hook in "$REPO_DIR/hooks/"*.sh; do
+    [[ -f "$hook" ]] || continue
+    name="$(basename "$hook")"
+    dst="$VAULT_DIR/.claude/hooks/$name"
+    if [[ ! -f "$dst" ]] || ! diff -q "$hook" "$dst" >/dev/null 2>&1; then
+      cp "$hook" "$dst"
+      chmod +x "$dst"
+      info "Updated hook: $name"
+      HOOK_COUNT=$((HOOK_COUNT + 1))
+    fi
+  done
+fi
+
+# ── Update settings.json ──────────────────────────────────────────────────
+SETTINGS_UPDATED=""
+if [[ -f "$REPO_DIR/settings.json" ]]; then
+  dst="$VAULT_DIR/.claude/settings.json"
+  if [[ ! -f "$dst" ]] || ! diff -q "$REPO_DIR/settings.json" "$dst" >/dev/null 2>&1; then
+    mkdir -p "$VAULT_DIR/.claude"
+    cp "$REPO_DIR/settings.json" "$dst"
+    info "Updated settings.json"
+    SETTINGS_UPDATED="1"
+  fi
+fi
+
 # ── Update CLAUDE.md ──────────────────────────────────────────────────────
 CLAUDE_MD_UPDATED=""
 if [[ -f "$REPO_DIR/CLAUDE.md" ]]; then
@@ -253,10 +282,10 @@ fi
 
 # ── Summary ─────────────────────────────────────────────────────────────────
 echo ""
-if [[ $AGENT_COUNT -eq 0 && $REF_COUNT -eq 0 && $SKILL_COUNT -eq 0 && $DEPRECATED_COUNT -eq 0 && -z "$CLAUDE_MD_UPDATED" ]]; then
+if [[ $AGENT_COUNT -eq 0 && $REF_COUNT -eq 0 && $SKILL_COUNT -eq 0 && $HOOK_COUNT -eq 0 && $DEPRECATED_COUNT -eq 0 && -z "$CLAUDE_MD_UPDATED" && -z "$SETTINGS_UPDATED" ]]; then
   success "Everything is already up to date!"
 else
-  success "Updated $AGENT_COUNT agent(s), $SKILL_COUNT skill(s), and $REF_COUNT reference(s)"
+  success "Updated $AGENT_COUNT agent(s), $SKILL_COUNT skill(s), $REF_COUNT reference(s), $HOOK_COUNT hook(s)"
   if [[ $DEPRECATED_COUNT -gt 0 ]]; then
     warn "Deprecated $DEPRECATED_COUNT file(s) no longer in the project"
   fi

@@ -1,12 +1,12 @@
 # Postman
 
-> Your bridge between Gmail, Google Calendar, and your vault.
+> Your bridge between email (Gmail or Hey.com), Google Calendar, and your vault.
 
 ## What it does
 
-The Postman connects your email and calendar to your Obsidian vault. It scans your Gmail inbox, identifies what actually matters (action requests, deadlines, important information), and saves it as structured notes. It imports Google Calendar events as meeting prep notes. It can even create new calendar events from your vault content.
+The Postman connects your email and calendar to your Obsidian vault. It scans your inbox (Gmail via GWS CLI, Hey.com via Hey CLI, or Gmail via MCP as read-only fallback), identifies what actually matters (action requests, deadlines, important information), and saves it as structured notes. It imports Google Calendar events as meeting prep notes. It can even create new calendar events from your vault content.
 
-The Postman is a smart filter, not a bulk importer. It knows the difference between a critical email from a client requesting a proposal and a marketing newsletter. It recognizes deadlines, extracts action items, and creates notes with the right priority level. Everything it skips, it tells you about, so you stay informed without your vault getting flooded with noise.
+The Postman is a smart filter, not a bulk importer. It knows the difference between a critical email from a client requesting a proposal and a marketing newsletter. It recognizes deadlines, extracts action items, and creates notes with the right priority level. Everything it skips, it tells you about, so you stay informed without your vault getting flooded with noise. When using Hey, the Postman leverages Hey's pre-sorted mailboxes (Imbox, Feed, Paper Trail, Reply Later, Set Aside, Bubble Up) for smarter triage.
 
 It works in four modes: email triage (scan and save important emails), calendar import (bring upcoming events into your vault), event creation (schedule something from a note or request), and targeted search (find specific emails or events on a topic).
 
@@ -25,7 +25,7 @@ What the Postman agent still does directly:
 
 - **Calendar import**: pulls upcoming Google Calendar events into the vault as meeting prep notes with participant lists and agenda
 - **Event creation**: creates Google Calendar events from your requests or from deadlines found in vault notes
-- **Targeted search**: searches Gmail or Calendar for specific topics, people, or date ranges
+- **Targeted search**: searches email (Gmail or Hey) or Calendar for specific topics, people, or date ranges
 - **VIP filter**: prioritizes emails from important contacts (colleagues, clients, key people)
 - **Email drafting**: drafts reply emails based on vault context
 - **Travel mode**: when it detects travel-related events (flights, hotels, conferences), creates a consolidated travel itinerary note
@@ -57,7 +57,7 @@ In German: "Prufe meine Emails", "Was steht im Kalender"
 
 **You:** Check my email
 
-**Postman:** Scanning your Gmail inbox... Found 28 unread messages.
+**Postman:** Scanning your inbox... Found 28 unread messages.
 
 Saved to vault (3):
 - **"Proposal Request From Luca"**: action required, high priority. Luca needs a project proposal by next Wednesday. Saved with action items and deadline.
@@ -131,7 +131,7 @@ Shall I proceed?
 - **Let it create calendar events from notes.** If a note contains a deadline or meeting plan, tell the Postman to schedule it. Saves you switching to Google Calendar.
 - **Trust the noise filter.** The Postman is aggressive about filtering newsletters, notifications, and receipts. If it ever filters something important, tell it. It learns from your corrections.
 - **Check "needs your input" items.** The Postman flags ambiguous emails rather than guessing. These are usually worth a quick look.
-- **Make sure Gmail and Google Calendar are connected.** The Postman needs API access to your accounts. Check `Meta/user-profile.md` to verify integrations are enabled, or ask the Architect during onboarding.
+- **Make sure at least one email backend is connected.** The Postman needs either GWS (`gws`), Hey CLI (`hey`), or MCP connectors to access your email. Check `Meta/user-profile.md` to verify integrations are enabled (including the `email_backend` setting if you have multiple backends), or ask the Architect during onboarding.
 
 ## What it remembers
 

@@ -58,7 +58,7 @@ i) **Custom agents are entirely user-created.** The author has no control over, 
 
 ### 4.1. Your Responsibilities
 
-This software can access your Gmail inbox and Google Calendar through MCP connectors, and may save content from those sources as notes inside your local Obsidian vault.
+This software can access your email inbox (Gmail via the Google Workspace CLI or MCP connectors, Hey.com via the Hey CLI) and Google Calendar, and may save content from those sources as notes inside your local Obsidian vault.
 
 **You are solely responsible for:**
 
@@ -93,6 +93,56 @@ The author of this software:
 - **Does not collect, receive, store, or transmit** any of your data or any third-party data
 - **Cannot respond** to data subject requests on your behalf
 - **Accepts no liability** for any data protection violations arising from your use of this software
+
+---
+
+## 4A. Email and Calendar Operations — Risks and Liability
+
+### 4A.1. Nature of Email and Calendar Access
+
+This software can perform **read and write operations** on your email inbox (Gmail and/or Hey.com) and Google Calendar, including but not limited to:
+
+**Read operations**: searching emails, reading email content and threads, listing calendar events, reading event details.
+
+**Write operations on email** (when the Google Workspace CLI or Hey CLI is installed): archiving emails, deleting/trashing emails, marking emails as read/unread (or seen/unseen in Hey), adding and removing labels, sending emails, replying to threads, creating email drafts. **Write operations on Google Calendar** (when the Google Workspace CLI is installed): creating calendar events, modifying calendar events, deleting calendar events.
+
+### 4A.2. Risks from Read Operations
+
+When the software reads your emails and calendar events:
+
+a) Email and calendar content is processed by the underlying AI model. The AI model is a **stochastic system** (see Section 5) and may misinterpret, misclassify, or hallucinate information from your emails. The software may create vault notes that contain inaccurate summaries, wrong dates, fabricated action items, or misattributed quotes.
+
+b) Emails may contain **adversarial content** (prompt injection, social engineering, phishing) designed to manipulate AI systems. While the software includes prompt-level defenses against such attacks, **prompt-based security is best-effort, not a guarantee.** The author cannot guarantee that the AI model will correctly ignore adversarial instructions embedded in email content under all circumstances.
+
+c) Sensitive information from emails (personal data, financial details, confidential communications, passwords, tokens, API keys) may be inadvertently saved to vault notes in plaintext. You are responsible for reviewing what the software saves.
+
+### 4A.3. Risks from Write Operations
+
+When the software performs write operations on your Gmail or Google Calendar:
+
+a) **Sending emails**: The software may compose and send emails on your behalf. An email sent by the software is **indistinguishable from an email you sent yourself.** The author accepts no responsibility for the content, tone, accuracy, appropriateness, or consequences of any email sent by the software, including but not limited to: emails sent to wrong recipients, emails with incorrect information, emails with inappropriate tone or content, and emails that cause professional, personal, legal, or financial harm.
+
+b) **Archiving, deleting, or modifying emails**: The software may archive, trash, delete, label, or mark emails as read. These operations may cause you to **miss important emails, deadlines, or communications.** Deleted emails may be unrecoverable. The author accepts no responsibility for any email that is lost, archived prematurely, mislabeled, or otherwise modified in a way that causes harm.
+
+c) **Calendar modifications**: The software may create, modify, or delete calendar events. This may result in **missed meetings, scheduling conflicts, double-bookings, deleted events, or events created with incorrect details** (wrong date, time, participants, or location). The author accepts no responsibility for any scheduling disruption caused by the software.
+
+d) **Adversarial email content triggering write actions**: Despite prompt-level security measures, a malicious or adversarial email could potentially manipulate the AI model into performing unintended write operations — such as sending a reply, forwarding content, archiving important emails, creating calendar events, or deleting messages. **The author cannot guarantee that prompt-based defenses will prevent all such scenarios.** You assume full responsibility for all actions performed by the software on your email and calendar accounts.
+
+### 4A.4. Your Responsibilities
+
+**By enabling email and calendar access, you explicitly acknowledge and accept that:**
+
+a) You have **reviewed and understood** the risks described in this section before granting the software access to your email and calendar accounts.
+
+b) You are **solely responsible** for monitoring and reviewing all actions the software performs on your email and calendar accounts, including emails sent, emails archived or deleted, labels applied, and calendar events created, modified, or deleted.
+
+c) You should **regularly check your Sent folder, Trash, and Calendar** to verify that the software has not performed unintended actions.
+
+d) The software's prompt-level security measures (instructions to ignore adversarial content, confirmation gates before write operations) are **best-effort safeguards, not guarantees.** They depend on the underlying AI model correctly following instructions, which cannot be assured in all cases.
+
+e) You **voluntarily assume all risk** associated with granting the software read and write access to your email and calendar accounts, including the risk of data loss, unintended communications, missed messages, and scheduling disruptions.
+
+f) The author **accepts no liability whatsoever** for any harm, loss, or damage resulting from the software's email and calendar operations, whether caused by AI misinterpretation, adversarial content, software bugs, model hallucination, or any other reason.
 
 ---
 
@@ -151,6 +201,10 @@ This includes, without limitation, liability for:
 - Loss or corruption of data in your vault
 - Violations of data protection law arising from your use of the software
 - Any action taken by custom agents created by the user (Section 9)
+- **Emails sent, forwarded, or replied to** by the software, including emails with incorrect content, wrong recipients, or inappropriate tone
+- **Emails archived, deleted, trashed, labeled, or marked as read** by the software, including missed communications resulting from premature archival or deletion
+- **Calendar events created, modified, or deleted** by the software, including missed meetings, scheduling conflicts, or events with incorrect details
+- **Any action triggered by adversarial or malicious email content** that manipulates the AI model into performing unintended operations, despite prompt-level security measures
 - Any indirect, incidental, special, consequential, or punitive damages
 - Loss of profits, data, goodwill, or other intangible losses
 

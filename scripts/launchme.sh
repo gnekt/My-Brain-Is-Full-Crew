@@ -167,13 +167,39 @@ if [[ -f "$REPO_DIR/CLAUDE.md" ]]; then
   success "Copied CLAUDE.md"
 fi
 
+# ── Copy hooks ───────────────────────────────────────────────────────────────
+HOOK_COUNT=0
+if [[ -d "$REPO_DIR/hooks" ]]; then
+  mkdir -p "$VAULT_DIR/.claude/hooks"
+  for hook in "$REPO_DIR/hooks/"*.sh; do
+    [[ -f "$hook" ]] || continue
+    cp "$hook" "$VAULT_DIR/.claude/hooks/"
+    chmod +x "$VAULT_DIR/.claude/hooks/$(basename "$hook")"
+    HOOK_COUNT=$((HOOK_COUNT + 1))
+  done
+  success "Copied $HOOK_COUNT hooks"
+fi
+
+# ── Copy settings.json ───────────────────────────────────────────────────────
+if [[ -f "$REPO_DIR/settings.json" ]]; then
+  if [[ -f "$VAULT_DIR/.claude/settings.json" ]]; then
+    warn ".claude/settings.json already exists — skipping (won't overwrite)"
+  else
+    mkdir -p "$VAULT_DIR/.claude"
+    cp "$REPO_DIR/settings.json" "$VAULT_DIR/.claude/settings.json"
+    success "Copied settings.json (hooks configuration)"
+  fi
+fi
+
 # ── MCP servers (Gmail + Calendar) ──────────────────────────────────────────
 echo ""
-echo -e "${BOLD}Do you use Gmail or Google Calendar?${NC}"
+echo -e "${BOLD}Do you use Gmail, Hey.com, or Google Calendar?${NC}"
 echo -e "   ${DIM}The Postman agent can read your inbox and calendar.${NC}"
+echo -e "   ${DIM}Gmail uses MCP connectors (read-only). For full access, set up GWS CLI later.${NC}"
+echo -e "   ${DIM}Hey.com uses the Hey CLI (install from https://github.com/basecamp/hey-cli).${NC}"
 echo -e "   ${DIM}You can always add this later.${NC}"
 echo ""
-echo -e "   ${BOLD}y)${NC} Yes, set up Gmail + Calendar"
+echo -e "   ${BOLD}y)${NC} Yes, set up Gmail + Calendar (MCP connectors)"
 echo -e "   ${BOLD}n)${NC} No, skip for now"
 if ! read -r -p "   > " MCP_ANSWER 2>/dev/null; then MCP_ANSWER=""; fi
 
@@ -198,6 +224,8 @@ echo -e "   ${VAULT_DIR}/"
 echo -e "   ├── .claude/"
 echo -e "   │   ├── agents/          ${DIM}← ${AGENT_COUNT} crew agents${NC}"
 echo -e "   │   ├── skills/          ${DIM}← ${SKILL_COUNT:-0} crew skills (Desktop/Cowork)${NC}"
+echo -e "   │   ├── hooks/           ${DIM}← ${HOOK_COUNT:-0} hooks${NC}"
+echo -e "   │   ├── settings.json    ${DIM}← hooks configuration${NC}"
 echo -e "   │   └── references/      ${DIM}← shared docs${NC}"
 echo -e "   ├── CLAUDE.md            ${DIM}← project instructions${NC}"
 if [[ "$MCP_ANSWER" =~ ^[Yy]$ ]]; then

@@ -72,11 +72,11 @@ This is a tool for self-care and personal organization. If you fork it, please k
 
 ## On privacy and data protection (GDPR and applicable laws)
 
-> **Read this carefully before using the Postman agent or any feature that accesses external data sources.**
+> **Read this carefully before using the Postman agent or any feature that accesses external data sources (Gmail, Hey.com, Google Calendar).**
 
 **This software is designed exclusively for personal, private use on your own data.**
 
-This project can access your Gmail inbox and Google Calendar through MCP connectors, and saves content from those sources as notes inside your local Obsidian vault. **You are solely responsible for ensuring that your use of this software complies with all applicable privacy and data protection laws**, including but not limited to:
+This project can access your email inbox (Gmail via the Google Workspace CLI or MCP connectors, Hey.com via the Hey CLI) and Google Calendar, and saves content from those sources as notes inside your local Obsidian vault. **You are solely responsible for ensuring that your use of this software complies with all applicable privacy and data protection laws**, including but not limited to:
 
 - The **EU General Data Protection Regulation (GDPR)**, Regulation (EU) 2016/679
 - The **California Consumer Privacy Act (CCPA)**
@@ -92,3 +92,20 @@ This project can access your Gmail inbox and Google Calendar through MCP connect
 **The author provides this software "as is" and accepts no liability whatsoever** for any violation of data protection laws arising from your use of this software, including any fines, penalties, claims, or damages resulting from improper processing of personal data.
 
 **If you are unsure whether your intended use complies with applicable law, do not use the email or calendar features, and consult a qualified legal professional.**
+
+---
+
+## On email and calendar write operations
+
+> **Read this carefully if you enable the Google Workspace CLI (`gws`) or Hey CLI (`hey`), which grant the Postman agent read/write access to your email (and calendar, for GWS).**
+
+With `gws` and/or `hey` enabled, the Postman agent can **send emails, reply to threads, archive emails, delete emails, modify labels, and mark as seen/unseen** on your behalf. With `gws` specifically, it can also **create/modify/delete Google Calendar events** (Hey CLI does not operate on Google Calendar). This means:
+
+- **Emails can be sent from your account.** An email sent by the AI is indistinguishable from one you sent yourself. If the AI misunderstands your intent, drafts an inappropriate response, or hallucinates content, that email goes out with your name on it. Always review drafts before confirming.
+- **Emails can be archived or deleted.** You might miss important emails if the AI archives or trashes them prematurely. Check your Trash and Archive regularly.
+- **Calendar events can be created, modified, or deleted.** Incorrect dates, times, or participants could lead to missed meetings or scheduling conflicts.
+- **Adversarial emails are a real risk.** A malicious email could contain text designed to trick the AI into performing actions you didn't intend — sending a reply, forwarding content, deleting messages, or creating events. The software includes defenses against this (prompt-level security rules, mandatory user confirmation), but **no prompt-based defense is 100% reliable.** The AI model is a stochastic system that may not follow safety instructions in all cases.
+
+**The MCP fallback (`.mcp.json`) is read-only by design.** If you want email/calendar access without write risks, use MCP instead of `gws` or `hey`. MCP can read emails, create drafts, and read calendar events, but it cannot send, archive, delete, or modify anything.
+
+**I built the confirmation gates and security rules to be as strict as I could.** But I'm not a security expert, and prompt-based security has fundamental limits. **Use write access at your own risk, review everything before confirming, and back up anything you can't afford to lose.**
