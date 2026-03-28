@@ -31,13 +31,9 @@ If vault-map.md is absent: warn the user once — "No vault-map.md found, using 
 
 | Token | Default |
 |-------|---------|
-| `{{inbox}}` | `00-Inbox` |
 | `{{projects}}` | `01-Projects` |
 | `{{areas}}` | `02-Areas` |
 | `{{resources}}` | `03-Resources` |
-| `{{archive}}` | `04-Archive` |
-| `{{people}}` | `05-People` |
-| `{{meetings}}` | `06-Meetings` |
 | `{{daily}}` | `07-Daily` |
 | `{{templates}}` | `Templates` |
 | `{{meta}}` | `Meta` |

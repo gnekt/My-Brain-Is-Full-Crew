@@ -20,6 +20,7 @@ If vault-map.md is absent: warn the user once — "No vault-map.md found, using 
 | Token | Default |
 |-------|---------|
 | `{{inbox}}` | `00-Inbox` |
+| `{{areas}}` | `02-Areas` |
 | `{{meta}}` | `Meta` |
 
 If vault-map.md is present but a role is missing: warn the user — "vault-map.md does not define [role]. What folder should I use?" — and wait for their answer before proceeding.

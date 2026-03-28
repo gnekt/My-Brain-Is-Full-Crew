@@ -29,7 +29,6 @@ If vault-map.md is absent: warn the user once — "No vault-map.md found, using 
 | `{{projects}}` | `01-Projects` |
 | `{{areas}}` | `02-Areas` |
 | `{{archive}}` | `04-Archive` |
-| `{{people}}` | `05-People` |
 | `{{meetings}}` | `06-Meetings` |
 | `{{meta}}` | `Meta` |
 | `{{moc}}` | `MOC` |

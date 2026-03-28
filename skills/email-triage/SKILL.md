@@ -20,6 +20,7 @@ If vault-map.md is absent: warn the user once — "No vault-map.md found, using 
 | Token | Default |
 |-------|---------|
 | `{{inbox}}` | `00-Inbox` |
+| `{{areas}}` | `02-Areas` |
 | `{{people}}` | `05-People` |
 | `{{meetings}}` | `06-Meetings` |
 | `{{meta}}` | `Meta` |
