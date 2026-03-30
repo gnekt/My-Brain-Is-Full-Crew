@@ -305,7 +305,7 @@ All agent files are written in English. Agents automatically respond in whatever
 
 Each agent is defined in `.codex/agents/{name}.md` (in the destination vault) with YAML frontmatter (`name`, `description`, `tools`, `model`) and a full system prompt body. Codex CLI auto-discovers these agents at session start, reads their `description` field, and delegates automatically when the user's message matches.
 
-The AGENTS.md routing rules REINFORCE this auto-delegation — they provide explicit priority ordering and trigger lists to ensure Claude delegates correctly.
+The AGENTS.md routing rules REINFORCE this auto-delegation — they provide explicit priority ordering and trigger lists to ensure the Codex runtime delegates to the correct agents.
 
 Key design decisions:
 
