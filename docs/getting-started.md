@@ -8,7 +8,7 @@ A step-by-step guide for setting up your AI-powered vault. No technical backgrou
 
 ### Required
 - **Obsidian**: A free note-taking app. Download it at [obsidian.md](https://obsidian.md)
-- **Claude Code**: Anthropic's coding assistant. You need a Claude Pro, Max, or Team subscription.
+- **One runtime**: Claude Code (Pro/Max/Team) or Codex CLI
 - **An Obsidian vault**: This is just a folder on your computer where Obsidian stores your notes. If you don't have one yet, Obsidian will create one for you when you first open it.
 - **Git**: A tool to download the project. On Mac, the terminal will prompt you to install it automatically the first time you use it. On Windows, download it from [git-scm.com](https://git-scm.com).
 
@@ -57,11 +57,11 @@ Don't worry if this feels like a lot. The Architect agent will remind you about 
 
 ---
 
-## Step 2: Install Claude Code
+## Step 2: Install your runtime
 
-1. Go to [claude.ai/code](https://claude.ai/code) and follow the instructions to install Claude Code
-2. You need a **Claude Pro**, **Max**, or **Team** subscription
-3. You can use either the **Desktop app** (Cowork) or the **CLI** (command-line interface). The Crew works on both
+1. If you use Claude: go to [claude.ai/code](https://claude.ai/code) and install Claude Code
+2. If you use Codex: install Codex CLI in your environment
+3. You can set up both in the same vault; each runtime has its own installer path
 
 ---
 
@@ -81,11 +81,25 @@ Clone the repo inside your vault:
 git clone https://github.com/gnekt/My-Brain-Is-Full-Crew.git
 ```
 
-Run the installer:
+Run the installer for your runtime:
 
 ```bash
 cd My-Brain-Is-Full-Crew
 bash scripts/launchme.sh
+```
+
+For Codex CLI:
+
+```bash
+cd My-Brain-Is-Full-Crew
+bash scripts/launchme-codex.sh
+```
+
+For Windows PowerShell (Codex):
+
+```powershell
+cd My-Brain-Is-Full-Crew
+powershell -ExecutionPolicy Bypass -File scripts/launchme-codex.ps1
 ```
 
 The script will ask two quick questions:
@@ -101,6 +115,8 @@ your-vault/
 │   ├── skills/          ← 13 specialized skills for complex flows
 │   └── references/      ← shared docs the agents read
 ├── CLAUDE.md            ← project instructions
+├── .codex/              ← Codex runtime mirror (agents, skills, references)
+├── AGENTS.md            ← Codex dispatcher instructions
 ├── .mcp.json            ← Gmail + Calendar (only if you said yes)
 ├── My-Brain-Is-Full-Crew/  ← the repo (for future updates)
 └── ... your Obsidian notes
@@ -112,8 +128,8 @@ your-vault/
 
 ## Step 4: Connect your vault
 
-1. Open Claude Code (CLI or Desktop)
-2. Open it **inside your Obsidian vault folder**. This is important: Claude needs to be in your vault to read and write your notes.
+1. Open your runtime (Claude Code or Codex CLI)
+2. Open it **inside your Obsidian vault folder** so it can read and write notes.
 
 If you're using the CLI:
 ```bash
@@ -211,7 +227,7 @@ The Crew works best with simple daily routines:
 ## Troubleshooting
 
 ### "The agent doesn't seem to activate"
-Make sure Claude Code is open inside your vault folder (not a different directory). Verify agent files exist at `.claude/agents/` and skill files at `.claude/skills/` in your vault. Try saying the trigger phrase differently. Agents and skills understand natural language in multiple languages.
+Make sure your runtime is open inside your vault folder (not a different directory). For Claude, verify `.claude/agents/` and `.claude/skills/`. For Codex, verify `.codex/agents/` and `.codex/skills/` plus `AGENTS.md`. Try saying the trigger phrase differently. Agents and skills understand natural language in multiple languages.
 
 ### "Email/Calendar isn't working"
 The Postman needs at least one email backend: GWS CLI (`gws`), Hey CLI (`hey`), or MCP connectors. For GWS, see `docs/gws-setup-guide.md`. For Hey, install from [github.com/basecamp/hey-cli](https://github.com/basecamp/hey-cli) and run `hey auth login`. For MCP, run the installer again (`bash scripts/launchme.sh`) and answer **yes** to the Gmail/Calendar question, or manually copy `.mcp.json` from the repo to your vault root.
@@ -225,6 +241,14 @@ The Architect customizes the structure based on your onboarding answers.
 cd /path/to/your-vault/My-Brain-Is-Full-Crew
 git pull
 bash scripts/updateme.sh
+```
+
+For Codex:
+
+```bash
+cd /path/to/your-vault/My-Brain-Is-Full-Crew
+git pull
+bash scripts/updateme-codex.sh
 ```
 
 Only changed files are updated. Your vault notes are never touched.

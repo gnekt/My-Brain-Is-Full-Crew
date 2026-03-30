@@ -18,7 +18,7 @@
   <img src="https://img.shields.io/badge/Agents-8%2B-blueviolet?style=flat-square" alt="8+ Agents" />
   <img src="https://img.shields.io/badge/Skills-13-blue?style=flat-square" alt="13 Skills" />
   <img src="https://img.shields.io/badge/Language-Any-success?style=flat-square" alt="Any Language" />
-  <img src="https://img.shields.io/badge/Platform-Obsidian%20%2B%20Claude-blue?style=flat-square" alt="Obsidian + Claude" />
+  <img src="https://img.shields.io/badge/Platform-Obsidian%20%2B%20Claude%20%2B%20Codex-blue?style=flat-square" alt="Obsidian + Claude + Codex" />
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=flat-square" alt="MIT License" />
 </p>
 
@@ -233,16 +233,16 @@ sequenceDiagram
     S->>S: files notes to correct locations
 ```
 
-### Works on both Claude Code CLI and Claude Code Desktop (Cowork)
+### Works on Claude Code and Codex CLI
 
-The installer sets up **two parallel layers** so the Crew works everywhere:
+The installers set up parallel runtime layers so the Crew works in both environments:
 
 | Layer | Location | Purpose |
 |-------|----------|---------|
-| **Agents** | `.claude/agents/` | Lightweight reactive agents for single-shot tasks (capture, search, create) |
-| **Skills** | `.claude/skills/` | Specialized multi-step flows for complex tasks (onboarding, triage, audits) |
+| **Claude runtime** | `.claude/agents/`, `.claude/skills/`, `.claude/references/`, `CLAUDE.md` | Claude-native dispatcher + crew runtime |
+| **Codex runtime** | `.codex/agents/`, `.codex/skills/`, `.codex/references/`, `AGENTS.md` | Codex-native dispatcher + crew runtime |
 
-Both layers work on CLI and Desktop. `launchme.sh` installs both automatically. The dispatcher decides whether to invoke a skill or an agent based on your message.
+Use `launchme.sh` for Claude setup and `launchme-codex.sh` or `launchme-codex.ps1` for Codex setup.
 
 Your vault follows a hybrid **PARA + Zettelkasten** structure:
 
@@ -264,7 +264,7 @@ Meta/              Vault config, agent logs, health reports
 
 ## Quick start
 
-> **Prerequisite**: You need [Claude Code](https://claude.ai/code) with a Claude Pro, Max, or Team subscription, and [Obsidian](https://obsidian.md) (free).
+> **Prerequisite**: You need [Obsidian](https://obsidian.md) and at least one runtime: [Claude Code](https://claude.ai/code) or Codex CLI.
 
 ### 1. Create your Obsidian vault
 
@@ -277,20 +277,34 @@ cd /path/to/your-vault
 git clone https://github.com/gnekt/My-Brain-Is-Full-Crew.git
 ```
 
-### 3. Run the installer
+### 3. Run the installer for your runtime
 
 ```bash
 cd My-Brain-Is-Full-Crew
 bash scripts/launchme.sh
 ```
 
-The script asks a couple of questions and copies the agents and skills into your vault's `.claude/` directory. That's it. When Claude Code is open in your vault folder, the agents activate automatically. When you're in any other project, they don't.
+For Codex CLI:
+
+```bash
+cd My-Brain-Is-Full-Crew
+bash scripts/launchme-codex.sh
+```
+
+For Windows PowerShell (Codex):
+
+```powershell
+cd My-Brain-Is-Full-Crew
+powershell -ExecutionPolicy Bypass -File scripts/launchme-codex.ps1
+```
+
+Claude installer writes `.claude/*` + `CLAUDE.md`. Codex installer writes `.codex/*` + `AGENTS.md`.
 
 > **Never used a terminal before?** See the [step-by-step guide for beginners](docs/getting-started.md). It walks you through everything, or just show this page to a tech-savvy friend. It takes 60 seconds.
 
 ### 4. Initialize
 
-Open Claude Code **inside your vault folder** and say:
+Open your selected runtime **inside your vault folder** and say:
 
 > **"Initialize my vault"**
 
@@ -360,7 +374,11 @@ The **Postman** agent (and its related skills: `/email-triage`, `/meeting-prep`,
 - **Hey CLI** (`hey`) — for Hey.com accounts. Read/reply/compose emails, leverages Hey's pre-sorted mailboxes (Imbox, Feed, Paper Trail, Reply Later, Set Aside, Bubble Up). Calendar operations still use `gws`. See [Hey CLI](https://github.com/basecamp/hey-cli) for installation.
 - **MCP connectors** (read-only fallback) — `launchme.sh` offers to set up `.mcp.json` automatically. Limited to reading emails and calendar events, plus draft creation.
 
-You can use `gws` and `hey` simultaneously if you have both Gmail and Hey.com accounts. All other agents and skills work with just your local Obsidian vault. No integrations needed.
+You can use `gws` and `hey` simultaneously if you have both Gmail and Hey.com accounts.
+
+Both installer paths can set up `.mcp.json`. You still need to authorize connectors in your runtime client.
+
+All other agents and skills work with just your local Obsidian vault. No integrations needed.
 
 ### Updating
 
@@ -370,6 +388,14 @@ After pulling new changes from the repo:
 cd /path/to/your-vault/My-Brain-Is-Full-Crew
 git pull
 bash scripts/updateme.sh
+```
+
+For Codex CLI updates:
+
+```bash
+cd /path/to/your-vault/My-Brain-Is-Full-Crew
+git pull
+bash scripts/updateme-codex.sh
 ```
 
 Only changed files are updated. Your vault notes are never touched.
@@ -426,6 +452,8 @@ My-Brain-Is-Full-Crew/               ← cloned inside your vault
 └── CONTRIBUTING.md
 ```
 
+Codex runtime scripts and helpers are in `scripts/launchme-codex.sh`, `scripts/updateme-codex.sh`, `scripts/launchme-codex.ps1`, `scripts/updateme-codex.ps1`, and `scripts/lib/`.
+
 After running `launchme.sh`, your vault looks like:
 
 ```
@@ -435,7 +463,9 @@ your-vault/
 │   ├── skills/          ← specialized multi-step skills
 │   └── references/      ← shared docs
 ├── CLAUDE.md            ← project instructions (dispatcher routing)
-├── .mcp.json            ← Gmail + Calendar read-only fallback (if enabled)
+├── .codex/              ← Codex runtime mirror (agents, skills, references)
+├── AGENTS.md            ← Codex dispatcher instructions
+├── .mcp.json            ← Gmail + Calendar (if enabled)
 ├── My-Brain-Is-Full-Crew/  ← the repo (for updates)
 └── ... your Obsidian notes
 ```

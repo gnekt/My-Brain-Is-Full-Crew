@@ -1,0 +1,23 @@
+name: Compatibility Gate
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  linux-compat:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Linux compatibility gate
+        run: bash scripts/tests/compatibility-gate.sh
+
+  windows-compat:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Windows compatibility gate
+        shell: powershell
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/tests/compatibility-gate.ps1
