@@ -244,7 +244,7 @@ The installer sets up **two parallel layers** so the Crew works everywhere:
 
 Both layers work on CLI and Desktop. `launchme.sh` installs both automatically. The dispatcher decides whether to invoke a skill or an agent based on your message.
 
-Your vault follows a hybrid **PARA + Zettelkasten** structure:
+Your vault follows a hybrid **PARA + Zettelkasten** structure. These are the default folder names — if you already have a vault with different names, the Crew adapts to yours during onboarding (see [Vault Mapping](docs/vault-mapping.md)):
 
 ```
 00-Inbox/          Capture everything here first
@@ -300,7 +300,7 @@ The `/onboarding` skill starts a friendly guided conversation:
 2. **What do you need?** Which agents to activate, which areas of life to manage
 3. **Integrations** Gmail and Google Calendar connections
 
-After onboarding, the Architect creates your entire vault folder structure, saves your profile, leaves you a welcome note, and you're ready to go.
+After onboarding, the Architect generates `Meta/vault-map.md` (mapping your folder names to the Crew's internal tokens), creates your entire vault folder structure, saves your profile, leaves you a welcome note, and you're ready to go. If you already have an existing vault, the Architect scans your folders and adapts — no renaming needed.
 
 ### 5. Start using it
 
@@ -418,6 +418,7 @@ My-Brain-Is-Full-Crew/               ← cloned inside your vault
 ├── docs/                            User-facing documentation
 │   ├── getting-started.md             Step-by-step setup guide
 │   ├── examples.md                    Real-world usage examples
+│   ├── vault-mapping.md               Vault path tokenization guide
 │   └── agents/                        Deep-dive into each agent
 ├── .mcp.json                        MCP servers — read-only fallback (see docs/gws-setup-guide.md for full access)
 ├── .claude-plugin/plugin.json       Plugin manifest (for --plugin-dir)
@@ -434,6 +435,8 @@ your-vault/
 │   ├── agents/          ← lightweight reactive agents
 │   ├── skills/          ← specialized multi-step skills
 │   └── references/      ← shared docs
+├── Meta/
+│   └── vault-map.md     ← maps folder roles to your actual paths (created during onboarding)
 ├── CLAUDE.md            ← project instructions (dispatcher routing)
 ├── .mcp.json            ← Gmail + Calendar read-only fallback (if enabled)
 ├── My-Brain-Is-Full-Crew/  ← the repo (for updates)

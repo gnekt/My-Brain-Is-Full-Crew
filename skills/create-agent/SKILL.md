@@ -12,6 +12,24 @@ description: >
   PT: "criar um novo agente".
 ---
 
+## Vault Path Resolution
+
+Read `Meta/vault-map.md` (always this literal path) to resolve folder paths. Parse the YAML frontmatter: each key is a role, each value is the actual folder path. Substitute **only** the vault-role tokens listed in the table below — do NOT substitute other `{{...}}` patterns (like `{{date}}`, `{{Name}}`, `{{YYYY}}`, etc.), which are template placeholders.
+
+If vault-map.md is absent: warn the user once — "No vault-map.md found, using default paths" — then use these defaults:
+
+| Token | Default |
+|-------|---------|
+| `{{inbox}}` | `00-Inbox` |
+| `{{areas}}` | `02-Areas` |
+| `{{resources}}` | `03-Resources` |
+| `{{templates}}` | `Templates` |
+| `{{meta}}` | `Meta` |
+
+If vault-map.md is present but a role is missing: warn the user — "vault-map.md does not define [role]. What folder should I use?" — and wait for their answer before proceeding.
+
+---
+
 # Create Agent — Custom Agent Creation Skill
 
 You are the Architect running the Custom Agent Creation flow. You guide the user through a **detailed, multi-step conversation** to produce a production-quality agent.
@@ -30,19 +48,19 @@ You are the Architect running the Custom Agent Creation flow. You guide the user
 
 You MUST use the `AskUserQuestion` tool for EVERY question in every phase. This is not optional. This is how the conversation works:
 
-0. **BEFORE the first question**: read your post-it (`Meta/states/architect.md`). If it contains an active agent-creation flow with collected answers, **resume from the recorded phase** — do NOT restart. If no post-it exists or no active flow, start from Phase 1.
+0. **BEFORE the first question**: read your post-it (`{{meta}}/states/architect.md`). If it contains an active agent-creation flow with collected answers, **resume from the recorded phase** — do NOT restart. If no post-it exists or no active flow, start from Phase 1.
 1. Ask ONE question using `AskUserQuestion`
 2. Read the user's answer
-3. **Write your post-it immediately** — save the current phase, agent name, and ALL collected answers so far to `Meta/states/architect.md`. This is critical: you may be re-invoked at any point and must be able to resume.
+3. **Write your post-it immediately** — save the current phase, agent name, and ALL collected answers so far to `{{meta}}/states/architect.md`. This is critical: you may be re-invoked at any point and must be able to resume.
 4. Ask the NEXT question using `AskUserQuestion`
 5. Repeat steps 2-4 until ALL phases are complete
 6. Only THEN generate the agent file
 
 ### Post-it Protocol
 
-At the START of every execution, read `Meta/states/architect.md` (if it exists). Check if there is an active agent-creation flow with collected answers. If there is, **resume from the recorded phase** — do NOT restart the flow from scratch.
+At the START of every execution, read `{{meta}}/states/architect.md` (if it exists). Check if there is an active agent-creation flow with collected answers. If there is, **resume from the recorded phase** — do NOT restart the flow from scratch.
 
-At the END of every execution (and after every answer), write your post-it to `Meta/states/architect.md`:
+At the END of every execution (and after every answer), write your post-it to `{{meta}}/states/architect.md`:
 
 ```markdown
 ---
@@ -128,9 +146,9 @@ Before writing the agent .md file, verify you have checked off ALL of these. If 
 5. **Does this agent need to run shell commands?** Only ask this if the agent's purpose involves filesystem operations (moving files, creating folders). Most agents do NOT need Bash.
 
 6. **Which vault folders does this agent work with?** Ask where it reads from and where it writes to. Common patterns:
-   - Output to `00-Inbox/` (most common)
-   - Read from specific areas like `02-Areas/Health/` or `03-Resources/`
-   - If unsure, default to `00-Inbox/` for output
+   - Output to `{{inbox}}/` (most common)
+   - Read from specific areas like `{{areas}}/Health/` or `{{resources}}/`
+   - If unsure, default to `{{inbox}}/` for output
 
 ## Phase 3: Output and Coordination
 
@@ -152,7 +170,7 @@ Before writing the agent .md file, verify you have checked off ALL of these. If 
    - "Should it scan existing notes in the vault to bootstrap itself?"
 
    Based on the answers, write a `## First Run Setup` section in the agent with:
-   - How to detect first run (e.g., check if `Meta/{agent-name}-config.md` exists)
+   - How to detect first run (e.g., check if `{{meta}}/{agent-name}-config.md` exists)
    - The questions to ask the user
    - What to create (config file, folders, templates, welcome note)
    - Rule that the onboarding never repeats unless the user asks to reconfigure
@@ -161,7 +179,7 @@ Before writing the agent .md file, verify you have checked off ALL of these. If 
 
 10. **External tools or MCP servers?** Only ask if the agent interacts with external services. If the user doesn't need this, skip entirely.
 
-11. **Dedicated template?** Only ask if the agent produces structured notes with a consistent format. If yes, create the template in `Templates/`.
+11. **Dedicated template?** Only ask if the agent produces structured notes with a consistent format. If yes, create the template in `{{templates}}/`.
 
 ## Phase 6: Confirmation and Generation
 
@@ -176,7 +194,7 @@ Before writing the agent .md file, verify you have checked off ALL of these. If 
 4. **Save the file** to `.claude/agents/{name}.md`
 5. **Update the registry**: add a new row to `.claude/references/agents-registry.md`
 6. **Update the directory**: add a new section under "Custom Agents" in `.claude/references/agents.md`
-7. **Log the creation** in `Meta/agent-log.md`
+7. **Log the creation** in `{{meta}}/agent-log.md`
 8. **Report to the user**: "Your new agent `{name}` is now active. You can try it by saying one of your trigger phrases."
 
 ---

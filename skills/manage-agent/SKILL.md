@@ -11,6 +11,20 @@ description: >
   PT: "editar meu agente", "remover agente", "listar agentes".
 ---
 
+## Vault Path Resolution
+
+Read `Meta/vault-map.md` (always this literal path) to resolve folder paths. Parse the YAML frontmatter: each key is a role, each value is the actual folder path. Substitute **only** the vault-role tokens listed in the table below — do NOT substitute other `{{...}}` patterns (like `{{date}}`, `{{Name}}`, `{{YYYY}}`, etc.), which are template placeholders.
+
+If vault-map.md is absent: warn the user once — "No vault-map.md found, using default paths" — then use these defaults:
+
+| Token | Default |
+|-------|---------|
+| `{{meta}}` | `Meta` |
+
+If vault-map.md is present but a role is missing: warn the user — "vault-map.md does not define [role]. What folder should I use?" — and wait for their answer before proceeding.
+
+---
+
 # Manage Agent — Edit, Remove, and List Custom Agents
 
 You are the Architect running the Agent Management flow. You handle editing, updating, removing, and listing custom agents.
@@ -23,9 +37,9 @@ You are the Architect running the Agent Management flow. You handle editing, upd
 
 ## Post-it Protocol
 
-At the START of every execution, read `Meta/states/architect.md` (if it exists). Check if there is an active agent-management flow. If there is, **resume from the recorded state** — do NOT restart.
+At the START of every execution, read `{{meta}}/states/architect.md` (if it exists). Check if there is an active agent-management flow. If there is, **resume from the recorded state** — do NOT restart.
 
-At the END of every execution, write your post-it to `Meta/states/architect.md`:
+At the END of every execution, write your post-it to `{{meta}}/states/architect.md`:
 
 ```markdown
 ---
@@ -71,7 +85,7 @@ When the user says "edit my agent", "update agent X", "modify agent X", or equiv
 
 6. **Update agents.md.** If the change affects the agent's role description, update `.claude/references/agents.md`.
 
-7. **Log the change** in `Meta/agent-log.md`.
+7. **Log the change** in `{{meta}}/agent-log.md`.
 
 8. **Report to the user**: confirm what was changed and remind them of the trigger phrases.
 
@@ -90,7 +104,7 @@ When the user says "remove agent", "delete agent X", "rimuovi agente", or equiva
    - Delete the agent file from `.claude/agents/{name}.md`
    - Update `.claude/references/agents-registry.md`: set the agent's status to `disabled` (do NOT delete the row — keep it for historical reference)
    - Update `.claude/references/agents.md`: remove or mark the agent's section as disabled under "Custom Agents"
-   - Log the removal in `Meta/agent-log.md`
+   - Log the removal in `{{meta}}/agent-log.md`
 
 4. **If not confirmed:** acknowledge and do nothing.
 

@@ -82,10 +82,42 @@ model: sonnet
 
 1. **Write in English.** All agent instructions are in English. Agents respond in the user's language automatically.
 2. **Multilingual triggers.** The `description` field should include natural trigger phrases in at least English and Italian, ideally more languages.
-3. **Read user profile.** Agents should read `Meta/user-profile.md` for personalization. Never hardcode personal data.
-4. **Inter-agent coordination.** Every agent must include the coordination section with `### Suggested next agent` output format. See `references/agent-orchestration.md`.
-5. **Conservative by default.** Agents never delete, always archive. They ask before making structural decisions.
-6. **Minimal tools.** Only grant the tools the agent actually needs. Read-only agents should use `disallowedTools: Write, Edit`.
+3. **Read user profile.** Agents should read `{{meta}}/user-profile.md` for personalization. Never hardcode personal data.
+4. **Use vault-role tokens for folder paths.** Never hardcode folder names like `00-Inbox/` or `Meta/`. Use tokens (`{{inbox}}`, `{{meta}}`, etc.) so the Crew works with any vault structure. See [Vault path tokens](#vault-path-tokens) below.
+5. **Inter-agent coordination.** Every agent must include the coordination section with `### Suggested next agent` output format. See `references/agent-orchestration.md`.
+6. **Conservative by default.** Agents never delete, always archive. They ask before making structural decisions.
+7. **Minimal tools.** Only grant the tools the agent actually needs. Read-only agents should use `disallowedTools: Write, Edit`.
+
+---
+
+## Vault path tokens
+
+Every agent and skill uses **vault-role tokens** instead of hardcoded folder paths. This allows the Crew to work with any Obsidian vault structure.
+
+### The 11 tokens
+
+| Token | Default | Purpose |
+|-------|---------|---------|
+| `{{inbox}}` | `00-Inbox` | Capture inbox |
+| `{{projects}}` | `01-Projects` | Active projects |
+| `{{areas}}` | `02-Areas` | Life areas |
+| `{{resources}}` | `03-Resources` | Reference material |
+| `{{archive}}` | `04-Archive` | Completed content |
+| `{{people}}` | `05-People` | Person notes |
+| `{{meetings}}` | `06-Meetings` | Meeting notes |
+| `{{daily}}` | `07-Daily` | Daily notes |
+| `{{templates}}` | `Templates` | Note templates |
+| `{{meta}}` | `Meta` | Crew config |
+| `{{moc}}` | `MOC` | Maps of Content |
+
+### Rules for using tokens
+
+1. **Every agent/skill file needs a Vault Path Resolution preamble** after the YAML frontmatter. It tells the LLM to read `Meta/vault-map.md` (always this literal path — never `{{meta}}/vault-map.md`, to avoid circular lookup) and substitute the tokens listed in its table.
+2. **Only list tokens the file actually uses** in the preamble table.
+3. **Only substitute vault-role tokens** — the 11 listed above. Many files use `{{...}}` for template placeholders (`{{date}}`, `{{Name}}`, `{{YYYY}}`, `{{N}}`). Those must **not** be substituted. The preamble must explicitly say this.
+4. **Use tokens everywhere**: in instructions, examples, templates, output formats, and `### Suggested next agent` sections. No hardcoded folder names outside the preamble defaults table.
+
+See [`docs/vault-mapping.md`](docs/vault-mapping.md) for the full specification.
 
 ---
 
@@ -121,7 +153,7 @@ If your custom agent solves a problem that many users would benefit from, consid
 | `connector.md` | Connector | Knowledge Graph | Read, Edit, Glob, Grep |
 | `librarian.md` | Librarian | Vault Maintenance | Read, Write, Edit, Bash, Glob, Grep |
 | `transcriber.md` | Transcriber | Audio & Transcription | Read, Write, Glob, Grep |
-| `postman.md` | Postman | Email & Calendar | Read, Write, Edit, Glob, Grep |
+| `postman.md` | Postman | Email & Calendar | Read, Write, Edit, Glob, Grep, Bash |
 
 ---
 

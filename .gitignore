@@ -9,3 +9,4 @@ Test-SecondBrain/
 *.zip
 # Dev config
 .claude/settings.local.json
+.planning/

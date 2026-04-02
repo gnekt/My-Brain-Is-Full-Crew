@@ -270,6 +270,15 @@ fi
 CLAUDE_MD_UPDATED=""
 if [[ -f "$REPO_DIR/CLAUDE.md" ]]; then
   if [[ ! -f "$VAULT_DIR/CLAUDE.md" ]] || ! diff -q "$REPO_DIR/CLAUDE.md" "$VAULT_DIR/CLAUDE.md" >/dev/null 2>&1; then
+    if [[ -f "$VAULT_DIR/CLAUDE.md" ]]; then
+      if [[ -f "$VAULT_DIR/CLAUDE_ORIGINAL.md" ]]; then
+        CLAUDE_BACKUP="$VAULT_DIR/CLAUDE_ORIGINAL_$(date +%Y%m%d_%H%M%S).md"
+      else
+        CLAUDE_BACKUP="$VAULT_DIR/CLAUDE_ORIGINAL.md"
+      fi
+      cp "$VAULT_DIR/CLAUDE.md" "$CLAUDE_BACKUP"
+      warn "Existing CLAUDE.md backed up to $(basename "$CLAUDE_BACKUP") — ask Claude to merge your customizations into the new CLAUDE.md"
+    fi
     cp "$REPO_DIR/CLAUDE.md" "$VAULT_DIR/CLAUDE.md"
     info "Updated CLAUDE.md"
     CLAUDE_MD_UPDATED="1"

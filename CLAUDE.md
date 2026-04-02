@@ -212,6 +212,12 @@ See `.claude/references/agent-orchestration.md` for the full protocol and `.clau
 
 ---
 
+## Vault Path Resolution
+
+This crew uses a vault map (`Meta/vault-map.md`) to adapt to any Obsidian vault structure. The vault map file is always loaded from this fixed literal path — agents must **not** use `{{meta}}` to locate it, to avoid circular lookups. When agents reference folder paths, they use **vault-role tokens** (the 11 tokens: `{{inbox}}`, `{{projects}}`, `{{areas}}`, `{{resources}}`, `{{archive}}`, `{{people}}`, `{{meetings}}`, `{{daily}}`, `{{templates}}`, `{{meta}}`, `{{moc}}`) that resolve to actual folder names from vault-map.md at runtime. **Only** these vault-role tokens are eligible for path substitution — agents must **not** substitute other `{{...}}` patterns used for templating (dates, names, etc.). If vault-map.md is absent, each agent falls back to its built-in default paths — existing users are unaffected. The Architect generates vault-map.md during onboarding. No dispatcher action is required for path resolution.
+
+---
+
 # Project Info
 
 ## My Brain Is Full - Crew

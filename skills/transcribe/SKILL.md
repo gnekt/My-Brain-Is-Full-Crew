@@ -12,17 +12,36 @@ description: >
   PT: "transcrever", "tenho uma gravação".
 ---
 
+## Vault Path Resolution
+
+Read `Meta/vault-map.md` (always this literal path) to resolve folder paths. Parse the YAML frontmatter: each key is a role, each value is the actual folder path. Substitute **only** the vault-role tokens listed in the table below — do NOT substitute other `{{...}}` patterns (like `{{date}}`, `{{Name}}`, `{{YYYY}}`, etc.), which are template placeholders.
+
+If vault-map.md is absent: warn the user once — "No vault-map.md found, using default paths" — then use these defaults:
+
+| Token | Default |
+|-------|---------|
+| `{{inbox}}` | `00-Inbox` |
+| `{{projects}}` | `01-Projects` |
+| `{{areas}}` | `02-Areas` |
+| `{{resources}}` | `03-Resources` |
+| `{{people}}` | `05-People` |
+| `{{meta}}` | `Meta` |
+
+If vault-map.md is present but a role is missing: warn the user — "vault-map.md does not define [role]. What folder should I use?" — and wait for their answer before proceeding.
+
+---
+
 # Transcribe — Audio & Meeting Intelligence
 
 **Always respond to the user in their language. Match the language the user writes in.**
 
-Process audio recordings, raw transcriptions, podcasts, lectures, interviews, and voice memos into richly structured Obsidian notes. Every output lands in `00-Inbox/` for later triage by the Sorter.
+Process audio recordings, raw transcriptions, podcasts, lectures, interviews, and voice memos into richly structured Obsidian notes. Every output lands in `{{inbox}}/` for later triage by the Sorter.
 
 ---
 
 ## User Profile
 
-Before processing, read `Meta/user-profile.md` to understand the user's preferences, context, and priorities.
+Before processing, read `{{meta}}/user-profile.md` to understand the user's preferences, context, and priorities.
 
 ---
 
@@ -45,7 +64,7 @@ When you detect work that another agent should handle, include a `### Suggested 
 ### Suggested next agent
 - **Agent**: architect
 - **Reason**: Meeting revealed new project "Alpha" for client "Acme Corp" with no vault structure
-- **Context**: Meeting note placed in 00-Inbox/. Suggest creating 02-Areas/Work/Acme Corp/Alpha/ with Projects/ and Notes/ sub-folders.
+- **Context**: Meeting note placed in {{inbox}}/. Suggest creating {{areas}}/Work/Acme Corp/Alpha/ with Projects/ and Notes/ sub-folders.
 ```
 
 For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
@@ -465,7 +484,7 @@ Examples:
 - Use professional but accessible language
 - Transform rambling speech into concise, scannable prose
 - Preserve exact quotes for important statements (use `> blockquote`)
-- Tag action items with the person's `[[Name]]` as a wikilink to `05-People/`
+- Tag action items with the person's `[[Name]]` as a wikilink to `{{people}}/`
 - Add `#followup` tag to notes that require action within 48 hours
 - For voice journals, preserve the personal and reflective tone — do NOT corporate-ify
 - When multiple speakers are detected, use consistent labels throughout (e.g., `**Speaker A (Marco)**:`)
@@ -475,11 +494,11 @@ Examples:
 ## Obsidian Integration
 
 - Use YAML frontmatter compatible with Dataview queries
-- Create wikilinks for people mentioned: `[[05-People/Name]]`
-- Create wikilinks for projects mentioned: `[[01-Projects/Project Name]]`
+- Create wikilinks for people mentioned: `[[{{people}}/Name]]`
+- Create wikilinks for projects mentioned: `[[{{projects}}/Project Name]]`
 - Use Obsidian Tasks plugin syntax for action items when appropriate: `- [ ] Task @due(date)`
-- Save the file to `00-Inbox/` — the Sorter will handle final placement
-- For lecture notes, link to course MOCs if they exist: `[[03-Resources/Courses/Course Name]]`
+- Save the file to `{{inbox}}/` — the Sorter will handle final placement
+- For lecture notes, link to course MOCs if they exist: `[[{{resources}}/Courses/Course Name]]`
 - For podcast summaries, link to the podcast's page if it exists in the vault
 
 ---
@@ -502,15 +521,15 @@ Before saving, verify:
 
 ## Agent State (Post-it)
 
-You have a personal post-it at `Meta/states/transcriber.md`. This is your memory between executions.
+You have a personal post-it at `{{meta}}/states/transcriber.md`. This is your memory between executions.
 
 ### At the START of every execution
 
-Read `Meta/states/transcriber.md` if it exists. It contains notes you left for yourself last time — e.g., speaker mappings from previous transcriptions, recurring meeting series, terminology learned. If the file does not exist, this is your first run — proceed without prior context.
+Read `{{meta}}/states/transcriber.md` if it exists. It contains notes you left for yourself last time — e.g., speaker mappings from previous transcriptions, recurring meeting series, terminology learned. If the file does not exist, this is your first run — proceed without prior context.
 
 ### At the END of every execution
 
-**You MUST write your post-it. This is not optional.** Write (or overwrite if it already exists) `Meta/states/transcriber.md` with:
+**You MUST write your post-it. This is not optional.** Write (or overwrite if it already exists) `{{meta}}/states/transcriber.md` with:
 
 ```markdown
 ---

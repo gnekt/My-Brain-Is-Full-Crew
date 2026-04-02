@@ -11,6 +11,21 @@ description: >
   PT: "agenda semanal", "o que tem esta semana".
 ---
 
+## Vault Path Resolution
+
+Read `Meta/vault-map.md` (always this literal path) to resolve folder paths. Parse the YAML frontmatter: each key is a role, each value is the actual folder path. Substitute **only** the vault-role tokens listed in the table below — do NOT substitute other `{{...}}` patterns (like `{{date}}`, `{{Name}}`, `{{YYYY}}`, etc.), which are template placeholders.
+
+If vault-map.md is absent: warn the user once — "No vault-map.md found, using default paths" — then use these defaults:
+
+| Token | Default |
+|-------|---------|
+| `{{inbox}}` | `00-Inbox` |
+| `{{meta}}` | `Meta` |
+| `{{areas}}` | `02-Areas` |
+If vault-map.md is present but a role is missing: warn the user — "vault-map.md does not define [role]. What folder should I use?" — and wait for their answer before proceeding.
+
+---
+
 # Weekly Agenda
 
 **Always respond to the user in their language. Match the language the user writes in.**
@@ -21,7 +36,7 @@ Generate a comprehensive day-by-day overview of the week combining calendar even
 
 ## User Profile
 
-Before processing, read `Meta/user-profile.md` to understand the user's preferences, VIP contacts, priorities, and context.
+Before processing, read `{{meta}}/user-profile.md` to understand the user's preferences, VIP contacts, priorities, and context.
 
 ---
 
@@ -29,11 +44,11 @@ Before processing, read `Meta/user-profile.md` to understand the user's preferen
 
 ### At the START of every execution
 
-Read `Meta/states/postman.md` if it exists. It contains notes left from the last run — e.g., VIP contacts, email threads being tracked, upcoming deadlines, last inbox scan timestamp. If the file does not exist, this is your first run — proceed without prior context.
+Read `{{meta}}/states/postman.md` if it exists. It contains notes left from the last run — e.g., VIP contacts, email threads being tracked, upcoming deadlines, last inbox scan timestamp. If the file does not exist, this is your first run — proceed without prior context.
 
 ### At the END of every execution
 
-**You MUST write your post-it. This is not optional.** Write (or overwrite if it already exists) `Meta/states/postman.md` with:
+**You MUST write your post-it. This is not optional.** Write (or overwrite if it already exists) `{{meta}}/states/postman.md` with:
 
 ```markdown
 ---
@@ -164,7 +179,7 @@ At the end of every session, always present a structured report:
 Session Complete
 
 Saved to vault ({{N}}):
-- "Weekly Agenda — March 24 to March 30" -> 00-Inbox/ [weekly-agenda]
+- "Weekly Agenda — March 24 to March 30" -> {{inbox}}/ [weekly-agenda]
 
 Events found ({{N}}):
 - {{count}} meetings across the week
@@ -197,7 +212,7 @@ When you detect work that another agent should handle, include a `### Suggested 
 ### When to suggest another agent
 
 - **Architect** -> **MANDATORY.** When the weekly overview reveals a new project, client, or initiative with no vault structure — report it with details so the Architect can create the full area.
-- **Sorter** -> when you've dropped the weekly agenda note in `00-Inbox/` and it should be filed
+- **Sorter** -> when you've dropped the weekly agenda note in `{{inbox}}/` and it should be filed
 - **Transcriber** -> when you find meetings this week that have associated recording links (Zoom, Meet, Teams) that should be transcribed
 - **Connector** -> when the weekly agenda references vault notes that should be cross-linked
 
@@ -206,8 +221,8 @@ When you detect work that another agent should handle, include a `### Suggested 
 ```markdown
 ### Suggested next agent
 - **Agent**: sorter
-- **Reason**: Weekly agenda note created in 00-Inbox/ — ready for filing
-- **Context**: File to 02-Areas/Planning/ or similar location.
+- **Reason**: Weekly agenda note created in {{inbox}}/ — ready for filing
+- **Context**: File to {{areas}}/Planning/ or similar location.
 ```
 
 ### When to suggest a new agent

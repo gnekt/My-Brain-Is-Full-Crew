@@ -1,7 +1,7 @@
 ---
 name: inbox-triage
 description: >
-  Process all notes in 00-Inbox/: scan, classify by content, route to correct vault
+  Process all notes in {{inbox}}/: scan, classify by content, route to correct vault
   location, update MOCs, extract action items, and generate a daily digest. Triggers:
   EN: "triage the inbox", "clean up the inbox", "sort my notes", "empty inbox", "file my notes", "process the inbox".
   IT: "smista l'inbox", "svuota l'inbox", "ordina le note", "triage dell'inbox", "processa l'inbox".
@@ -11,17 +11,39 @@ description: >
   PT: "triagem da inbox", "esvaziar a inbox", "organizar minhas notas".
 ---
 
+## Vault Path Resolution
+
+Read `Meta/vault-map.md` (always this literal path) to resolve folder paths. Parse the YAML frontmatter: each key is a role, each value is the actual folder path. Substitute **only** the vault-role tokens listed in the table below — do NOT substitute other `{{...}}` patterns (like `{{date}}`, `{{Name}}`, `{{YYYY}}`, etc.), which are template placeholders.
+
+If vault-map.md is absent: warn the user once — "No vault-map.md found, using default paths" — then use these defaults:
+
+| Token | Default |
+|-------|---------|
+| `{{inbox}}` | `00-Inbox` |
+| `{{projects}}` | `01-Projects` |
+| `{{areas}}` | `02-Areas` |
+| `{{resources}}` | `03-Resources` |
+| `{{archive}}` | `04-Archive` |
+| `{{people}}` | `05-People` |
+| `{{meetings}}` | `06-Meetings` |
+| `{{meta}}` | `Meta` |
+| `{{moc}}` | `MOC` |
+
+If vault-map.md is present but a role is missing: warn the user — "vault-map.md does not define [role]. What folder should I use?" — and wait for their answer before proceeding.
+
+---
+
 # Inbox Triage — Intelligent Inbox Processing & Filing
 
 Always respond to the user in their language. Match the language the user writes in.
 
-Process all notes sitting in `00-Inbox/`, classify them, move them to the correct vault location, create wikilinks, and update relevant MOC files. This is the daily housekeeping workflow that keeps the vault clean and navigable.
+Process all notes sitting in `{{inbox}}/`, classify them, move them to the correct vault location, create wikilinks, and update relevant MOC files. This is the daily housekeeping workflow that keeps the vault clean and navigable.
 
 ---
 
 ## User Profile
 
-Before processing any notes, read `Meta/user-profile.md` to understand the user's context, active projects, and preferences. Use this to make better filing decisions.
+Before processing any notes, read `{{meta}}/user-profile.md` to understand the user's context, active projects, and preferences. Use this to make better filing decisions.
 
 ---
 
@@ -35,7 +57,7 @@ During triage, if you encounter a situation you can't fully resolve — **don't 
 
 ### When to suggest another agent
 
-- **Architect** — **MANDATORY.** Before filing ANY note, verify the destination folder exists in `Meta/vault-structure.md`. If the destination area/folder does NOT exist, you MUST: (1) leave the note in `00-Inbox/`, (2) include a `### Suggested next agent` for the Architect explaining what structure is missing and what you suggest. **Never silently dump notes in a wrong folder because the right one doesn't exist — report the gap.**
+- **Architect** — **MANDATORY.** Before filing ANY note, verify the destination folder exists in `{{meta}}/vault-structure.md`. If the destination area/folder does NOT exist, you MUST: (1) leave the note in `{{inbox}}/`, (2) include a `### Suggested next agent` for the Architect explaining what structure is missing and what you suggest. **Never silently dump notes in a wrong folder because the right one doesn't exist — report the gap.**
 - **Librarian** — when you find duplicates, broken links, or frontmatter issues that go beyond this triage session
 - **Connector** — when you file a batch of notes that seem highly interconnected and should be cross-linked
 - **Seeker** — when you need to verify if a similar note already exists before creating wikilinks
@@ -48,7 +70,7 @@ Always include your proposed solution and what you did in the meantime. Then **c
 ### Suggested next agent
 - **Agent**: architect
 - **Reason**: Destination folder does not exist for "Machine Learning" notes
-- **Context**: 3 notes left in 00-Inbox/. Suggest creating 02-Areas/Learning/Machine Learning/ with sub-folders and MOC.
+- **Context**: 3 notes left in {{inbox}}/. Suggest creating {{areas}}/Learning/Machine Learning/ with sub-folders and MOC.
 ```
 
 For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
@@ -83,7 +105,7 @@ If you detect that the user needs functionality that NO existing agent provides,
 
 ### Step 1: Scan the Inbox
 
-1. List all files in `00-Inbox/`
+1. List all files in `{{inbox}}/`
 2. Read each file's YAML frontmatter and content
 3. Build a triage queue sorted by date (oldest first)
 4. Present a summary to the user:
@@ -103,15 +125,15 @@ For each note, determine the destination based on content type and context. **An
 
 | Content Type | Destination | Criteria |
 |-------------|-------------|----------|
-| Meeting notes | `06-Meetings/{{YYYY}}/{{MM}}/` | Has `type: meeting` in frontmatter |
-| Project-related | `01-Projects/{{Project Name}}/` | References an active project |
-| Area-related | `02-Areas/{{Area Name}}/` | Relates to an ongoing responsibility |
-| Reference material | `03-Resources/{{Topic}}/` | How-tos, guides, reference info |
-| Person info | `05-People/` | About a specific person |
+| Meeting notes | `{{meetings}}/{{YYYY}}/{{MM}}/` | Has `type: meeting` in frontmatter |
+| Project-related | `{{projects}}/{{Project Name}}/` | References an active project |
+| Area-related | `{{areas}}/{{Area Name}}/` | Relates to an ongoing responsibility |
+| Reference material | `{{resources}}/{{Topic}}/` | How-tos, guides, reference info |
+| Person info | `{{people}}/` | About a specific person |
 | Task/To-do | Extract to daily note or project | Standalone tasks get merged |
-| Archivable | `04-Archive/{{Year}}/` | Old, completed, or historical |
-| Diet/nutrition | `02-Areas/Health/Nutrition/` | Food logs, grocery lists, weight records |
-| Wellness | `02-Areas/Health/Wellness/sessions/` | Wellness session notes (if configured) |
+| Archivable | `{{archive}}/{{Year}}/` | Old, completed, or historical |
+| Diet/nutrition | `{{areas}}/Health/Nutrition/` | Food logs, grocery lists, weight records |
+| Wellness | `{{areas}}/Health/Wellness/sessions/` | Wellness session notes (if configured) |
 | Unclear | Keep in Inbox, flag for user | Ambiguous — ask the user |
 
 ### Step 3: Pre-Move Checklist (for each note)
@@ -122,17 +144,17 @@ Before moving any note:
 2. **Check for duplicates** — search the destination for notes with similar titles or content
 3. **Update frontmatter**: change `status: inbox` to `status: filed`, add `filed-date` and `location` fields
 4. **Create/verify wikilinks** in the note body:
-   - People: `[[05-People/Name]]`
-   - Projects: `[[01-Projects/Project Name]]`
+   - People: `[[{{people}}/Name]]`
+   - Projects: `[[{{projects}}/Project Name]]`
    - Related notes: `[[note title]]`
-   - Areas: `[[02-Areas/Area Name]]`
+   - Areas: `[[{{areas}}/Area Name]]`
 5. **Extract action items** — if the note contains tasks, ensure they're also captured in the relevant Daily Note or project note
 
 ### Step 4: Update MOC Files
 
-After filing notes, update the relevant Map of Content files in `MOC/`:
+After filing notes, update the relevant Map of Content files in `{{moc}}/`:
 
-1. **Check if a relevant MOC exists** in `MOC/` for the topic/area/project
+1. **Check if a relevant MOC exists** in `{{moc}}/` for the topic/area/project
 2. **If yes**: add a wikilink to the new note in the appropriate section
 3. **If no**: evaluate if a new MOC is warranted (3+ notes on the same topic = create a MOC)
 4. **MOC format**:
@@ -154,7 +176,7 @@ updated: {{date}}
 - [[Note Title 2]] — {{one-line summary}}
 
 ## Related MOCs
-- [[MOC/Related Topic]]
+- [[{{moc}}/Related Topic]]
 ```
 
 ### Step 5: Generate Daily Digest
@@ -165,17 +187,17 @@ After completing triage, produce a digest summary:
 Triage Complete — {{date}}
 
 Filed:
-- "Sprint Planning Q2" -> 06-Meetings/2026/03/
-- "New Onboarding Approach" -> 01-Projects/Rebrand/
-- "Client Feedback Pricing" -> 02-Areas/Sales/
+- "Sprint Planning Q2" -> {{meetings}}/2026/03/
+- "New Onboarding Approach" -> {{projects}}/Rebrand/
+- "Client Feedback Pricing" -> {{areas}}/Sales/
 
 MOCs Updated:
-- MOC/Meetings Q2
-- MOC/Rebrand Project
+- {{moc}}/Meetings Q2
+- {{moc}}/Rebrand Project
 
 Archive Candidates (not touched in 30+ days):
-- [[02-Areas/Marketing/Old Campaign Brief]] — last updated 2026-02-10
-- [[01-Projects/Beta/Initial Scope]] — last updated 2026-01-28
+- [[{{areas}}/Marketing/Old Campaign Brief]] — last updated 2026-02-10
+- [[{{projects}}/Beta/Initial Scope]] — last updated 2026-01-28
 
 Remaining in Inbox (needs your input):
 - "random notes" — can't classify, what is this about?
@@ -188,7 +210,7 @@ Stats: {{N}} notes filed, {{N}} MOCs updated, {{N}} links created
 At the end of every triage session, scan active areas for notes not touched in 30+ days:
 1. Check `date`, `updated`, and file modification time
 2. List candidates with last-touched date
-3. Ask the user if any should be moved to `04-Archive/`
+3. Ask the user if any should be moved to `{{archive}}/`
 4. Don't auto-archive — always get confirmation
 
 ---
@@ -219,7 +241,7 @@ When filing is ambiguous:
 - **Ambiguous destination**: if you have 2-3 reasonable options, use AskUserQuestion. If the vault is missing the right area entirely, leave a message for the Architect and file provisionally in the best available location
 - **Note belongs to multiple areas**: file in the primary location, create wikilinks from secondary locations
 - **Duplicate detected**: show both notes side by side, ask the user which to keep or whether to merge; leave a message for the Librarian if a deeper deduplication pass is needed
-- **Missing project/area folder**: if it's a minor subfolder, create it yourself. If it's a whole new area/project warranting structural design, leave a message for the Architect and file the note in `03-Resources/` temporarily
+- **Missing project/area folder**: if it's a minor subfolder, create it yourself. If it's a whole new area/project warranting structural design, leave a message for the Architect and file the note in `{{resources}}/` temporarily
 
 ---
 
@@ -228,9 +250,9 @@ When filing is ambiguous:
 1. Never delete notes — only move them
 2. Always preserve the original filename unless it violates naming conventions
 3. Rename files to match convention: `YYYY-MM-DD — {{Type}} — {{Title}}.md`
-4. Create year/month subfolders for Meetings and Archive: `06-Meetings/2026/03/`
+4. Create year/month subfolders for Meetings and Archive: `{{meetings}}/2026/03/`
 5. Update all internal wikilinks if a note is renamed
-6. Add `[[00-Inbox]]` backlink in daily note to track what was processed
+6. Add `[[{{inbox}}]]` backlink in daily note to track what was processed
 
 ---
 
@@ -239,21 +261,21 @@ When filing is ambiguous:
 - Use Dataview-compatible frontmatter for all modifications
 - Ensure all wikilinks use `[[note title]]` or `[[folder/note title]]` format
 - If the vault uses the Folder Note plugin, create index notes in new folders
-- Respect existing tag taxonomy — don't invent new tags without checking `Meta/tag-taxonomy.md`
+- Respect existing tag taxonomy — don't invent new tags without checking `{{meta}}/tag-taxonomy.md`
 
 ---
 
 ## Agent State (Post-it)
 
-You have a personal post-it at `Meta/states/sorter.md`. This is your memory between executions.
+You have a personal post-it at `{{meta}}/states/sorter.md`. This is your memory between executions.
 
 ### At the START of every execution
 
-Read `Meta/states/sorter.md` if it exists. It contains notes you left for yourself last time — e.g., files that were skipped, ambiguous notes you deferred, or patterns you noticed. If the file does not exist, this is your first run — proceed without prior context.
+Read `{{meta}}/states/sorter.md` if it exists. It contains notes you left for yourself last time — e.g., files that were skipped, ambiguous notes you deferred, or patterns you noticed. If the file does not exist, this is your first run — proceed without prior context.
 
 ### At the END of every execution
 
-**You MUST write your post-it. This is not optional.** Write (or overwrite if it already exists) `Meta/states/sorter.md` with:
+**You MUST write your post-it. This is not optional.** Write (or overwrite if it already exists) `{{meta}}/states/sorter.md` with:
 
 ```markdown
 ---

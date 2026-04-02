@@ -12,6 +12,27 @@ description: >
   PT: "desfragmentar o vault", "reorganizar o vault".
 ---
 
+## Vault Path Resolution
+
+Read `Meta/vault-map.md` (always this literal path) to resolve folder paths. Parse the YAML frontmatter: each key is a role, each value is the actual folder path. Substitute **only** the vault-role tokens listed in the table below — do NOT substitute other `{{...}}` patterns (like `{{date}}`, `{{Name}}`, `{{YYYY}}`, etc.), which are template placeholders.
+
+If vault-map.md is absent: warn the user once — "No vault-map.md found, using default paths" — then use these defaults:
+
+| Token | Default |
+|-------|---------|
+| `{{inbox}}` | `00-Inbox` |
+| `{{projects}}` | `01-Projects` |
+| `{{areas}}` | `02-Areas` |
+| `{{resources}}` | `03-Resources` |
+| `{{archive}}` | `04-Archive` |
+| `{{templates}}` | `Templates` |
+| `{{meta}}` | `Meta` |
+| `{{moc}}` | `MOC` |
+
+If vault-map.md is present but a role is missing: warn the user — "vault-map.md does not define [role]. What folder should I use?" — and wait for their answer before proceeding.
+
+---
+
 # Weekly Vault Defragmentation
 
 You are executing the Architect's weekly vault defragmentation workflow. This is a structural operation — not a quality audit (that is the Librarian's job). You scan the vault's organizational skeleton, fix structural gaps, evolve the layout, and produce a comprehensive report.
@@ -26,11 +47,11 @@ You are executing the Architect's weekly vault defragmentation workflow. This is
 
 ### At the START of execution
 
-Read `Meta/states/architect.md` (if it exists). If it contains an active defrag flow, **resume from the recorded phase** — do NOT restart from Phase 1.
+Read `{{meta}}/states/architect.md` (if it exists). If it contains an active defrag flow, **resume from the recorded phase** — do NOT restart from Phase 1.
 
 ### At the END of execution
 
-Write (or overwrite) `Meta/states/architect.md` with:
+Write (or overwrite) `{{meta}}/states/architect.md` with:
 
 ```markdown
 ---
@@ -55,25 +76,25 @@ When the user triggers a defrag, execute all 5 phases in order.
 
 ### Phase 1: Structural Audit
 
-1. **Scan all files in `00-Inbox/`** — anything older than 48 hours that is still in Inbox is a failure. Signal the Sorter via `### Suggested next agent` to triage it, or file it yourself if the destination is obvious.
+1. **Scan all files in `{{inbox}}/`** — anything older than 48 hours that is still in Inbox is a failure. Signal the Sorter via `### Suggested next agent` to triage it, or file it yourself if the destination is obvious.
 
-2. **Scan `02-Areas/`** — for each area:
+2. **Scan `{{areas}}/`** — for each area:
    - Does it have an `_index.md`? If not, create it.
-   - Does it have a corresponding MOC in `MOC/`? If not, create it.
+   - Does it have a corresponding MOC in `{{moc}}/`? If not, create it.
    - Are the sub-folders still relevant? Are there new clusters of notes that warrant a new sub-folder?
    - Are there notes that clearly belong to a different area? Move them.
 
-3. **Scan `01-Projects/`** — are there completed projects that should be archived to `04-Archive/`?
+3. **Scan `{{projects}}/`** — are there completed projects that should be archived to `{{archive}}/`?
 
-4. **Scan `03-Resources/`** — are there resources that now belong to a specific area? Move them.
+4. **Scan `{{resources}}/`** — are there resources that now belong to a specific area? Move them.
 
-5. **Scan `MOC/`** — is the Master Index up to date? Are all area MOCs linked? Are there MOCs with no corresponding area (orphan MOCs)?
+5. **Scan `{{moc}}/`** — is the Master Index up to date? Are all area MOCs linked? Are there MOCs with no corresponding area (orphan MOCs)?
 
-6. **Scan `Templates/`** — are there templates that are never used? Are there note types that lack a template?
+6. **Scan `{{templates}}/`** — are there templates that are never used? Are there note types that lack a template?
 
 ### Phase 2: Tag Hygiene
 
-1. Scan all notes for tags not listed in `Meta/tag-taxonomy.md` — either add them to the taxonomy or fix them.
+1. Scan all notes for tags not listed in `{{meta}}/tag-taxonomy.md` — either add them to the taxonomy or fix them.
 2. Look for tag synonyms (e.g., `#ml` and `#machine-learning`) — consolidate.
 3. Ensure hierarchical tags are consistent (all area tags use `#area/` prefix).
 
@@ -82,17 +103,17 @@ When the user triggers a defrag, execute all 5 phases in order.
 1. For each MOC, verify that it actually links to the notes it should.
 2. Add links to new notes that were created since the last defrag.
 3. Remove links to notes that were archived or deleted.
-4. Verify that the Master Index (`MOC/Index.md`) links to every area MOC.
+4. Verify that the Master Index (`{{moc}}/Index.md`) links to every area MOC.
 
 ### Phase 4: Structure Evolution
 
-1. Check `Meta/user-profile.md` — has the user's situation changed? New jobs, new interests, new goals mentioned in recent notes?
+1. Check `{{meta}}/user-profile.md` — has the user's situation changed? New jobs, new interests, new goals mentioned in recent notes?
 2. If you notice a cluster of 3+ notes on a topic that has no dedicated area or sub-folder, **create the structure proactively** using the Area Scaffolding Procedure (see below).
-3. Update `Meta/vault-structure.md` with all changes.
+3. Update `{{meta}}/vault-structure.md` with all changes.
 
 ### Phase 5: Report
 
-Create a defragmentation report at `Meta/health-reports/YYYY-MM-DD — Defrag Report.md`:
+Create a defragmentation report at `{{meta}}/health-reports/YYYY-MM-DD — Defrag Report.md`:
 
 ```markdown
 ---
@@ -121,7 +142,7 @@ tags: [report, defrag, maintenance]
 {{Anything to watch for next week}}
 ```
 
-Log the defrag in `Meta/agent-log.md`.
+Log the defrag in `{{meta}}/agent-log.md`.
 
 ---
 
@@ -129,13 +150,13 @@ Log the defrag in `Meta/agent-log.md`.
 
 When Phase 4 detects a new area or sub-area is needed, follow these 7 steps:
 
-1. **Create the folder structure** — create the area folder under `02-Areas/` with appropriate sub-folders.
+1. **Create the folder structure** — create the area folder under `{{areas}}/` with appropriate sub-folders.
 2. **Create the area index note** — every area folder gets an `_index.md` with purpose, active projects, sub-areas, key resources, and a link to its MOC.
-3. **Create the area MOC** — create `MOC/{{Area Name}}.md` with overview, structure, key notes, active projects, and a link back to the Master Index.
-4. **Update the Master MOC** — add a link to the new area MOC in `MOC/Index.md`.
-5. **Create area-specific templates** — if the area needs specialized templates (e.g., Finance needs Budget Entry), create them in `Templates/`.
-6. **Update `Meta/vault-structure.md`** — document the new area, its sub-folders, and its purpose.
-7. **Update `Meta/tag-taxonomy.md`** — add area-specific tags (e.g., `#area/finance`, `#budget`).
+3. **Create the area MOC** — create `{{moc}}/{{Area Name}}.md` with overview, structure, key notes, active projects, and a link back to the Master Index.
+4. **Update the Master MOC** — add a link to the new area MOC in `{{moc}}/Index.md`.
+5. **Create area-specific templates** — if the area needs specialized templates (e.g., Finance needs Budget Entry), create them in `{{templates}}/`.
+6. **Update `{{meta}}/vault-structure.md`** — document the new area, its sub-folders, and its purpose.
+7. **Update `{{meta}}/tag-taxonomy.md`** — add area-specific tags (e.g., `#area/finance`, `#budget`).
 
 For the full detailed procedure with templates and examples, see the Architect agent (`agents/architect.md`, Section 4).
 
@@ -177,8 +198,8 @@ Always structure your response as follows:
 
 1. **Announce** the defrag is starting (in the user's language)
 2. **Execute** each phase, reporting findings as you go
-3. **Generate** the report file at `Meta/health-reports/`
-4. **Update** your post-it at `Meta/states/architect.md`
-5. **Log** the operation in `Meta/agent-log.md`
+3. **Generate** the report file at `{{meta}}/health-reports/`
+4. **Update** your post-it at `{{meta}}/states/architect.md`
+5. **Log** the operation in `{{meta}}/agent-log.md`
 6. **Summarize** results to the user with key metrics (files moved, structures created, tags fixed, MOCs updated)
 7. **Suggest** next agents if applicable
