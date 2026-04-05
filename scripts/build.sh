@@ -84,6 +84,74 @@ build_sed_script() {
   done < "$env_file"
 }
 
+extract_frontmatter() {
+  local file="$1"
+
+  awk 'BEGIN{n=0} /^---$/{n++; if(n==2) exit; next} n==1{print}' "$file"
+}
+
+extract_body_after_frontmatter() {
+  local file="$1"
+
+  awk 'BEGIN{n=0} /^---$/{n++; next} n>=2{print}' "$file"
+}
+
+escape_toml_multiline_basic_string() {
+  local value="$1"
+
+  value="${value//\\/\\\\}"
+  value="${value//\"\"\"/\"\"\\\"}"
+
+  printf '%s' "$value"
+}
+
+escape_toml_basic_string() {
+  local value="$1"
+
+  value="${value//\\/\\\\}"
+  value="${value//\"/\\\"}"
+  value="${value//$'\t'/\\t}"
+  value="${value//$'\r'/\\r}"
+  value="${value//$'\n'/\\n}"
+
+  printf '%s' "$value"
+}
+
+convert_agent_to_toml() {
+  local src="$1"
+  local dst="$2"
+
+  local frontmatter
+  frontmatter=$(extract_frontmatter "$src")
+
+  local name
+  name=$(printf '%s\n' "$frontmatter" | yq eval '.name' -)
+  name=$(escape_toml_basic_string "$name")
+
+  local description
+  description=$(printf '%s\n' "$frontmatter" | yq eval '.description' -)
+  description=$(escape_toml_basic_string "$description")
+
+  local model
+  model=$(printf '%s\n' "$frontmatter" | yq eval '.model' -)
+  model=$(escape_toml_basic_string "$model")
+
+  local body
+  body=$(extract_body_after_frontmatter "$src")
+
+  local escaped_body
+  escaped_body=$(escape_toml_multiline_basic_string "$body")
+
+  {
+    printf 'name = "%s"\n' "$name"
+    printf 'description = "%s"\n' "$description"
+    printf 'developer_instructions = """\n'
+    printf '%s\n' "$escaped_body"
+    printf '"""\n'
+    printf 'model = "%s"\n' "$model"
+  } > "$dst"
+}
+
 # ── Gemini: convert comma-separated tools: to YAML list ──────────────────────
 
 convert_tools_to_yaml_list() {
@@ -94,7 +162,7 @@ convert_tools_to_yaml_list() {
   [[ "$first_line" != "---" ]] && return 0
 
   local frontmatter
-  frontmatter=$(awk 'BEGIN{n=0} /^---$/{n++; if(n==2) exit; next} n==1{print}' "$file")
+  frontmatter=$(extract_frontmatter "$file")
 
   if ! printf '%s\n' "$frontmatter" | grep -q '^tools:'; then
     return 0
@@ -111,7 +179,7 @@ convert_tools_to_yaml_list() {
   new_frontmatter=$(printf '%s\n' "$frontmatter" | yq eval '.tools = (.tools | split(", "))' -)
 
   local body
-  body=$(awk 'BEGIN{n=0} /^---$/{n++; next} n>=2{print}' "$file")
+  body=$(extract_body_after_frontmatter "$file")
 
   {
     printf '%s\n' "---"
@@ -158,8 +226,20 @@ build_platform() {
     [[ -f "$tmpl" ]] || continue
     local basename
     basename="$(basename "$tmpl" .md.tmpl)"
-    local dst="$platform_build/agents/${basename}.md"
-    expand_file "$tmpl" "$dst" "$sed_file"
+
+    if [[ "$platform" == "codex" ]]; then
+      local expanded_agent
+      expanded_agent=$(mktemp)
+      expand_file "$tmpl" "$expanded_agent" "$sed_file"
+
+      local dst="$platform_build/agents/${basename}.toml"
+      convert_agent_to_toml "$expanded_agent" "$dst"
+      rm -f "$expanded_agent"
+    else
+      local dst="$platform_build/agents/${basename}.md"
+      expand_file "$tmpl" "$dst" "$sed_file"
+    fi
+
     agent_count=$((agent_count + 1))
   done
   success "$agent_count agents"
@@ -224,17 +304,14 @@ build_platform() {
 }
 
 case "$TARGET" in
-  claude|opencode|gemini)
+  claude|opencode|gemini|codex)
     build_platform "$TARGET"
-    ;;
-  codex)
-    warn "Codex build is not yet implemented (coming in T9)."
-    exit 0
     ;;
   all)
     build_platform "claude"
     build_platform "opencode"
     build_platform "gemini"
+    build_platform "codex"
     echo ""
     echo -e "${GREEN}${BOLD}   All platforms built successfully.${NC}"
     echo ""
