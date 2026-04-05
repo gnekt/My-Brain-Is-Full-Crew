@@ -290,27 +290,27 @@ Use Bash to:
 
 ```bash
 # 1. Create the project-scoped agents directory inside the vault
-mkdir -p .claude/agents
+mkdir -p {{PLATFORM_DIR}}/agents
 
 # 2. Find where the crew agent files are currently installed
 # Try user-scope location first, then common plugin cache paths
 AGENT_SOURCE=""
-if ls ~/.claude/agents/architect.md 2>/dev/null; then
-  AGENT_SOURCE=~/.claude/agents
+if ls ~/{{PLATFORM_DIR}}/agents/architect.md 2>/dev/null; then
+  AGENT_SOURCE=~/{{PLATFORM_DIR}}/agents
 fi
 
 # 3. Copy only the agents the user selected during onboarding
 # (copy all if the user selected "all agents")
 if [ -n "$AGENT_SOURCE" ]; then
-  cp "$AGENT_SOURCE"/architect.md .claude/agents/
+  cp "$AGENT_SOURCE"/architect.md {{PLATFORM_DIR}}/agents/
   # Copy each selected agent — replace the list based on Phase 2 answers:
-  # cp "$AGENT_SOURCE"/scribe.md .claude/agents/
-  # cp "$AGENT_SOURCE"/sorter.md .claude/agents/
-  # cp "$AGENT_SOURCE"/seeker.md .claude/agents/
-  # cp "$AGENT_SOURCE"/connector.md .claude/agents/
-  # cp "$AGENT_SOURCE"/librarian.md .claude/agents/
-  # cp "$AGENT_SOURCE"/transcriber.md .claude/agents/
-  # cp "$AGENT_SOURCE"/postman.md .claude/agents/
+  # cp "$AGENT_SOURCE"/scribe.md {{PLATFORM_DIR}}/agents/
+  # cp "$AGENT_SOURCE"/sorter.md {{PLATFORM_DIR}}/agents/
+  # cp "$AGENT_SOURCE"/seeker.md {{PLATFORM_DIR}}/agents/
+  # cp "$AGENT_SOURCE"/connector.md {{PLATFORM_DIR}}/agents/
+  # cp "$AGENT_SOURCE"/librarian.md {{PLATFORM_DIR}}/agents/
+  # cp "$AGENT_SOURCE"/transcriber.md {{PLATFORM_DIR}}/agents/
+  # cp "$AGENT_SOURCE"/postman.md {{PLATFORM_DIR}}/agents/
 fi
 ```
 
@@ -324,7 +324,7 @@ After copying, verify with `ls {{PLATFORM_DIR}}/agents/` that the files are in p
 The crew agents read shared docs from `{{PLATFORM_DIR}}/references/`. The `launchme.sh` script copies these automatically. Verify they exist:
 
 ```bash
-ls .claude/references/agents.md .claude/references/agent-orchestration.md .claude/references/agents-registry.md
+ls {{PLATFORM_DIR}}/references/agents.md {{PLATFORM_DIR}}/references/agent-orchestration.md {{PLATFORM_DIR}}/references/agents-registry.md
 ```
 
 If they don't exist, create them from scratch using Write:
@@ -1128,8 +1128,8 @@ Before telling the user onboarding is complete, verify ALL of the following:
 [ ] MOC/Index.md exists and links to all area MOCs
 [ ] Templates/ has all core templates
 [ ] Templates/ has area-specific templates for selected areas
-[ ] .claude/agents/ has the selected agent files
-[ ] .claude/references/ has shared docs
+[ ] {{PLATFORM_DIR}}/agents/ has the selected agent files
+[ ] {{PLATFORM_DIR}}/references/ has shared docs
 [ ] .mcp.json exists (if integrations were enabled)
 [ ] Welcome note exists in 00-Inbox/
 [ ] Essential Obsidian plugins were recommended to the user
