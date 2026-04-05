@@ -18,7 +18,7 @@
   <img src="https://img.shields.io/badge/Agents-8%2B-blueviolet?style=flat-square" alt="8+ Agents" />
   <img src="https://img.shields.io/badge/Skills-14-blue?style=flat-square" alt="14 Skills" />
   <img src="https://img.shields.io/badge/Language-Any-success?style=flat-square" alt="Any Language" />
-  <img src="https://img.shields.io/badge/Platform-Obsidian%20%2B%20Claude-blue?style=flat-square" alt="Obsidian + Claude" />
+  <img src="https://img.shields.io/badge/Platform-Multi--Platform-blue?style=flat-square" alt="Multi-Platform" />
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=flat-square" alt="MIT License" />
 </p>
 
@@ -234,16 +234,18 @@ sequenceDiagram
     S->>S: files notes to correct locations
 ```
 
-### Works on both Claude Code CLI and Claude Code Desktop (Cowork)
+### Works on Claude Code, OpenCode, Gemini CLI, and Codex CLI
 
-The installer sets up **two parallel layers** so the Crew works everywhere:
+The installer sets up the Crew for your preferred platform:
 
-| Layer | Location | Purpose |
+| Platform | Location | Purpose |
 |-------|----------|---------|
-| **Agents** | `.claude/agents/` | Lightweight reactive agents for single-shot tasks (capture, search, create) |
-| **Skills** | `.claude/skills/` | Specialized multi-step flows for complex tasks (onboarding, triage, audits) |
+| **Claude Code** | `.claude/` | Official CLI and Desktop (Cowork) support |
+| **OpenCode** | `.opencode/` | Open-source agent runner support |
+| **Gemini CLI** | `.gemini/` | Google Gemini-optimized agent support |
+| **Codex CLI** | `.codex/` | TOML-based agent configuration support |
 
-Both layers work on CLI and Desktop. `launchme.sh` installs both automatically. The dispatcher decides whether to invoke a skill or an agent based on your message.
+All platforms support the same 8 agents and 13 skills. `launchme.sh` installs your chosen platform automatically.
 
 Your vault follows a hybrid **PARA + Zettelkasten** structure:
 
@@ -265,7 +267,7 @@ Meta/              Vault config, agent logs, health reports
 
 ## Quick start
 
-> **Prerequisite**: You need [Claude Code](https://claude.ai/code) with a Claude Pro, Max, or Team subscription, and [Obsidian](https://obsidian.md) (free).
+> **Prerequisite**: You need a supported AI platform (**Claude Code**, **OpenCode**, **Gemini CLI**, or **Codex CLI**) and [Obsidian](https://obsidian.md) (free).
 
 ### 1. Create your Obsidian vault
 
@@ -285,13 +287,29 @@ cd My-Brain-Is-Full-Crew
 bash scripts/launchme.sh
 ```
 
-The script asks a couple of questions and copies the agents and skills into your vault's `.claude/` directory. That's it. When Claude Code is open in your vault folder, the agents activate automatically. When you're in any other project, they don't.
+By default, the script installs for **Claude Code**. You can also target other platforms:
+
+```bash
+# Install for a specific platform
+bash scripts/launchme.sh --platform opencode
+
+# Install into a specific vault path
+bash scripts/launchme.sh --vault /path/to/vault
+
+# Non-interactive install with defaults
+bash scripts/launchme.sh --yes
+```
+
+#### Preferred Model Selection
+During interactive installation for specific platforms, the script will prompt you for your preferred models (Fast, Powerful, and Light). These choices are persisted in `<vault>/<platform-dir>/.installer-models.env` and reused during updates.
+
+The script copies the agents and skills into your vault's platform directory (e.g., `.claude/` or `.opencode/`). When your AI tool is open in your vault folder, the agents activate automatically.
 
 > **Never used a terminal before?** See the [step-by-step guide for beginners](docs/getting-started.md). It walks you through everything, or just show this page to a tech-savvy friend. It takes 60 seconds.
 
 ### 4. Initialize
 
-Open Claude Code **inside your vault folder** and say:
+Open your AI tool **inside your vault folder** and say:
 
 > **"Initialize my vault"**
 
@@ -396,7 +414,28 @@ git pull
 bash scripts/updateme.sh
 ```
 
-Only changed files are updated. Your vault notes are never touched.
+The updater detects all installed platforms in your vault, preserves your custom agents, and rebuilds the core agents using your saved model preferences. Only changed files are updated; your vault notes are never touched.
+
+---
+
+## Requirements
+
+- **Claude Code**, **OpenCode**, **Gemini CLI**, or **Codex CLI**
+- **Obsidian** (free) — [obsidian.md](https://obsidian.md)
+- **Gmail / Google Calendar** (optional) — only for the Postman agent
+
+## Development & Build Tooling
+
+The project uses a template-based build system to support multiple platforms.
+
+- **`scripts/build.sh <platform>`**: Generates platform-specific agents and configs from templates. Supports `all` to build everything.
+- **`scripts/validate.sh <dir>`**: Validates generated agents for syntax, tool consistency, and unresolved variables.
+- **`yq`**: Required for build and validation processes (processing YAML/TOML).
+
+To build all platforms locally:
+```bash
+bash scripts/build.sh all
+```
 
 ---
 
@@ -456,7 +495,9 @@ My-Brain-Is-Full-Crew/               ← cloned inside your vault
 └── CONTRIBUTING.md
 ```
 
-After running `launchme.sh`, your vault looks like:
+After running `launchme.sh`, your vault contains a platform-specific directory (e.g., `.claude/` for Claude Code) and a corresponding dispatcher file (e.g., `CLAUDE.md`).
+
+For a **Claude Code** installation, it looks like:
 
 ```
 your-vault/
@@ -471,6 +512,8 @@ your-vault/
 ├── My-Brain-Is-Full-Crew/  ← the repo (for updates)
 └── ... your Obsidian notes
 ```
+
+Other platforms follow the same structure using their own directory and dispatcher names (e.g., `.gemini/` and `GEMINI.md`).
 
 ---
 
