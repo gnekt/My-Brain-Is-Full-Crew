@@ -38,25 +38,53 @@ fi
 
 ERROR_COUNT=0
 
-# ── Check 1: Unresolved variables ───────────────────────────────────────────
-# Scan .md and .toml files for {{BUILD_VAR}} patterns (must contain underscore).
-# Skip .tmpl files, test fixtures, and lines inside fenced code blocks.
+# ── Check 1: Unresolved build variables ─────────────────────────────────────
+
+is_allowed_runtime_placeholder() {
+  case "$1" in
+    A|B|DD|MM|N|X|Y|YY|YYYY)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+is_unresolved_build_placeholder() {
+  local placeholder="$1"
+
+  case "$placeholder" in
+    PLATFORM_*|TOOL_*|MODEL_*|DISPATCHER_FILE)
+      return 0
+      ;;
+  esac
+
+  if [[ "$placeholder" =~ ^[A-Z][A-Z0-9_]*$ ]] && ! is_allowed_runtime_placeholder "$placeholder"; then
+    return 0
+  fi
+
+  return 1
+}
 
 while IFS= read -r -d '' file; do
   [[ "$file" == *.tmpl ]] && continue
   [[ "$file" == *tests/fixtures/invalid-*.md ]] && continue
 
-  # Strip code-fenced lines, then scan for unresolved build variables
   while IFS=: read -r line_num line_content; do
     remaining="$line_content"
-    while [[ "$remaining" =~ \{\{([A-Z][A-Z_]*_[A-Z_]*)\}\} ]]; do
+    while [[ "$remaining" =~ \{\{([^}]+)\}\} ]]; do
       var_name="${BASH_REMATCH[1]}"
       match="${BASH_REMATCH[0]}"
-      echo "[ERROR] ${file}:${line_num}: unresolved variable {{${var_name}}}"
-      ERROR_COUNT=$((ERROR_COUNT + 1))
+
+      if is_unresolved_build_placeholder "$var_name"; then
+        echo "[ERROR] ${file}:${line_num}: unresolved variable {{${var_name}}}"
+        ERROR_COUNT=$((ERROR_COUNT + 1))
+      fi
+
       remaining="${remaining#*"$match"}"
     done
-  done < <(awk 'BEGIN{f=0} /^```/{f=!f; next} !f{print NR":"$0}' "$file" | grep '{{[A-Z_]*_[A-Z_]*}}' 2>/dev/null || true)
+  done < <(awk '{print NR ":" $0}' "$file")
 done < <(find "$BUILD_DIR" -type f \( -name '*.md' -o -name '*.toml' \) -print0)
 
 # ── Check 2: YAML frontmatter validity ──────────────────────────────────────
@@ -93,7 +121,7 @@ done < <(find "$BUILD_DIR" -type f -name '*.toml' -print0)
 # Warn (don't fail) if agent/skill counts are unexpected.
 
 if [[ -d "${BUILD_DIR}/agents" ]]; then
-  agent_count=$(find "${BUILD_DIR}/agents" -maxdepth 1 -type f -name '*.md' | wc -l)
+  agent_count=$(find "${BUILD_DIR}/agents" -maxdepth 1 -type f \( -name '*.md' -o -name '*.toml' \) | wc -l)
   if [[ "$agent_count" -ne 8 ]]; then
     echo "[WARN] agents/ has ${agent_count} files (expected 8)"
   fi

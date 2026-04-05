@@ -88,27 +88,14 @@ done
 
 [[ -n "$TARGET" ]] || { usage; exit 1; }
 
-# ── Expand {{VAR}} in a template, protecting fenced code blocks ──────────────
+# ── Expand build-time {{VAR}} tokens in a template ───────────────────────────
 
 expand_file() {
   local src="$1"
   local dst="$2"
   local sed_file="$3"
 
-  # awk tags lines: F (inside ``` fence) or E (outside). Only E lines get sed.
-  awk '
-    BEGIN { in_fence = 0 }
-    /^```/ { in_fence = !in_fence; print "F:" $0; next }
-    { if (in_fence) print "F:" $0; else print "E:" $0 }
-  ' "$src" | while IFS= read -r tagged_line; do
-    local prefix="${tagged_line%%:*}"
-    local content="${tagged_line#?:}"
-    if [[ "$prefix" == "E" ]]; then
-      printf '%s\n' "$content" | sed -f "$sed_file"
-    else
-      printf '%s\n' "$content"
-    fi
-  done > "$dst"
+  sed -f "$sed_file" "$src" > "$dst"
 }
 
 # ── Build sed script ──────────────────────────────────────────────────────────
