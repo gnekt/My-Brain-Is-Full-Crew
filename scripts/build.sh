@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# Usage: ./scripts/build.sh <claude|opencode|gemini|codex|all>
 
 set -euo pipefail
 
@@ -31,12 +30,63 @@ fi
 
 # ── Arguments ────────────────────────────────────────────────────────────────
 
-if [[ $# -ne 1 ]]; then
-  echo "Usage: $0 <claude|opencode|gemini|codex|all>"
-  exit 1
-fi
+usage() {
+  echo "Usage: $0 <claude|opencode|gemini|codex|all> [--overrides <file>]"
+}
 
-TARGET="$1"
+validate_overrides_file() {
+  local override_file="$1"
+  local line_num=0
+
+  [[ -f "$override_file" ]] || die "Overrides file not found: $override_file"
+
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    line_num=$((line_num + 1))
+
+    if [[ "$line" =~ ^[[:space:]]*$ ]] || [[ "$line" =~ ^[[:space:]]*# ]]; then
+      continue
+    fi
+
+    if [[ "$line" =~ ^[[:space:]]*(export[[:space:]]+)?(MODEL_FAST|MODEL_POWERFUL|MODEL_LIGHT)=\"?[A-Za-z0-9._:/@+-]+\"?[[:space:]]*$ ]]; then
+      continue
+    fi
+
+    die "Invalid override in $override_file:$line_num. Only MODEL_FAST, MODEL_POWERFUL, and MODEL_LIGHT assignments are allowed."
+  done < "$override_file"
+}
+
+apply_model_overrides() {
+  local override_file="$1"
+
+  validate_overrides_file "$override_file"
+
+  # shellcheck source=/dev/null
+  source "$override_file"
+}
+
+TARGET=""
+OVERRIDES_FILE=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    claude|opencode|gemini|codex|all)
+      [[ -z "$TARGET" ]] || die "Target already set: $TARGET"
+      TARGET="$1"
+      shift
+      ;;
+    --overrides)
+      [[ $# -ge 2 ]] || die "--overrides requires a file path"
+      OVERRIDES_FILE="$2"
+      shift 2
+      ;;
+    *)
+      usage
+      die "Unknown argument: $1"
+      ;;
+  esac
+done
+
+[[ -n "$TARGET" ]] || { usage; exit 1; }
 
 # ── Expand {{VAR}} in a template, protecting fenced code blocks ──────────────
 
@@ -61,7 +111,7 @@ expand_file() {
   done > "$dst"
 }
 
-# ── Build sed script from env KEY=VALUE pairs ────────────────────────────────
+# ── Build sed script ──────────────────────────────────────────────────────────
 
 build_sed_script() {
   local env_file="$1"
@@ -77,8 +127,13 @@ build_sed_script() {
     value="${value#\"}"
     value="${value%\"}"
 
+    local current_value="$value"
+    if [[ -v "$key" ]]; then
+      current_value="${!key}"
+    fi
+
     local escaped_value
-    escaped_value=$(printf '%s' "$value" | sed 's/[&\\/]/\\&/g')
+    escaped_value=$(printf '%s' "$current_value" | sed 's/[&\\/]/\\&/g')
 
     printf 's/{{%s}}/%s/g\n' "$key" "$escaped_value" >> "$sed_file"
   done < "$env_file"
@@ -106,6 +161,18 @@ escape_toml_multiline_basic_string() {
 }
 
 escape_toml_basic_string() {
+  local value="$1"
+
+  value="${value//\\/\\\\}"
+  value="${value//\"/\\\"}"
+  value="${value//$'\t'/\\t}"
+  value="${value//$'\r'/\\r}"
+  value="${value//$'\n'/\\n}"
+
+  printf '%s' "$value"
+}
+
+escape_json_string() {
   local value="$1"
 
   value="${value//\\/\\\\}"
@@ -189,6 +256,75 @@ convert_tools_to_yaml_list() {
   } > "$file"
 }
 
+write_models_json_config() {
+  local dst="$1"
+  local platform_name="$2"
+  local escaped_platform_name
+  local escaped_fast
+  local escaped_powerful
+  local escaped_light
+
+  escaped_platform_name=$(escape_json_string "$platform_name")
+  escaped_fast=$(escape_json_string "$MODEL_FAST")
+  escaped_powerful=$(escape_json_string "$MODEL_POWERFUL")
+  escaped_light=$(escape_json_string "$MODEL_LIGHT")
+
+  {
+    printf '{\n'
+    printf '  "platform": "%s",\n' "$escaped_platform_name"
+    printf '  "models": {\n'
+    printf '    "fast": "%s",\n' "$escaped_fast"
+    printf '    "powerful": "%s",\n' "$escaped_powerful"
+    printf '    "light": "%s"\n' "$escaped_light"
+    printf '  }\n'
+    printf '}\n'
+  } > "$dst"
+}
+
+generate_platform_config() {
+  local platform="$1"
+  local platform_build="$2"
+  local platform_name="${PLATFORM_NAME:-$platform}"
+
+  info "Processing platform config..."
+
+  case "$platform" in
+    claude)
+      mkdir -p "$platform_build/hooks"
+
+      cp "$REPO_DIR/settings.json" "$platform_build/settings.json"
+      cp "$REPO_DIR/.mcp.json" "$platform_build/.mcp.json"
+
+      local hook_count=0
+      local hook_file
+      for hook_file in "$REPO_DIR/hooks/"*.sh; do
+        [[ -f "$hook_file" ]] || continue
+        cp "$hook_file" "$platform_build/hooks/"
+        hook_count=$((hook_count + 1))
+      done
+
+      success "Created Claude config files and copied $hook_count hooks"
+      ;;
+    opencode)
+      write_models_json_config "$platform_build/opencode.json" "$platform_name"
+      success "Created opencode.json"
+      ;;
+    gemini)
+      write_models_json_config "$platform_build/settings.json" "$platform_name"
+      success "Created settings.json"
+      ;;
+    codex)
+      {
+        printf '[models]\n'
+        printf 'fast = "%s"\n' "$(escape_toml_basic_string "$MODEL_FAST")"
+        printf 'powerful = "%s"\n' "$(escape_toml_basic_string "$MODEL_POWERFUL")"
+        printf 'light = "%s"\n' "$(escape_toml_basic_string "$MODEL_LIGHT")"
+      } > "$platform_build/config.toml"
+      success "Created config.toml"
+      ;;
+  esac
+}
+
 build_platform() {
   local platform="$1"
 
@@ -213,6 +349,11 @@ build_platform() {
 
   # shellcheck source=/dev/null
   source "$env_file"
+
+  if [[ -n "$OVERRIDES_FILE" ]]; then
+    apply_model_overrides "$OVERRIDES_FILE"
+    info "Applied model overrides from $(basename "$OVERRIDES_FILE")"
+  fi
 
   local sed_file
   sed_file=$(mktemp)
@@ -279,6 +420,8 @@ build_platform() {
   local dst="$platform_build/$DISPATCHER_FILE"
   expand_file "$dispatcher_tmpl" "$dst" "$sed_file"
   success "Created $DISPATCHER_FILE"
+
+  generate_platform_config "$platform" "$platform_build"
 
   if [[ "$platform" == "gemini" ]]; then
     info "Converting tools to YAML lists..."
