@@ -4,11 +4,11 @@
 
 ## I'm not an expert
 
-Let me be upfront: **I am not a Claude Code expert.** I'm a PhD researcher who needed help and built something that works for me. This project is an accumulation of personal needs, not a polished product from someone who knows all the best practices.
+Let me be upfront: **I am not a GitHub Copilot expert.** I'm a PhD researcher who needed help and built something that works for me. This project is an accumulation of personal needs, not a polished product from someone who knows all the best practices.
 
 The code might not be optimal. The prompts might not be perfect. The architecture might make a seasoned Claude developer cringe. **And that's okay.** I'm sharing this because I believe it can help other people in my same situation, not because I think it's the definitive way to do things.
 
-If you know Claude Code better than I do (and chances are you do), **please contribute.** Every PR is welcome. Every suggestion, every critique, every improvement. I want this to get better, and I know it will get better faster with help from people who actually know what they're doing.
+If you know GitHub Copilot better than I do (and chances are you do), **please contribute.** Every PR is welcome. Every suggestion, every critique, every improvement. I want this to get better, and I know it will get better faster with help from people who actually know what they're doing.
 
 ---
 

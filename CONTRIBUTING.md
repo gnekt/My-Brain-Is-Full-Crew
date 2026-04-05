@@ -22,7 +22,7 @@ claude --plugin-dir ./
 
 ### Propose a new core crew member
 
-> **Note**: Users can create custom agents directly within their vault by saying "create a new agent" in Claude Code. The Architect handles the entire process. The section below is for proposing new *core* agents that ship with the project.
+> **Note**: Users can create custom agents directly within their vault by saying "create a new agent" in GitHub Copilot. The Architect handles the entire process. The section below is for proposing new *core* agents that ship with the project.
 
 Have an idea for a new core agent? Open an issue with:
 
@@ -50,7 +50,7 @@ Open an issue with:
 
 ## Agent file structure
 
-Each agent is a Claude Code **subagent**, a standalone `.md` file with YAML frontmatter:
+Each agent is a standalone `.md` file with YAML frontmatter that GitHub Copilot reads for role instructions:
 
 ```yaml
 ---
@@ -97,7 +97,7 @@ Agents coordinate through a dispatcher-driven orchestration system. When an agen
 
 ## Custom agents vs. core agents
 
-**Custom agents** are created by users within their own vault using the Architect agent. They live in the user's `.claude/agents/` directory and are personal to that vault. Custom agents:
+**Custom agents** are created by users within their own vault using the Architect agent. They live in the user's `.github/agents/` directory and are personal to that vault. Custom agents:
 - Are created through a conversational flow with the Architect
 - Follow the same file structure and conventions as core agents
 - Participate in the dispatcher's routing and orchestration system

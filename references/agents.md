@@ -6,7 +6,7 @@ This reference is shared across all agents. Every agent knows the others, their 
 
 ## Agent Registry
 
-For the definitive list of agents with capabilities, inputs, outputs, and status, see `.claude/references/agents-registry.md`. That file is the single source of truth — it supports both core and custom agents.
+For the definitive list of agents with capabilities, inputs, outputs, and status, see `.github/references/agents-registry.md`. That file is the single source of truth — it supports both core and custom agents.
 
 ---
 
@@ -128,7 +128,7 @@ The dispatcher routes triggers to skills FIRST, then falls through to agents.
 
 ## Quick Reference: When to Suggest Another Agent
 
-When an agent detects work for another agent, it includes a `### Suggested next agent` section in its output. The dispatcher reads this and decides whether to chain the next agent. See `.claude/references/agent-orchestration.md` for the full protocol.
+When an agent detects work for another agent, it includes a `### Suggested next agent` section in its output. The dispatcher reads this and decides whether to chain the next agent. See `.github/references/agent-orchestration.md` for the full protocol.
 
 | Situation | Suggest |
 |-----------|---------|
@@ -151,9 +151,9 @@ When an agent detects work for another agent, it includes a `### Suggested next 
 
 ## Custom Agents
 
-Custom agents are created by the Architect and live in `.claude/agents/` alongside the core agents. They follow the same conventions: YAML frontmatter, trigger phrases written in the user's language, inter-agent coordination sections, and dispatcher-driven orchestration.
+Custom agents are created by the Architect and live in `.github/agents/` alongside the core agents. They follow the same conventions: YAML frontmatter, trigger phrases written in the user's language, inter-agent coordination sections, and dispatcher-driven orchestration.
 
-For the definitive list of all agents (core + custom) with capabilities, inputs, outputs, and status, see `.claude/references/agents-registry.md`.
+For the definitive list of all agents (core + custom) with capabilities, inputs, outputs, and status, see `.github/references/agents-registry.md`.
 
 ### How Custom Agents Coordinate
 

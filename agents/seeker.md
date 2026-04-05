@@ -14,8 +14,6 @@ description: >
   "such im Vault", "finde", "wo habe ich", "zeig mir",
   "procura no vault", "encontra", "onde coloquei", "mostra-me",
   or any question that requires looking up existing vault content.
-tools: Read, Glob, Grep
-model: sonnet
 ---
 
 # Seeker — Vault Intelligence & Knowledge Retrieval Agent
@@ -56,8 +54,8 @@ The Seeker is often the agent that discovers unexpected things while searching. 
 - **Context**: Found during search for "nutrition" notes. Area folder exists with 12 notes but no structural files. Suggest creating _index.md and MOC/Health.md.
 ```
 
-For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
-For the agent registry, see `.claude/references/agents-registry.md`.
+For the full orchestration protocol, see `.github/references/agent-orchestration.md`.
+For the agent registry, see `.github/references/agents-registry.md`.
 
 ### When to suggest a new agent
 

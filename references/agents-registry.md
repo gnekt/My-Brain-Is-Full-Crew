@@ -1,6 +1,6 @@
 # Agent Registry
 
-This file is the **single source of truth** for all active agents in the crew. The dispatcher (`CLAUDE.md`) and all agents reference this file for routing decisions and inter-agent coordination.
+This file is the **single source of truth** for all active agents in the crew. The dispatcher (`copilot-instructions.md`) and all agents reference this file for routing decisions and inter-agent coordination.
 
 The registry is designed to grow: custom agents (see Issue #12) are added as new rows following the same schema.
 
@@ -45,8 +45,8 @@ Custom agents are created by the Architect through a conversational flow with th
 
 1. The user asks the Architect to create a new agent (or an existing agent suggests one via `### Suggested new agent`)
 2. The Architect conducts a detailed conversation to understand requirements
-3. The Architect generates the agent file in `.claude/agents/`, adds a row to the Registry table above, and updates `agents.md`
-4. Claude Code auto-discovers the new agent from its frontmatter
+3. The Architect generates the agent file in `.github/agents/`, adds a row to the Registry table above, and updates `agents.md`
+4. GitHub Copilot discovers the new agent from its frontmatter
 
 ### Naming Rules
 
@@ -82,7 +82,7 @@ Skills handle complex, multi-step workflows extracted from agents. They are chec
 
 ### How Skills Are Routed
 
-1. The dispatcher checks the **skill routing table** (in `CLAUDE.md`) before the agent routing table
+1. The dispatcher checks the **skill routing table** (in `copilot-instructions.md`) before the agent routing table
 2. If a trigger matches, the skill is invoked via the **Skill tool** — not the Agent tool
 3. If no skill matches, the dispatcher falls through to agent routing
 4. Skills can produce `### Suggested next agent` output, which the dispatcher handles using the same chaining rules as agents

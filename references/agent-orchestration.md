@@ -1,6 +1,6 @@
 # Agent Orchestration Protocol
 
-This document defines how agents coordinate through the **dispatcher** (`CLAUDE.md`). Agents do NOT communicate directly with each other — the dispatcher handles all routing and chaining.
+This document defines how agents coordinate through the **dispatcher** (`copilot-instructions.md`). Agents do NOT communicate directly with each other — the dispatcher handles all routing and chaining.
 
 ---
 
@@ -25,7 +25,7 @@ Skills are checked **before** agents. They handle complex, multi-step workflows 
 
 ### How it works
 
-- The dispatcher maintains a **skill routing table** (defined in `CLAUDE.md`) with trigger phrases in multiple languages.
+- The dispatcher maintains a **skill routing table** (defined in `copilot-instructions.md`) with trigger phrases in multiple languages.
 - If a user message matches a skill trigger, the skill is invoked via the **Skill tool** (not the Agent tool). The dispatcher does NOT also invoke the source agent.
 - Skills run in the **main conversation context**, preserving multi-turn state. This is different from agents, which run as subprocesses.
 - If no skill matches, the dispatcher falls through to the **agent routing table**.
@@ -39,7 +39,7 @@ Skills can still produce output that triggers agent chaining:
 
 ### List of skills
 
-See `.claude/references/agents.md` (Skills section) for the full table of skills, their source agents, and purposes.
+See `.github/references/agents.md` (Skills section) for the full table of skills, their source agents, and purposes.
 
 ---
 
@@ -132,13 +132,13 @@ If the dispatcher would need a 4th agent, it:
 
 ## Custom Agent Lifecycle
 
-Custom agents are created by the Architect and stored in `.claude/agents/`. They participate fully in the orchestration system:
+Custom agents are created by the Architect and stored in `.github/agents/`. They participate fully in the orchestration system:
 
 1. **Creation**: the Architect creates the agent file, adds a row to `agents-registry.md`, and updates `agents.md`
-2. **Discovery**: Claude Code auto-discovers the agent from its frontmatter in `.claude/agents/`
+2. **Discovery**: GitHub Copilot reads the agent file from `.github/agents/`
 3. **Routing**: the dispatcher checks `agents-registry.md` for custom agents when no core agent matches
 4. **Chaining**: custom agents can suggest (and be suggested by) any other agent, following the same protocol
-5. **Maintenance**: the Librarian audits custom agents during vault health checks. For every row in agents-registry.md with status=active, the corresponding file must exist in `.claude/agents/`
+5. **Maintenance**: the Librarian audits custom agents during vault health checks. For every row in agents-registry.md with status=active, the corresponding file must exist in `.github/agents/`
 6. **Deletion**: only the Architect can remove a custom agent (with user confirmation). The agent file is deleted, and the registry row is set to `disabled`
 
 ---
@@ -146,7 +146,7 @@ Custom agents are created by the Architect and stored in `.claude/agents/`. They
 ## What Agents Should NOT Do
 
 - ❌ **Do NOT reference `Meta/agent-messages.md`** — the shared message board is deprecated
-- ❌ **Do NOT edit other agents' prompt/config files** (e.g., `.claude/agents/*.md`) — normal vault notes/MOC edits are still allowed per your responsibilities; all coordination goes through the dispatcher
+- ❌ **Do NOT edit other agents' prompt/config files** (e.g., `.github/agents/*.md`) — normal vault notes/MOC edits are still allowed per your responsibilities; all coordination goes through the dispatcher
 - ❌ **Do NOT block waiting for another agent** — finish your task and suggest next steps in your output
 - ❌ **Do NOT call other agents** — only the dispatcher invokes agents
 
@@ -191,5 +191,5 @@ last-run: "YYYY-MM-DDTHH:MM:SS"
 
 ## Reference Files
 
-- **Agent registry**: `.claude/references/agents-registry.md` — the single source of truth for all agents
-- **Agent directory**: `.claude/references/agents.md` — detailed descriptions of each agent's responsibilities
+- **Agent registry**: `.github/references/agents-registry.md` — the single source of truth for all agents
+- **Agent directory**: `.github/references/agents.md` — detailed descriptions of each agent's responsibilities

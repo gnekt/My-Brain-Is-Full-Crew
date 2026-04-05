@@ -8,7 +8,7 @@ A step-by-step guide for setting up your AI-powered vault. No technical backgrou
 
 ### Required
 - **Obsidian**: A free note-taking app. Download it at [obsidian.md](https://obsidian.md)
-- **Claude Code**: Anthropic's coding assistant. You need a Claude Pro, Max, or Team subscription.
+- **GitHub Copilot**: GitHub's AI coding assistant. You need a Copilot Pro, Business, or Enterprise subscription.
 - **An Obsidian vault**: This is just a folder on your computer where Obsidian stores your notes. If you don't have one yet, Obsidian will create one for you when you first open it.
 - **Git**: A tool to download the project. On Mac, the terminal will prompt you to install it automatically the first time you use it. On Windows, download it from [git-scm.com](https://git-scm.com).
 
@@ -57,11 +57,12 @@ Don't worry if this feels like a lot. The Architect agent will remind you about 
 
 ---
 
-## Step 2: Install Claude Code
+## Step 2: Install GitHub Copilot in VS Code
 
-1. Go to [claude.ai/code](https://claude.ai/code) and follow the instructions to install Claude Code
-2. You need a **Claude Pro**, **Max**, or **Team** subscription
-3. You can use either the **Desktop app** (Cowork) or the **CLI** (command-line interface). The Crew works on both
+1. Download [VS Code](https://code.visualstudio.com/) if you don't have it
+2. Install the [GitHub Copilot extension](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot)
+3. Install the [GitHub Copilot Chat extension](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat)
+4. Sign in with your GitHub account (you need a **Copilot Pro**, **Business**, or **Enterprise** subscription)
 
 ---
 
@@ -78,13 +79,13 @@ cd /path/to/your-vault
 Clone the repo inside your vault:
 
 ```bash
-git clone https://github.com/gnekt/My-Brain-Is-Full-Crew.git
+git clone https://github.com/Mikehutu/Second-brain-crew.git
 ```
 
 Run the installer:
 
 ```bash
-cd My-Brain-Is-Full-Crew
+cd Second-brain-crew
 bash scripts/launchme.sh
 ```
 
@@ -96,13 +97,14 @@ When it's done, your vault will look like this:
 
 ```
 your-vault/
-├── .claude/
-│   ├── agents/          ← 8 lightweight crew agents
-│   ├── skills/          ← 13 specialized skills for complex flows
-│   └── references/      ← shared docs the agents read
-├── CLAUDE.md            ← project instructions
-├── .mcp.json            ← Gmail + Calendar (only if you said yes)
-├── My-Brain-Is-Full-Crew/  ← the repo (for future updates)
+├── .github/
+│   ├── copilot-instructions.md  ← dispatcher instructions (auto-loaded by Copilot)
+│   ├── agents/                  ← 8 crew agent instruction files
+│   ├── skills/                  ← 13 specialized skill instruction files
+│   └── references/              ← shared docs the agents read
+├── .vscode/settings.json        ← VS Code Copilot settings
+├── .mcp.json                    ← Gmail + Calendar (only if you said yes)
+├── Second-brain-crew/           ← the repo (for future updates)
 └── ... your Obsidian notes
 ```
 
@@ -112,22 +114,20 @@ your-vault/
 
 ## Step 4: Connect your vault
 
-1. Open Claude Code (CLI or Desktop)
-2. Open it **inside your Obsidian vault folder**. This is important: Claude needs to be in your vault to read and write your notes.
+1. Open VS Code
+2. Open your Obsidian vault folder: **File → Open Folder** and select your vault. This is important: Copilot needs to be in your vault to read the crew instructions and write your notes.
 
-If you're using the CLI:
 ```bash
+# Or from the terminal:
 cd /path/to/your-vault
-claude
+code .
 ```
-
-If you're using Claude Code Desktop (Cowork), open the vault folder as your working directory.
 
 ---
 
 ## Step 5: Initialize your vault
 
-This is the fun part. Just type:
+This is the fun part. Open GitHub Copilot Chat (`Ctrl+Shift+I` / `Cmd+Shift+I`) and type:
 
 > **"Initialize my vault"**
 
@@ -160,7 +160,7 @@ You don't need to manage these files — agents handle them automatically. Each 
 
 ## Step 6: Start using it
 
-From now on, you just talk to Claude. Here are some things to try on your first day:
+From now on, you just talk to GitHub Copilot. Here are some things to try on your first day:
 
 ### Capture some thoughts
 > "Save this: I had an idea about reorganizing the team standup. Maybe we should do async updates on Mondays and only meet on Wednesdays"
@@ -211,7 +211,7 @@ The Crew works best with simple daily routines:
 ## Troubleshooting
 
 ### "The agent doesn't seem to activate"
-Make sure Claude Code is open inside your vault folder (not a different directory). Verify agent files exist at `.claude/agents/` and skill files at `.claude/skills/` in your vault. Try saying the trigger phrase differently. Agents and skills understand natural language in multiple languages.
+Make sure VS Code is open inside your vault folder (not a different directory). Verify agent files exist at `.github/agents/` and skill files at `.github/skills/` in your vault. Verify that `.github/copilot-instructions.md` exists. Try saying the trigger phrase differently. Agents and skills understand natural language in multiple languages.
 
 ### "Email/Calendar isn't working"
 The Postman needs at least one email backend: GWS CLI (`gws`), Hey CLI (`hey`), or MCP connectors. For GWS, see `docs/gws-setup-guide.md`. For Hey, install from [github.com/basecamp/hey-cli](https://github.com/basecamp/hey-cli) and run `hey auth login`. For MCP, run the installer again (`bash scripts/launchme.sh`) and answer **yes** to the Gmail/Calendar question, or manually copy `.mcp.json` from the repo to your vault root.
@@ -222,7 +222,7 @@ The Architect customizes the structure based on your onboarding answers.
 ### "How do I update to a new version?"
 
 ```bash
-cd /path/to/your-vault/My-Brain-Is-Full-Crew
+cd /path/to/your-vault/Second-brain-crew
 git pull
 bash scripts/updateme.sh
 ```
@@ -249,4 +249,4 @@ Open an issue on GitHub with:
 
 ---
 
-*Remember: the best organizational system is the one you actually use. Start small. Talk to Claude. Let the Crew handle the rest.*
+*Remember: the best organizational system is the one you actually use. Start small. Talk to GitHub Copilot. Let the Crew handle the rest.*

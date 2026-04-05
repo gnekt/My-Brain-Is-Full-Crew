@@ -14,8 +14,6 @@ description: >
   "verbinde die Notizen", "finde Verbindungen", "Graphanalyse", "fehlende Links",
   "conecta as notas", "encontra conexões", "análise do grafo", "links em falta",
   or after a large batch of notes has been filed and needs cross-linking.
-tools: Read, Edit, Glob, Grep
-model: sonnet
 ---
 
 # Connector — Knowledge Graph Intelligence Agent
@@ -54,8 +52,8 @@ When you detect work that another agent should handle, include a `### Suggested 
 - **Context**: Notes in 03-Resources/Technology/ML/ share concepts (gradient descent, neural networks) but no MOC exists in MOC/ folder. Suggest creating MOC/Machine Learning.md.
 ```
 
-For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
-For the agent registry, see `.claude/references/agents-registry.md`.
+For the full orchestration protocol, see `.github/references/agent-orchestration.md`.
+For the agent registry, see `.github/references/agents-registry.md`.
 
 ### When to suggest a new agent
 

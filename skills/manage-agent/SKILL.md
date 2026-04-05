@@ -46,7 +46,7 @@ last-run: "{{ISO timestamp}}"
 
 When the user says "edit my agent", "update agent X", "modify agent X", or equivalents:
 
-1. **Identify the agent.** If the user specifies a name, read `.claude/agents/{name}.md`. If the name is ambiguous or not provided, read `.claude/references/agents-registry.md` and ask the user which agent they mean using `AskUserQuestion`.
+1. **Identify the agent.** If the user specifies a name, read `.github/agents/{name}.md`. If the name is ambiguous or not provided, read `.github/references/agents-registry.md` and ask the user which agent they mean using `AskUserQuestion`.
 
 2. **Show current configuration.** Present the agent's current setup to the user in a readable format:
    - Name and description
@@ -65,11 +65,11 @@ When the user says "edit my agent", "update agent X", "modify agent X", or equiv
    - Change description
    - Add new capabilities
 
-4. **Apply changes.** Modify the agent file at `.claude/agents/{name}.md` with the requested changes.
+4. **Apply changes.** Modify the agent file at `.github/agents/{name}.md` with the requested changes.
 
-5. **Update the registry.** If the change affects the agent's description, triggers, or capabilities, update the corresponding row in `.claude/references/agents-registry.md`.
+5. **Update the registry.** If the change affects the agent's description, triggers, or capabilities, update the corresponding row in `.github/references/agents-registry.md`.
 
-6. **Update agents.md.** If the change affects the agent's role description, update `.claude/references/agents.md`.
+6. **Update agents.md.** If the change affects the agent's role description, update `.github/references/agents.md`.
 
 7. **Log the change** in `Meta/agent-log.md`.
 
@@ -81,15 +81,15 @@ When the user says "edit my agent", "update agent X", "modify agent X", or equiv
 
 When the user says "remove agent", "delete agent X", "rimuovi agente", or equivalents:
 
-1. **Identify the agent.** If the user specifies a name, locate `.claude/agents/{name}.md`. If not provided, read `.claude/references/agents-registry.md` and ask the user which agent to remove using `AskUserQuestion`.
+1. **Identify the agent.** If the user specifies a name, locate `.github/agents/{name}.md`. If not provided, read `.github/references/agents-registry.md` and ask the user which agent to remove using `AskUserQuestion`.
 
 2. **Ask for confirmation.** Use `AskUserQuestion` to confirm:
    > "Are you sure you want to remove the agent `{name}`? This will delete its file and deactivate it. This action cannot be undone."
 
 3. **If confirmed:**
-   - Delete the agent file from `.claude/agents/{name}.md`
-   - Update `.claude/references/agents-registry.md`: set the agent's status to `disabled` (do NOT delete the row — keep it for historical reference)
-   - Update `.claude/references/agents.md`: remove or mark the agent's section as disabled under "Custom Agents"
+   - Delete the agent file from `.github/agents/{name}.md`
+   - Update `.github/references/agents-registry.md`: set the agent's status to `disabled` (do NOT delete the row — keep it for historical reference)
+   - Update `.github/references/agents.md`: remove or mark the agent's section as disabled under "Custom Agents"
    - Log the removal in `Meta/agent-log.md`
 
 4. **If not confirmed:** acknowledge and do nothing.
@@ -102,7 +102,7 @@ When the user says "remove agent", "delete agent X", "rimuovi agente", or equiva
 
 When the user says "list agents", "show my agents", "lista agenti", "see my agents", or equivalents:
 
-1. **Read `.claude/references/agents-registry.md`** to get the full list of agents (core + custom).
+1. **Read `.github/references/agents-registry.md`** to get the full list of agents (core + custom).
 
 2. **Present the list** to the user in a clear format, organized by type:
 

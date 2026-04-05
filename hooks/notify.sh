@@ -2,7 +2,7 @@
 # =============================================================================
 # Hook: Desktop Notification (Notification event)
 # =============================================================================
-# Sends a macOS/Linux desktop notification when Claude Code needs attention.
+# Sends a macOS/Linux desktop notification when GitHub Copilot needs attention.
 # Useful during long agent chains that can take several minutes.
 #
 # macOS: uses osascript (built-in)
@@ -11,7 +11,7 @@
 
 INPUT=$(cat)
 TITLE=$(echo "$INPUT" | jq -r '.title // "Second Brain Crew"' 2>/dev/null)
-MESSAGE=$(echo "$INPUT" | jq -r '.message // "Claude needs your attention"' 2>/dev/null)
+MESSAGE=$(echo "$INPUT" | jq -r '.message // "Copilot needs your attention"' 2>/dev/null)
 
 if [[ "$(uname)" == "Darwin" ]]; then
   osascript -e "display notification \"$MESSAGE\" with title \"$TITLE\"" 2>/dev/null

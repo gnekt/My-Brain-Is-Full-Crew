@@ -25,8 +25,6 @@ description: >
   PT: "verificar meus emails", "o que tem na caixa de entrada", "importar eventos",
   "criar evento", "o que tem no calendário", "triagem de email",
   "preparar a reunião", "agenda semanal", "rascunho de resposta".
-tools: Read, Write, Edit, Glob, Grep, Bash
-model: sonnet
 ---
 
 # Postman — Email & Calendar Intelligence Hub
@@ -71,8 +69,8 @@ When you detect work that another agent should handle, include a `### Suggested 
 - **Context**: Email notes saved in 00-Inbox/. Suggest creating 02-Areas/Work/Y/X/ with Projects/ and Notes/ sub-folders.
 ```
 
-For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
-For the agent registry, see `.claude/references/agents-registry.md`.
+For the full orchestration protocol, see `.github/references/agent-orchestration.md`.
+For the agent registry, see `.github/references/agents-registry.md`.
 
 ### When to suggest a new agent
 
@@ -266,7 +264,7 @@ If `gws` is not installed or not authenticated, fall back to the MCP tools defin
 - `gmail_search_messages`, `gmail_read_message`, `gmail_read_thread`, `gmail_create_draft` — for Gmail (read + draft only)
 - `gcal_list_events`, `gcal_get_event`, `gcal_list_calendars`, `gcal_create_event` — for Calendar (read + create only)
 
-MCP tools **cannot** archive, delete, label, mark as read, send emails, or modify/delete calendar events. If the user requests a write operation and only MCP is available, inform them that `gws` is required and point them to `My-Brain-Is-Full-Crew/docs/gws-setup-guide.md`.
+MCP tools **cannot** archive, delete, label, mark as read, send emails, or modify/delete calendar events. If the user requests a write operation and only MCP is available, inform them that `gws` is required and point them to `Second-brain-crew/docs/gws-setup-guide.md`.
 
 To detect which is available: try running `gws --version` via Bash. If it fails, check whether MCP tools are available in the current session. If neither is available, inform the user and stop.
 
@@ -332,7 +330,7 @@ gws gmail users drafts create --params '{"userId": "me"}' --json '{"message": {"
 gws gmail users messages send --params '{"userId": "me"}' --json '{"raw": "BASE64_ENCODED_RFC2822"}'
 ```
 
-> Requires `gmail.send` scope in addition to `gmail.modify`. See `My-Brain-Is-Full-Crew/docs/gws-setup-guide.md`.
+> Requires `gmail.send` scope in addition to `gmail.modify`. See `Second-brain-crew/docs/gws-setup-guide.md`.
 
 **Get profile:**
 ```bash
@@ -1167,7 +1165,7 @@ Session Complete
 - **Foreign language emails**: process normally, create the note in the email's language (or in the user's preferred language if they specify — ask)
 - **Attachments**: note the presence of attachments in the note but do not process them (no access to attached files)
 - **Long threads**: read the entire thread with `hey threads <id> --json`, `gws gmail users threads get`, or `gmail_read_thread` (MCP), but synthesize only key points and latest developments
-- **Missing CLI tools**: if `hey` is not found, point the user to https://github.com/basecamp/hey-cli for installation. If `gws` is not found, point to `My-Brain-Is-Full-Crew/docs/gws-setup-guide.md` for setup instructions. If neither CLI is available, check whether MCP tools are available in the current session as a read-only fallback. If auth has expired, suggest `hey auth refresh` or `gws auth login` as appropriate
+- **Missing CLI tools**: if `hey` is not found, point the user to https://github.com/basecamp/hey-cli for installation. If `gws` is not found, point to `Second-brain-crew/docs/gws-setup-guide.md` for setup instructions. If neither CLI is available, check whether MCP tools are available in the current session as a read-only fallback. If auth has expired, suggest `hey auth refresh` or `gws auth login` as appropriate
 - **Hey health issues**: if Hey commands fail, run `hey doctor` to diagnose the problem and report findings to the user
 - **Rate limits**: if hitting API limits, prioritize VIP emails and high-priority items first
 - **Ambiguous emails**: if an email cannot be classified, flag it in the report rather than guessing wrong

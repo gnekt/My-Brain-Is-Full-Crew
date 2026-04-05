@@ -48,8 +48,8 @@ When you detect work that another agent should handle, include a `### Suggested 
 - **Context**: Found 12 orphan tags not in taxonomy, 5 taxonomy entries never used. Suggest Architect review and update Meta/tag-taxonomy.md.
 ```
 
-For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
-For the agent registry, see `.claude/references/agents-registry.md`.
+For the full orchestration protocol, see `.github/references/agent-orchestration.md`.
+For the agent registry, see `.github/references/agents-registry.md`.
 
 ### When to suggest a new agent
 

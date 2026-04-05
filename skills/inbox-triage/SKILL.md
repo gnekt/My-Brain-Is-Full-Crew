@@ -51,8 +51,8 @@ Always include your proposed solution and what you did in the meantime. Then **c
 - **Context**: 3 notes left in 00-Inbox/. Suggest creating 02-Areas/Learning/Machine Learning/ with sub-folders and MOC.
 ```
 
-For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
-For the agent registry, see `.claude/references/agents-registry.md`.
+For the full orchestration protocol, see `.github/references/agent-orchestration.md`.
+For the agent registry, see `.github/references/agents-registry.md`.
 
 ### When to suggest a new agent
 

@@ -1,12 +1,12 @@
 {
-  "name": "my-brain-is-full-crew",
-  "version": "1.0.1",
-  "description": "A crew of 10 AI agents that run your Obsidian vault like a team of personal assistants — capturing notes, triaging your inbox, managing your calendar and email, tracking your nutrition, supporting your mental health, and keeping everything connected. Works in any language.",
+  "name": "second-brain-crew",
+  "version": "2.0.0",
+  "description": "A crew of 8+ AI agents and 13 specialized skills that manage your Obsidian vault — powered by GitHub Copilot. Capturing notes, triaging your inbox, managing your calendar and email, and keeping everything connected. Works in any language.",
   "author": {
-    "name": "@gnekt (Christian Di Maio)",
-    "url": "https://github.com/gnekt"
+    "name": "Mikehutu",
+    "url": "https://github.com/Mikehutu/Second-brain-crew"
   },
-  "repository": "https://github.com/gnekt/My-Brain-Is-Full-Crew",
+  "repository": "https://github.com/Mikehutu/Second-brain-crew",
   "license": "MIT",
   "keywords": [
     "obsidian",
@@ -17,20 +17,12 @@
     "note-taking",
     "second-brain",
     "AI-agents",
-    "claude",
+    "github-copilot",
     "transcription",
     "gmail",
     "google-calendar",
     "email",
-    "nutrition",
-    "diet",
-    "health",
-    "mindfulness",
-    "cbt",
-    "act",
-    "mental-health",
     "productivity",
-    "multilingual",
-    "cowork"
+    "multilingual"
   ]
 }

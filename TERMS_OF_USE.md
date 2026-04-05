@@ -9,7 +9,7 @@ By using this software, you agree to the following terms. If you do not agree, d
 
 ## 1. Nature of the Software
 
-This software is a collection of AI agent prompts ("the Crew") designed to help individuals organize personal notes, tasks, and information inside an Obsidian vault using Claude Code. It is an open-source tool provided free of charge under the MIT License.
+This software is a collection of AI agent prompts ("the Crew") designed to help individuals organize personal notes, tasks, and information inside an Obsidian vault using GitHub Copilot. It is an open-source tool provided free of charge under the MIT License.
 
 The software does not collect, transmit, or store any data outside your local device. All data remains in your Obsidian vault on your filesystem.
 

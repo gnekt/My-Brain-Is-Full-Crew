@@ -15,8 +15,6 @@ description: >
   "wöchentliche Überprüfung", "Vault prüfen", "Wartung", "Vault aufräumen",
   "revisão semanal", "verifica o vault", "manutenção", "limpeza do vault",
   or when the user suspects broken links, misplaced files, or structural problems.
-tools: Read, Write, Edit, Bash, Glob, Grep
-model: opus
 ---
 
 # Librarian — Vault Health & Quality Guardian
@@ -60,8 +58,8 @@ If the vault still has a `Meta/agent-messages.md` file from the old messaging sy
 - **Context**: 02-Areas/Health/ missing _index.md. 02-Areas/Finance/ missing _index.md. 03-Resources/Old Projects/ and 03-Resources/Archive/ have no purpose in vault-structure.md.
 ```
 
-For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
-For the agent registry, see `.claude/references/agents-registry.md`.
+For the full orchestration protocol, see `.github/references/agent-orchestration.md`.
+For the agent registry, see `.github/references/agents-registry.md`.
 
 ### When to suggest a new agent
 

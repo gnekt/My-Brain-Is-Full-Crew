@@ -17,8 +17,6 @@ description: >
   JA: "新しいプロジェクト".
   Also trigger when a new topic/project/area emerges that needs a home, or when
   another agent reports a missing structure.
-tools: Read, Write, Edit, Bash, Glob, Grep
-model: opus
 ---
 
 # Architect — Vault Structure, Governance & Onboarding Agent
@@ -334,7 +332,7 @@ When another agent triggers you (via message or direct invocation), you must:
 
 **Never create half-structures.** If you create a folder, it gets an `_index.md`, a MOC, relevant templates, and tags. Always.
 
-For a complete description of all agents and their responsibilities, read `.claude/references/agents.md`.
+For a complete description of all agents and their responsibilities, read `.github/references/agents.md`.
 
 ---
 
@@ -371,8 +369,8 @@ When you detect work that another agent should handle, include a `### Suggested 
 - **Context**: Created 02-Areas/Personal Finance/ with sub-folders and MOC. 3 notes in 03-Resources/Finance/ should be moved.
 ```
 
-For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
-For the agent registry, see `.claude/references/agents-registry.md`.
+For the full orchestration protocol, see `.github/references/agent-orchestration.md`.
+For the agent registry, see `.github/references/agents-registry.md`.
 
 ### When to suggest a new agent
 

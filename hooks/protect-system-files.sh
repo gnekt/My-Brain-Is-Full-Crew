@@ -3,7 +3,7 @@
 # Hook: Protect System Files (PreToolUse on Write/Edit)
 # =============================================================================
 # Prevents agents from accidentally overwriting core crew files at runtime.
-# Custom agents in .claude/agents/ are allowed (the Architect creates them).
+# Custom agents in .github/agents/ are allowed (the Architect creates them).
 # User-mutable references (agents-registry.md, agents.md) are also allowed.
 #
 # Exit codes:
@@ -19,15 +19,15 @@ FILE=$(echo "$INPUT" | jq -r '.tool_input.file_path // .tool_input.command // ""
 
 BASENAME=$(basename "$FILE")
 
-# ── CLAUDE.md: never modify at runtime ──────────────────────────────────────
-if [[ "$BASENAME" == "CLAUDE.md" && "$FILE" != *".claude/"* ]]; then
-  echo "BLOCKED: CLAUDE.md is a system file. Update it in the repo and run updateme.sh."
+# ── copilot-instructions.md: never modify at runtime ────────────────────────
+if [[ "$BASENAME" == "copilot-instructions.md" ]]; then
+  echo "BLOCKED: copilot-instructions.md is a system file. Update it in the repo and run updateme.sh."
   exit 2
 fi
 
 # ── Core agent definitions: never modify at runtime ─────────────────────────
 CORE_AGENTS="architect.md scribe.md sorter.md seeker.md connector.md librarian.md transcriber.md postman.md"
-if [[ "$FILE" == *".claude/agents/"* ]]; then
+if [[ "$FILE" == *".github/agents/"* ]]; then
   for core in $CORE_AGENTS; do
     if [[ "$BASENAME" == "$core" ]]; then
       echo "BLOCKED: $BASENAME is a core agent definition. Update it in the repo and run updateme.sh."
@@ -39,13 +39,13 @@ if [[ "$FILE" == *".claude/agents/"* ]]; then
 fi
 
 # ── Skills: never modify at runtime ─────────────────────────────────────────
-if [[ "$FILE" == *".claude/skills/"* ]]; then
+if [[ "$FILE" == *".github/skills/"* ]]; then
   echo "BLOCKED: Skill files are managed by the repo. Update them in the repo and run updateme.sh."
   exit 2
 fi
 
 # ── Core references: block all except user-mutable ones ─────────────────────
-if [[ "$FILE" == *".claude/references/"* ]]; then
+if [[ "$FILE" == *".github/references/"* ]]; then
   USER_MUTABLE="agents-registry.md agents.md"
   for allowed in $USER_MUTABLE; do
     [[ "$BASENAME" == "$allowed" ]] && exit 0

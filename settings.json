@@ -1,37 +1,13 @@
 {
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/protect-system-files.sh"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/validate-frontmatter.sh"
-          }
-        ]
-      }
-    ],
-    "Notification": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/notify.sh"
-          }
-        ]
-      }
-    ]
-  }
+  "github.copilot.enable": {
+    "*": true,
+    "markdown": true,
+    "plaintext": true
+  },
+  "github.copilot.chat.localeOverride": "auto",
+  "files.associations": {
+    "*.md": "markdown"
+  },
+  "editor.wordWrap": "on",
+  "editor.formatOnSave": false
 }

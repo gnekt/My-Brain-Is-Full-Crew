@@ -5,7 +5,7 @@
 # After pulling new changes from the repo, run this to update the agents
 # in your vault:
 #
-#   cd /path/to/your-vault/My-Brain-Is-Full-Crew
+#   cd /path/to/your-vault/Second-brain-crew
 #   git pull
 #   bash scripts/updateme.sh
 #
@@ -34,8 +34,8 @@ VAULT_DIR="$(cd "$REPO_DIR/.." && pwd)"
 [[ -d "$REPO_DIR/agents" ]] || die "Can't find agents/ — are you running this from the repo?"
 
 # ── Check vault has been set up ─────────────────────────────────────────────
-if [[ ! -d "$VAULT_DIR/.claude/agents" ]]; then
-  die "No .claude/agents/ found in $VAULT_DIR — run launchme.sh first"
+if [[ ! -d "$VAULT_DIR/.github/agents" ]]; then
+  die "No .github/agents/ found in $VAULT_DIR — run launchme.sh first"
 fi
 
 # ── Banner ──────────────────────────────────────────────────────────────────
@@ -46,8 +46,8 @@ echo -e "${BOLD}╚════════════════════�
 echo ""
 
 # ── Confirm overwrite ────────────────────────────────────────────────────
-echo -e "${BOLD}This will overwrite core agent files, references, and CLAUDE.md.${NC}"
-echo -e "   ${DIM}Custom agent files in .claude/agents/ will not be deleted or overwritten.${NC}"
+echo -e "${BOLD}This will overwrite core agent files, references, and copilot-instructions.md.${NC}"
+echo -e "   ${DIM}Custom agent files in .github/agents/ will not be deleted or overwritten.${NC}"
 echo -e "   ${DIM}Custom agent entries in registry/directory will be preserved during update.${NC}"
 echo -e "   ${DIM}Your vault notes are never touched.${NC}"
 echo ""
@@ -66,9 +66,9 @@ echo ""
 # Read the OLD manifest first (before rewriting it) so we know which files
 # were previously installed as core. Agents removed from the repo will still
 # be in the old manifest and can be correctly deprecated.
-MANIFEST="$VAULT_DIR/.claude/agents/.core-manifest"
+MANIFEST="$VAULT_DIR/.github/agents/.core-manifest"
 DEPRECATED_COUNT=0
-for vault_agent in "$VAULT_DIR/.claude/agents/"*.md; do
+for vault_agent in "$VAULT_DIR/.github/agents/"*.md; do
   [[ -f "$vault_agent" ]] || continue
   name="$(basename "$vault_agent")"
   # Skip if it still exists in repo
@@ -84,13 +84,13 @@ for vault_agent in "$VAULT_DIR/.claude/agents/"*.md; do
     continue
   fi
   deprecated_name="${name%.md}-DEPRECATED.md"
-  mkdir -p "$VAULT_DIR/.claude/deprecated"
+  mkdir -p "$VAULT_DIR/.github/deprecated"
   # Skip if already deprecated in a previous run
-  [[ -f "$VAULT_DIR/.claude/deprecated/$deprecated_name" ]] && continue
-  mv "$vault_agent" "$VAULT_DIR/.claude/deprecated/$deprecated_name"
+  [[ -f "$VAULT_DIR/.github/deprecated/$deprecated_name" ]] && continue
+  mv "$vault_agent" "$VAULT_DIR/.github/deprecated/$deprecated_name"
   # Prepend deprecation header
-  { echo "########"; echo "DEPRECATED DO NOT USE"; echo "########"; echo ""; cat "$VAULT_DIR/.claude/deprecated/$deprecated_name"; } > "$VAULT_DIR/.claude/deprecated/$deprecated_name.tmp"
-  mv "$VAULT_DIR/.claude/deprecated/$deprecated_name.tmp" "$VAULT_DIR/.claude/deprecated/$deprecated_name"
+  { echo "########"; echo "DEPRECATED DO NOT USE"; echo "########"; echo ""; cat "$VAULT_DIR/.github/deprecated/$deprecated_name"; } > "$VAULT_DIR/.github/deprecated/$deprecated_name.tmp"
+  mv "$VAULT_DIR/.github/deprecated/$deprecated_name.tmp" "$VAULT_DIR/.github/deprecated/$deprecated_name"
   warn "Deprecated agent: $name -> deprecated/$deprecated_name"
   DEPRECATED_COUNT=$((DEPRECATED_COUNT + 1))
   # Remove deprecated agent from manifest
@@ -102,18 +102,18 @@ done
 
 # ── Update agents and rewrite manifest ────────────────────────────────────
 AGENT_COUNT=0
-: > "$VAULT_DIR/.claude/agents/.core-manifest"
+: > "$VAULT_DIR/.github/agents/.core-manifest"
 for agent in "$REPO_DIR/agents/"*.md; do
   name="$(basename "$agent")"
-  basename "$agent" >> "$VAULT_DIR/.claude/agents/.core-manifest"
-  if [[ -f "$VAULT_DIR/.claude/agents/$name" ]]; then
-    if ! diff -q "$agent" "$VAULT_DIR/.claude/agents/$name" >/dev/null 2>&1; then
-      cp "$agent" "$VAULT_DIR/.claude/agents/"
+  basename "$agent" >> "$VAULT_DIR/.github/agents/.core-manifest"
+  if [[ -f "$VAULT_DIR/.github/agents/$name" ]]; then
+    if ! diff -q "$agent" "$VAULT_DIR/.github/agents/$name" >/dev/null 2>&1; then
+      cp "$agent" "$VAULT_DIR/.github/agents/"
       info "Updated $name"
       AGENT_COUNT=$((AGENT_COUNT + 1))
     fi
   else
-    cp "$agent" "$VAULT_DIR/.claude/agents/"
+    cp "$agent" "$VAULT_DIR/.github/agents/"
     info "Added $name (new agent)"
     AGENT_COUNT=$((AGENT_COUNT + 1))
   fi
@@ -121,8 +121,8 @@ done
 
 # ── Deprecate removed references ──────────────────────────────────────────
 # Read the old manifest before rewriting, same logic as agents.
-REF_MANIFEST="$VAULT_DIR/.claude/references/.core-manifest"
-for vault_ref in "$VAULT_DIR/.claude/references/"*.md; do
+REF_MANIFEST="$VAULT_DIR/.github/references/.core-manifest"
+for vault_ref in "$VAULT_DIR/.github/references/"*.md; do
   [[ -f "$vault_ref" ]] || continue
   name="$(basename "$vault_ref")"
   [[ -f "$REPO_DIR/references/$name" ]] && continue
@@ -136,11 +136,11 @@ for vault_ref in "$VAULT_DIR/.claude/references/"*.md; do
     continue
   fi
   deprecated_name="${name%.md}-DEPRECATED.md"
-  mkdir -p "$VAULT_DIR/.claude/deprecated"
-  [[ -f "$VAULT_DIR/.claude/deprecated/$deprecated_name" ]] && continue
-  mv "$vault_ref" "$VAULT_DIR/.claude/deprecated/$deprecated_name"
-  { echo "########"; echo "DEPRECATED DO NOT USE"; echo "########"; echo ""; cat "$VAULT_DIR/.claude/deprecated/$deprecated_name"; } > "$VAULT_DIR/.claude/deprecated/$deprecated_name.tmp"
-  mv "$VAULT_DIR/.claude/deprecated/$deprecated_name.tmp" "$VAULT_DIR/.claude/deprecated/$deprecated_name"
+  mkdir -p "$VAULT_DIR/.github/deprecated"
+  [[ -f "$VAULT_DIR/.github/deprecated/$deprecated_name" ]] && continue
+  mv "$vault_ref" "$VAULT_DIR/.github/deprecated/$deprecated_name"
+  { echo "########"; echo "DEPRECATED DO NOT USE"; echo "########"; echo ""; cat "$VAULT_DIR/.github/deprecated/$deprecated_name"; } > "$VAULT_DIR/.github/deprecated/$deprecated_name.tmp"
+  mv "$VAULT_DIR/.github/deprecated/$deprecated_name.tmp" "$VAULT_DIR/.github/deprecated/$deprecated_name"
   warn "Deprecated reference: $name -> deprecated/$deprecated_name"
   DEPRECATED_COUNT=$((DEPRECATED_COUNT + 1))
 done
@@ -154,12 +154,12 @@ USER_MUTABLE_REFS="agents-registry.md agents.md"
 mkdir -p "$VAULT_DIR/Meta/states"
 
 REF_COUNT=0
-mkdir -p "$VAULT_DIR/.claude/references"
-: > "$VAULT_DIR/.claude/references/.core-manifest"
+mkdir -p "$VAULT_DIR/.github/references"
+: > "$VAULT_DIR/.github/references/.core-manifest"
 for ref in "$REPO_DIR/references/"*.md; do
   name="$(basename "$ref")"
-  basename "$ref" >> "$VAULT_DIR/.claude/references/.core-manifest"
-  vault_copy="$VAULT_DIR/.claude/references/$name"
+  basename "$ref" >> "$VAULT_DIR/.github/references/.core-manifest"
+  vault_copy="$VAULT_DIR/.github/references/$name"
 
   # For user-mutable files: preserve custom agent content
   if [[ " $USER_MUTABLE_REFS " == *" $name "* ]] && [[ -f "$vault_copy" ]]; then
@@ -227,9 +227,9 @@ if [[ -d "$REPO_DIR/skills" ]]; then
     [[ -f "$skill_dir/SKILL.md" ]] || continue
     skill_name="$(basename "$skill_dir")"
     src="$skill_dir/SKILL.md"
-    dst="$VAULT_DIR/.claude/skills/$skill_name/SKILL.md"
+    dst="$VAULT_DIR/.github/skills/$skill_name/SKILL.md"
     if [[ ! -f "$dst" ]] || ! diff -q "$src" "$dst" >/dev/null 2>&1; then
-      mkdir -p "$VAULT_DIR/.claude/skills/$skill_name"
+      mkdir -p "$VAULT_DIR/.github/skills/$skill_name"
       cp "$src" "$dst"
       info "Updated skill: $skill_name"
       SKILL_COUNT=$((SKILL_COUNT + 1))
@@ -240,11 +240,11 @@ fi
 # ── Update hooks ──────────────────────────────────────────────────────────
 HOOK_COUNT=0
 if [[ -d "$REPO_DIR/hooks" ]]; then
-  mkdir -p "$VAULT_DIR/.claude/hooks"
+  mkdir -p "$VAULT_DIR/.github/hooks"
   for hook in "$REPO_DIR/hooks/"*.sh; do
     [[ -f "$hook" ]] || continue
     name="$(basename "$hook")"
-    dst="$VAULT_DIR/.claude/hooks/$name"
+    dst="$VAULT_DIR/.github/hooks/$name"
     if [[ ! -f "$dst" ]] || ! diff -q "$hook" "$dst" >/dev/null 2>&1; then
       cp "$hook" "$dst"
       chmod +x "$dst"
@@ -254,24 +254,26 @@ if [[ -d "$REPO_DIR/hooks" ]]; then
   done
 fi
 
-# ── Update settings.json ──────────────────────────────────────────────────
+# ── Update settings.json (VS Code settings) ──────────────────────────────
 SETTINGS_UPDATED=""
 if [[ -f "$REPO_DIR/settings.json" ]]; then
-  dst="$VAULT_DIR/.claude/settings.json"
+  dst="$VAULT_DIR/.vscode/settings.json"
   if [[ ! -f "$dst" ]] || ! diff -q "$REPO_DIR/settings.json" "$dst" >/dev/null 2>&1; then
-    mkdir -p "$VAULT_DIR/.claude"
+    mkdir -p "$VAULT_DIR/.vscode"
     cp "$REPO_DIR/settings.json" "$dst"
-    info "Updated settings.json"
+    info "Updated settings.json (.vscode/settings.json)"
     SETTINGS_UPDATED="1"
   fi
 fi
 
-# ── Update CLAUDE.md ──────────────────────────────────────────────────────
+# ── Update copilot-instructions.md ──────────────────────────────────────────
 CLAUDE_MD_UPDATED=""
-if [[ -f "$REPO_DIR/CLAUDE.md" ]]; then
-  if [[ ! -f "$VAULT_DIR/CLAUDE.md" ]] || ! diff -q "$REPO_DIR/CLAUDE.md" "$VAULT_DIR/CLAUDE.md" >/dev/null 2>&1; then
-    cp "$REPO_DIR/CLAUDE.md" "$VAULT_DIR/CLAUDE.md"
-    info "Updated CLAUDE.md"
+if [[ -f "$REPO_DIR/copilot-instructions.md" ]]; then
+  dst="$VAULT_DIR/.github/copilot-instructions.md"
+  if [[ ! -f "$dst" ]] || ! diff -q "$REPO_DIR/copilot-instructions.md" "$dst" >/dev/null 2>&1; then
+    mkdir -p "$VAULT_DIR/.github"
+    cp "$REPO_DIR/copilot-instructions.md" "$dst"
+    info "Updated copilot-instructions.md"
     CLAUDE_MD_UPDATED="1"
   fi
 fi
@@ -287,5 +289,5 @@ else
   fi
 fi
 echo ""
-echo -e "   ${DIM}Restart Claude Code to pick up the changes.${NC}"
+echo -e "   ${DIM}Restart GitHub Copilot to pick up the changes.${NC}"
 echo ""

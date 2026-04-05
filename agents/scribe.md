@@ -12,8 +12,6 @@ description: >
   "salva isso", "nota rápida", "escreve isso", "lembra-me que",
   or when the user pastes messy, unformatted text, speech-to-text output, or a chain
   of related thoughts that need to be turned into proper notes.
-tools: Read, Write, Edit, Glob, Grep
-model: sonnet
 ---
 
 # Scribe — Intelligent Text Capture & Refinement Agent
@@ -55,8 +53,8 @@ When you detect work that another agent should handle, include a `### Suggested 
 - **Context**: Created "Monthly Budget.md" in 00-Inbox/. Suggest creating 02-Areas/Personal Finance/ with sub-folders, _index.md, MOC, and templates.
 ```
 
-For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
-For the agent registry, see `.claude/references/agents-registry.md`.
+For the full orchestration protocol, see `.github/references/agent-orchestration.md`.
+For the agent registry, see `.github/references/agents-registry.md`.
 
 ### When to suggest a new agent
 

@@ -21,22 +21,11 @@ description: >
   {{One-paragraph description of what the agent does, written in the user's language.}}
   Triggers: {{comma-separated list of natural phrases that should activate this agent,
   written in the user's language. Include at least 6-8 trigger phrases.}}
-# NOTE: The description is what Claude Code reads to auto-trigger the agent.
-# Write it in the language the user speaks. Be specific and include the exact phrases
-# a user would naturally say to invoke this agent.
-
-tools: {{tool list}}
-# Available tools and when to grant them:
-#   Read, Glob, Grep        -> DEFAULT. Every agent gets these (search and read the vault)
-#   Write                   -> Only if the agent CREATES new notes or files
-#   Edit                    -> Only if the agent MODIFIES existing notes or files
-#   Bash                    -> Only if the agent needs filesystem operations (move, rename, mkdir)
-#                              or CLI tool access (e.g., gws for Google Workspace API calls)
-# Principle: grant the MINIMUM tools necessary. Read-only agents should NOT have Write/Edit.
-
-model: sonnet
-# Options: sonnet (default), opus (deep reasoning), haiku (fast/lightweight)
-# Use sonnet unless there is a strong reason not to.
+# NOTE: The description is used by the dispatcher (copilot-instructions.md) to match
+# user messages to this agent. Write it in the language the user speaks. Be specific
+# and include the exact phrases a user would naturally say to invoke this agent.
+# Users can also reference this agent directly in Copilot Chat:
+#   #file:.github/agents/{{agent-name}}.md
 ---
 
 # {{Agent Name}} -- {{Short Subtitle}}
@@ -100,8 +89,8 @@ If you detect that the user needs functionality that NO existing agent provides,
 - The user is asking something outside the vault's scope entirely
 - The task is a one-off that does not warrant a dedicated agent
 
-For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
-For the agent registry, see `.claude/references/agents-registry.md`.
+For the full orchestration protocol, see `.github/references/agent-orchestration.md`.
+For the agent registry, see `.github/references/agents-registry.md`.
 
 ---
 
@@ -210,7 +199,7 @@ When generating a custom agent from this template:
 2. **Tools are minimal** by default. Start with `Read, Glob, Grep` and only add more if the user's answers justify it
 3. **The Inter-Agent Coordination section** is mandatory and must be included verbatim (with the When to suggest another agent list customized for this agent)
 4. **The Core Responsibilities section** must be deeply detailed. Ask the user enough questions to fill this section thoroughly. A vague agent is a useless agent
-5. **Every custom agent** gets a row in `.claude/references/agents-registry.md` and a section in `.claude/references/agents.md`
-6. **File location**: `.claude/agents/{{agent-name}}.md`
+5. **Every custom agent** gets a row in `.github/references/agents-registry.md` and a section in `.github/references/agents.md`
+6. **File location**: `.github/agents/{{agent-name}}.md` (installed in user vault)
 7. **Naming conflicts**: if the user picks a name that conflicts with the 8 core agents, suggest an alternative
-8. **Complex multi-step flows**: if an agent has conversational, multi-turn workflows (e.g., onboarding, multi-phase interviews), those should be extracted into **skills** (`.claude/skills/`) rather than kept in the agent body. Skills run in the main conversation context and preserve multi-turn state, which agents cannot do as subprocesses. See the 13 core skills in `.claude/references/agents.md` (Skills section) for examples
+8. **Complex multi-step flows**: if an agent has conversational, multi-turn workflows (e.g., onboarding, multi-phase interviews), those should be extracted into **skills** (`.github/skills/`) rather than kept in the agent body. Skills maintain state across multiple conversation turns. See the 13 core skills in `.github/references/agents.md` (Skills section) for examples

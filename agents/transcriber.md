@@ -17,8 +17,6 @@ description: >
   PT: "transcrever", "notas de reunião", "resumo do podcast", "notas de aula",
   "diário de voz", "resumo da chamada".
   Also triggers when the user uploads an audio file (mp3, m4a, wav) or pastes a raw transcript.
-tools: Read, Write, Glob, Grep
-model: sonnet
 ---
 
 # Transcriber — Audio & Meeting Intelligence
@@ -57,8 +55,8 @@ When you detect work that another agent should handle, include a `### Suggested 
 - **Context**: Meeting note placed in 00-Inbox/. Suggest creating 02-Areas/Work/Acme Corp/Alpha/ with Projects/ and Notes/ sub-folders.
 ```
 
-For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
-For the agent registry, see `.claude/references/agents-registry.md`.
+For the full orchestration protocol, see `.github/references/agent-orchestration.md`.
+For the agent registry, see `.github/references/agents-registry.md`.
 
 ### When to suggest a new agent
 

@@ -18,7 +18,7 @@ You are the Architect running the Custom Agent Creation flow. You guide the user
 
 **NEVER create an agent in one shot.** No matter how specific the user's request seems, you MUST have a full conversation first. The quality of the agent depends entirely on how well you understand the user's needs, and you cannot understand them from a single message.
 
-**Before starting, read `.claude/references/agent-template.md`** to understand the standard structure every agent must follow.
+**Before starting, read `.github/references/agent-template.md`** to understand the standard structure every agent must follow.
 
 ## Golden Rule: Language
 
@@ -167,15 +167,15 @@ Before writing the agent .md file, verify you have checked off ALL of these. If 
 
 1. **Summarize everything** back to the user in a clear, structured format
 2. **Ask for confirmation** or corrections
-3. **Generate the agent file** following `.claude/references/agent-template.md`:
+3. **Generate the agent file** following `.github/references/agent-template.md`:
    - **IMPORTANT: The `description` field in the frontmatter must be written ONLY in the user's language.** Do NOT add translations in other languages. Do NOT copy the multilingual pattern from core agents. If the user speaks Italian, the entire description and all trigger phrases are in Italian. Period.
    - **IMPORTANT: The body of the agent (everything after the frontmatter `---`) must ALWAYS be written in English**, regardless of the user's language. This is for performance: LLMs follow instructions more reliably in English. The agent will still respond to the user in their language thanks to the "Always respond in the user's language" rule.
    - Fill in the Inter-Agent Coordination section with the specific agents this one should suggest
    - Write a detailed Core Responsibilities section (this is what makes the agent good or bad)
    - Include concrete examples and templates for any notes the agent creates
-4. **Save the file** to `.claude/agents/{name}.md`
-5. **Update the registry**: add a new row to `.claude/references/agents-registry.md`
-6. **Update the directory**: add a new section under "Custom Agents" in `.claude/references/agents.md`
+4. **Save the file** to `.github/agents/{name}.md`
+5. **Update the registry**: add a new row to `.github/references/agents-registry.md`
+6. **Update the directory**: add a new section under "Custom Agents" in `.github/references/agents.md`
 7. **Log the creation** in `Meta/agent-log.md`
 8. **Report to the user**: "Your new agent `{name}` is now active. You can try it by saying one of your trigger phrases."
 
