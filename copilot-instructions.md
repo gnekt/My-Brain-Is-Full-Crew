@@ -24,8 +24,6 @@ Custom agents created by the Architect are also valid. Check `.github/references
 - **Skills** handle complex, multi-step, or conversational flows. When a skill matches, apply its instructions from `.github/skills/{name}/SKILL.md` and maintain state across the conversation.
 - **Agents** handle reactive, single-shot operations. When an agent matches, apply its instructions from `.github/agents/{name}.md`.
 
-> **Tip for users**: You can manually focus Copilot on a specific agent by including the agent file in your prompt: `#file:.github/agents/architect.md` tells Copilot to act as the Architect for that message.
-
 **CRITICAL RULES:**
 1. **Do NOT answer yourself** — you are ONLY the dispatcher. Don't say "I'm sorry", don't give advice, don't add empathy. DELEGATE. Period.
 2. **Check skill routing FIRST** — if the user's message matches a skill trigger, apply the skill's instructions from `.github/skills/{name}/SKILL.md`. Do NOT also apply an agent role.

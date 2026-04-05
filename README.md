@@ -314,6 +314,17 @@ After onboarding, the Architect creates your entire vault folder structure, save
 | *"Weekly review"* | `/vault-audit` skill runs a full vault audit: broken links, duplicates, health score |
 | *"Find connections for my latest note"* | **Connector** agent discovers hidden links to other notes in your vault |
 
+### Tip: focus Copilot on a specific agent
+
+You can add an agent file to your Copilot Chat prompt to ensure that agent's full instructions are active:
+
+```
+#file:.github/agents/architect.md Create a new area for Personal Finance
+#file:.github/agents/seeker.md What do I know about machine learning?
+```
+
+This is especially useful for complex tasks where you want to guarantee the right agent role is applied.
+
 ---
 
 ## Works in any language

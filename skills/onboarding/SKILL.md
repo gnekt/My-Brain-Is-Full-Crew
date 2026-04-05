@@ -293,12 +293,12 @@ Use Bash to:
 mkdir -p .github/agents
 
 # 2. Find where the crew agent files are currently installed
-# Try the installed crew repo path
+# Try the installed crew repo path (new name first, then legacy name)
 AGENT_SOURCE=""
 if ls Second-brain-crew/agents/architect.md 2>/dev/null; then
   AGENT_SOURCE=Second-brain-crew/agents
-elif ls Second-brain-crew/agents/architect.md 2>/dev/null; then
-  AGENT_SOURCE=Second-brain-crew/agents
+elif ls My-Brain-Is-Full-Crew/agents/architect.md 2>/dev/null; then
+  AGENT_SOURCE=My-Brain-Is-Full-Crew/agents
 fi
 
 # 3. Copy only the agents the user selected during onboarding
