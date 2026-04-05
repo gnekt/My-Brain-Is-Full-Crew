@@ -1,6 +1,5 @@
 # Build artifacts
 dist/
-scripts/build.sh
 logs/
 # macOS
 .DS_Store

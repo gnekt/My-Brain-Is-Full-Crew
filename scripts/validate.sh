@@ -39,24 +39,24 @@ fi
 ERROR_COUNT=0
 
 # ── Check 1: Unresolved variables ───────────────────────────────────────────
-# Scan .md and .toml files for {{UPPER_CASE}} patterns.
-# Skip .tmpl files (templates, not build output).
-# Skip tests/fixtures/invalid-*.md (intentionally broken test fixtures).
+# Scan .md and .toml files for {{BUILD_VAR}} patterns (must contain underscore).
+# Skip .tmpl files, test fixtures, and lines inside fenced code blocks.
 
 while IFS= read -r -d '' file; do
   [[ "$file" == *.tmpl ]] && continue
   [[ "$file" == *tests/fixtures/invalid-*.md ]] && continue
 
+  # Strip code-fenced lines, then scan for unresolved build variables
   while IFS=: read -r line_num line_content; do
     remaining="$line_content"
-    while [[ "$remaining" =~ \{\{([A-Z_]+)\}\} ]]; do
+    while [[ "$remaining" =~ \{\{([A-Z][A-Z_]*_[A-Z_]*)\}\} ]]; do
       var_name="${BASH_REMATCH[1]}"
       match="${BASH_REMATCH[0]}"
       echo "[ERROR] ${file}:${line_num}: unresolved variable {{${var_name}}}"
       ERROR_COUNT=$((ERROR_COUNT + 1))
       remaining="${remaining#*"$match"}"
     done
-  done < <(grep -n '{{[A-Z_]\+}}' "$file" 2>/dev/null || true)
+  done < <(awk 'BEGIN{f=0} /^```/{f=!f; next} !f{print NR":"$0}' "$file" | grep '{{[A-Z_]*_[A-Z_]*}}' 2>/dev/null || true)
 done < <(find "$BUILD_DIR" -type f \( -name '*.md' -o -name '*.toml' \) -print0)
 
 # ── Check 2: YAML frontmatter validity ──────────────────────────────────────
