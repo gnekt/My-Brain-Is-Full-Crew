@@ -367,9 +367,20 @@ You can use `gws` and `hey` simultaneously if you have both Gmail and Hey.com ac
 
 The `/contact-sync` skill syncs contacts to Apple Contacts on macOS. It requires the **apple-contacts MCP server**:
 
-- **[apple-contacts-mcp](https://github.com/jlowin/apple-contacts-mcp)** — an MCP server that provides full CRUD access to Apple Contacts (search, create, update, delete contacts and groups).
+- **[@griches/apple-contacts-mcp](https://www.npmjs.com/package/@griches/apple-contacts-mcp)** — an MCP server that provides full CRUD access to Apple Contacts (search, create, update, delete contacts and groups).
 
-Install it as an MCP server in your Claude Code configuration. Once connected, the `/contact-sync` skill auto-syncs contacts when you reply to emails or on demand ("sync contact", "add to contacts").
+Add it to your `.mcp.json`:
+
+```json
+{
+  "apple-contacts": {
+    "command": "npx",
+    "args": ["-y", "@griches/apple-contacts-mcp"]
+  }
+}
+```
+
+Once connected, the `/contact-sync` skill auto-syncs contacts when you reply to emails or on demand ("sync contact", "add to contacts").
 
 All other agents and skills work with just your local Obsidian vault. No integrations needed.
 
