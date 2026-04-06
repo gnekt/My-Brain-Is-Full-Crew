@@ -266,6 +266,24 @@ if [[ -f "$REPO_DIR/settings.json" ]]; then
   fi
 fi
 
+# ── Update orchestra scripts ──────────────────────────────────────────────
+ORCH_COUNT=0
+if [[ -d "$REPO_DIR/orchestra" ]]; then
+  mkdir -p "$VAULT_DIR/Meta/scripts"
+  for script in "$REPO_DIR/orchestra/"*; do
+    [[ -f "$script" ]] || continue
+    bname="$(basename "$script")"
+    [[ "$bname" == "README.md" ]] && continue
+    dst="$VAULT_DIR/Meta/scripts/$bname"
+    if [[ ! -f "$dst" ]] || ! diff -q "$script" "$dst" >/dev/null 2>&1; then
+      cp "$script" "$dst"
+      chmod +x "$dst"
+      info "Updated script: $bname"
+      ORCH_COUNT=$((ORCH_COUNT + 1))
+    fi
+  done
+fi
+
 # ── Update CLAUDE.md ──────────────────────────────────────────────────────
 CLAUDE_MD_UPDATED=""
 if [[ -f "$REPO_DIR/CLAUDE.md" ]]; then
@@ -278,10 +296,10 @@ fi
 
 # ── Summary ─────────────────────────────────────────────────────────────────
 echo ""
-if [[ $AGENT_COUNT -eq 0 && $REF_COUNT -eq 0 && $SKILL_COUNT -eq 0 && $HOOK_COUNT -eq 0 && $DEPRECATED_COUNT -eq 0 && -z "$CLAUDE_MD_UPDATED" && -z "$SETTINGS_UPDATED" ]]; then
+if [[ $AGENT_COUNT -eq 0 && $REF_COUNT -eq 0 && $SKILL_COUNT -eq 0 && $HOOK_COUNT -eq 0 && $ORCH_COUNT -eq 0 && $DEPRECATED_COUNT -eq 0 && -z "$CLAUDE_MD_UPDATED" && -z "$SETTINGS_UPDATED" ]]; then
   success "Everything is already up to date!"
 else
-  success "Updated $AGENT_COUNT agent(s), $SKILL_COUNT skill(s), $REF_COUNT reference(s), $HOOK_COUNT hook(s)"
+  success "Updated $AGENT_COUNT agent(s), $SKILL_COUNT skill(s), $REF_COUNT reference(s), $HOOK_COUNT hook(s), $ORCH_COUNT script(s)"
   if [[ $DEPRECATED_COUNT -gt 0 ]]; then
     warn "Deprecated $DEPRECATED_COUNT file(s) no longer in the project"
   fi

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# List notes currently in the inbox
+# Usage: vault-inbox [--count]
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+VAULT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+INBOX="$VAULT_DIR/00-Inbox"
+
+if [[ "${1:-}" == "--count" ]]; then
+    find "$INBOX" -name "*.md" -not -path "*/.*" 2>/dev/null | wc -l | tr -d ' '
+else
+    find "$INBOX" -name "*.md" -not -path "*/.*" 2>/dev/null | while read -r f; do
+        mod=$(stat -f "%Sm" -t "%Y-%m-%d %H:%M" "$f" 2>/dev/null || stat -c "%y" "$f" 2>/dev/null | cut -c1-16 || echo "?")
+        name=$(basename "$f" .md)
+        echo "  $mod  $name"
+    done | sort -r
+fi

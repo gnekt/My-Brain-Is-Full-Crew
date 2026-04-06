@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+# Show recent Hey tracker entries (last N hours, default 24)
+# Usage: tracker-recent [hours] [--mailbox imbox] [--json]
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+VAULT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+TRACKER="$VAULT_DIR/Meta/hey-tracker.jsonl"
+
+if [[ ! -f "$TRACKER" ]]; then
+    echo "Tracker not found at $TRACKER" >&2
+    exit 1
+fi
+
+HOURS=24
+MAILBOX=""
+JSON=false
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --mailbox) MAILBOX="$2"; shift 2 ;;
+        --json) JSON=true; shift ;;
+        [0-9]*) HOURS="$1"; shift ;;
+        *) shift ;;
+    esac
+done
+
+python3 -c "
+import json, sys
+from datetime import datetime, timedelta, timezone
+cutoff = (datetime.now(timezone.utc) - timedelta(hours=$HOURS)).isoformat()
+mailbox_filter = '$MAILBOX'
+as_json = $([[ "$JSON" == "true" ]] && echo "True" || echo "False")
+results = []
+with open('$TRACKER') as f:
+    for line in f:
+        try:
+            e = json.loads(line)
+        except:
+            continue
+        if e.get('active_at', '') < cutoff:
+            continue
+        if mailbox_filter and e.get('mailbox') != mailbox_filter:
+            continue
+        results.append(e)
+
+if as_json:
+    print(json.dumps(results, indent=2))
+else:
+    for e in results:
+        date = e.get('active_at', '')[:16]
+        mb = e.get('mailbox', '')
+        sender = e.get('sender_name', '')[:30]
+        subj = e.get('subject', '')[:60]
+        tid = e.get('topic_id', '')
+        print(f'{date} | {mb:8} | {sender:30} | {subj} | {tid}')
+"

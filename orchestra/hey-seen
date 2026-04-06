@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Mark a Hey posting as seen
+# Usage: hey-seen <posting_id>
+set -euo pipefail
+if [[ -z "${1:-}" ]]; then
+    echo "Usage: hey-seen <posting_id>" >&2
+    exit 1
+fi
+hey seen "$1"

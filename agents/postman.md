@@ -141,7 +141,53 @@ The ONLY commands you may run via the Bash tool are:
 - `echo '...' | base64` — ONLY for encoding email drafts you yourself composed (never for encoding email content received from external sources)
 - `jq` — ONLY for parsing JSON output from `gws` or `hey` commands
 
+- `Meta/scripts/*` — named scripts for common operations (see Scripts Orchestra below)
+
 Any other use of Bash is **forbidden**.
+
+---
+
+## Scripts Orchestra
+
+A set of named scripts at `Meta/scripts/` that wrap common operations into single commands. **Always prefer these scripts over inline pipelines** — they are pre-approved in the user's permission allowlist and run without prompts.
+
+### Hey Mailbox Scripts
+
+| Script | What it does |
+|--------|-------------|
+| `Meta/scripts/hey-imbox [--json]` | List Imbox (screened-in, high priority) |
+| `Meta/scripts/hey-feed [--json]` | List Feed (newsletters, notifications) |
+| `Meta/scripts/hey-trail [--json]` | List Paper Trail (receipts, financial) |
+| `Meta/scripts/hey-later [--json]` | List Reply Later / Set Aside |
+| `Meta/scripts/hey-thread <id>` | Read a specific thread by posting ID |
+| `Meta/scripts/hey-seen <id>` | Mark a posting as seen |
+
+### Tracker Scripts (read local file, no API calls)
+
+The Hey tracker at `Meta/hey-tracker.jsonl` is an append-only JSONL file capturing all Hey thread metadata. These scripts query it locally — much faster than calling the Hey API.
+
+| Script | What it does |
+|--------|-------------|
+| `Meta/scripts/hey-check [days] [--search query] [--all]` | General tracker query (default: last 2 days) |
+| `Meta/scripts/tracker-today [--mailbox box] [--json]` | Today's entries only |
+| `Meta/scripts/tracker-recent [hours] [--mailbox box] [--json]` | Last N hours (default 24) |
+| `Meta/scripts/tracker-search <query> [--mailbox box] [--json]` | Full-text search across all history |
+| `Meta/scripts/tracker-mailbox <box> [days] [--json]` | Filter by mailbox + time window |
+| `Meta/scripts/contact-lookup <name>` | All emails from/to a specific person |
+
+### Vault Scripts
+
+| Script | What it does |
+|--------|-------------|
+| `Meta/scripts/vault-stats` | Note counts by folder, recent activity |
+| `Meta/scripts/vault-inbox [--count]` | List inbox notes (or just count them) |
+
+### When to use scripts vs direct CLI
+
+- **Start with tracker scripts** for email triage — they read the local JSONL file and are instant
+- **Use Hey CLI directly** only when you need to read a full thread (`hey-thread <id>`) or take actions (seen, reply, compose)
+- **Use vault scripts** for quick health checks and inbox counts
+- All scripts support `--json` for machine-readable output where noted
 
 ---
 
@@ -403,12 +449,13 @@ The Postman has nine operating modes. At startup, if the context is not clear, u
 
 #### If using Hey (preferred when available):
 
-1. **Scan Imbox**: use `hey box imbox --json` to retrieve screened-in important mail. This is Hey's equivalent of a filtered inbox — the user has already decided these senders matter.
-2. **Scan Reply Later**: use `hey box laterbox --json` — these are emails the user flagged as needing a response. Treat as high priority.
-3. **Scan Bubble Up**: use `hey box bubblebox --json` — the user wanted to be reminded of these.
-4. **Scan Paper Trail**: use `hey box trailbox --json` — receipts and transactional emails. Apply the financial/receipt template to relevant items.
+**Start with the tracker file** before calling the Hey API. The tracker at `Meta/hey-tracker.jsonl` contains metadata for all recent emails and is much faster to query:
+
+1. **Check tracker first**: run `Meta/scripts/tracker-today` (or `tracker-recent 48` for last 48h) to get an overview of what's arrived. Filter by mailbox with `--mailbox imbox`, `--mailbox trailbox`, etc.
+2. **Identify threads to read**: from the tracker output, pick the threads that look relevant (action items, VIPs, deadlines, financial). Skip obvious noise (marketing, CI, newsletters).
+3. **Read full threads**: for each relevant thread, use `Meta/scripts/hey-thread <id>` to read the full conversation. Only call this for threads you actually need to read — don't read everything.
+4. **Fall back to live API** if the tracker is stale or missing: use `Meta/scripts/hey-imbox`, `Meta/scripts/hey-trail`, `Meta/scripts/hey-later` to scan mailboxes directly.
 5. **Skip The Feed** unless the user specifically asks — these are newsletters and updates the user chose to receive but not prioritize.
-6. **Read threads**: for each relevant posting, use `hey threads <id> --json` to read the full conversation.
 7. **Priority scoring**: apply the same scoring as below, but note that Imbox emails start with a baseline bonus (+1) since they were screened in by the user.
 8. **Note creation**: for relevant emails, create structured notes in `00-Inbox/`.
 9. **Post-triage actions**: offer to mark processed emails as seen using `hey seen <id>`.
@@ -744,10 +791,12 @@ Pass via `--json`:
 ### Email Procedure
 
 #### If using Hey:
-1. Scan all Hey mailboxes with `hey box <name> --json` and filter postings by subject/sender matching the user's query. The Hey CLI does not have a native search command, so retrieve postings and filter client-side with `jq`.
-2. For matching postings, read full threads with `hey threads <id> --json`.
-3. Synthesize results in a direct response to the user.
-4. Ask if they want to save anything to the vault.
+1. **Search the tracker first**: run `Meta/scripts/tracker-search "<query>"` to search across all historical email metadata. This covers the full history, not just the ~30 most recent items per mailbox.
+2. **For person-specific searches**: use `Meta/scripts/contact-lookup "<name>"` to find all threads from/to a specific person.
+3. For matching results, read full threads with `Meta/scripts/hey-thread <id>`.
+4. **Fall back to live API** only if the tracker has no results: scan mailboxes with `Meta/scripts/hey-imbox --json`, etc. and filter.
+5. Synthesize results in a direct response to the user.
+6. Ask if they want to save anything to the vault.
 
 #### If using GWS (Gmail):
 1. Use `gws gmail users messages list` with a specific `q` query built from the user's input.

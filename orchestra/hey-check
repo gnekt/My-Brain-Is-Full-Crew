@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+"""Read hey-tracker.jsonl and display recent emails.
+
+Usage:
+  hey-check              # show last 2 days
+  hey-check 7            # show last 7 days
+  hey-check --all        # show everything
+  hey-check --search FOI # search subjects and senders
+"""
+
+import json, sys, os
+from datetime import datetime, timedelta
+from pathlib import Path
+
+# Derive vault root from script location: Meta/scripts/ -> vault root
+SCRIPT_DIR = Path(__file__).parent
+VAULT_DIR = SCRIPT_DIR.parent.parent
+TRACKER = VAULT_DIR / "Meta" / "hey-tracker.jsonl"
+
+def read_tracker():
+    if TRACKER.exists() and TRACKER.stat().st_size > 0:
+        return TRACKER.read_text().strip().split("\n")
+    return []
+
+def main():
+    args = sys.argv[1:]
+    search = None
+    days = 2
+    show_all = False
+
+    if "--search" in args:
+        idx = args.index("--search")
+        search = args[idx + 1].lower() if idx + 1 < len(args) else ""
+        show_all = True
+    elif "--all" in args:
+        show_all = True
+    elif args and args[0].isdigit():
+        days = int(args[0])
+
+    cutoff = (datetime.utcnow() - timedelta(days=days)).strftime("%Y-%m-%d")
+
+    lines = read_tracker()
+    if not lines:
+        print("No tracker data available")
+        return
+
+    entries = []
+    for line in lines:
+        try:
+            entries.append(json.loads(line))
+        except:
+            continue
+
+    for e in entries:
+        date = e.get("active_at", "")[:10]
+        if not show_all and date < cutoff:
+            continue
+
+        sender = e.get("sender_name", "")
+        subj = e.get("subject", "")
+        mailbox = e.get("mailbox", "")
+        tid = e.get("topic_id", "")
+
+        if search and search not in subj.lower() and search not in sender.lower() and search not in e.get("sender_email", "").lower():
+            continue
+
+        print(f"{date} | {mailbox:8} | {sender[:30]:30} | {subj[:65]} | {tid}")
+
+if __name__ == "__main__":
+    main()

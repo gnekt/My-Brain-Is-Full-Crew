@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# List Hey Paper Trail (receipts, confirmations, financial)
+# Usage: hey-trail [--json]
+set -euo pipefail
+if [[ "${1:-}" == "--json" ]]; then
+    hey box trailbox --json
+else
+    hey box trailbox --json | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+for p in data.get('data', {}).get('postings', []):
+    date = p.get('active_at', '')[:10]
+    sender = p.get('creator', {}).get('name', '')[:30]
+    subj = p.get('name', '')[:65]
+    tid = p.get('app_url', '').split('/')[-1]
+    print(f'{date} | {sender:30} | {subj} | {tid}')
+"
+fi
