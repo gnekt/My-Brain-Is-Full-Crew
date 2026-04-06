@@ -79,6 +79,7 @@ Skills handle complex, multi-step workflows extracted from agents. They are chec
 | `/deep-clean` | librarian | "deep clean", "deep cleanup", "thorough cleanup", "the vault is a mess" | Extended vault cleanup with stale content detection | active |
 | `/tag-garden` | librarian | "tag garden", "clean up tags", "tag cleanup", "tag audit" | Tag analysis: unused, orphan, near-duplicates | active |
 | `/inbox-triage` | sorter | "triage the inbox", "clean up the inbox", "sort my notes", "empty inbox", "file my notes", "process the inbox" | Inbox note processing, classification, and routing | active |
+| `/contact-sync` | postman | "sync contact", "add to contacts", "save contact", "update contact", "is this person in my contacts" | Sync person to Apple Contacts (search, create, update). Requires `apple-contacts` MCP. | active |
 
 ### How Skills Are Routed
 
