@@ -235,6 +235,11 @@ Open an issue on GitHub with:
 2. What happened
 3. What you expected
 
+### "Desktop notifications aren't working on Windows"
+The `notify.sh` hook uses `osascript` (macOS) and `notify-send` (Linux). Neither is available natively on Windows. If you are on Windows, you have two options:
+- Use **WSL2** (Windows Subsystem for Linux) and install `libnotify` with `sudo apt install libnotify-bin`. Run Claude Code inside the WSL2 terminal.
+- Ignore the missing notifications — they are cosmetic only. Everything else works normally on Windows.
+
 ### "I want to change my profile"
 > "Update my profile" and the Architect will help you modify your settings
 

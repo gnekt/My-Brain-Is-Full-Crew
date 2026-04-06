@@ -61,4 +61,16 @@ if [[ "$FIRST_LINE" == "---" ]]; then
   fi
 fi
 
+# ── Check 4: agent state (post-it) file size ────────────────────────────────
+# Agent post-its should stay at max 30 lines to avoid bloating the vault.
+# Warn if a state file in Meta/states/ exceeds 50 lines (generous threshold
+# to reduce false positives while still catching runaway writes).
+if [[ "$FILE" == *"Meta/states/"*.md ]]; then
+  STATE_LINES=$(wc -l < "$FILE" 2>/dev/null || echo "0")
+  if [[ "$STATE_LINES" -gt 50 ]]; then
+    echo "WARNING: State file $(basename "$FILE") has $STATE_LINES lines (soft limit: 50, target: ~30). The agent that wrote this should trim its post-it on the next run."
+    exit 1
+  fi
+fi
+
 exit 0

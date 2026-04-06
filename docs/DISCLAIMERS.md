@@ -12,23 +12,25 @@ If you know Claude Code better than I do (and chances are you do), **please cont
 
 ---
 
-## On the health and wellness agents
+## On health and wellness agents
 
 > **This needs to be crystal clear, so I'm going to say it plainly.**
 
-The **Food Coach** and **Wellness Guide** agents are **AI-generated output. Nothing more.** They are not medical professionals. They are not licensed therapists. They are not dietitians. They are language models following instructions I wrote based on my own personal needs.
+The **Food Coach** and **Wellness Guide** agents are **examples of custom agents** that can be built on top of this crew using the `/create-agent` skill. They are **not included** in the core release — they are personal agents the author built for their own use to illustrate what is possible. If you create similar agents yourself, the following warnings apply.
 
-**I take absolutely no responsibility for the output of these agents.** Specifically:
+Any AI-powered health or wellness agent is **AI-generated output. Nothing more.** It is not a medical professional. It is not a licensed therapist. It is not a dietitian. It is a language model following instructions you wrote based on your own personal needs.
 
-- The Food Coach agent **does not provide medical advice.** Its meal plans, calorie calculations, and dietary suggestions are AI-generated and may be inaccurate, incomplete, or inappropriate for your specific health situation. **Always consult a real doctor or registered dietitian** before making changes to your diet, especially if you have medical conditions.
+**The author takes absolutely no responsibility for the output of any health or wellness agent, whether created from these examples or built independently.** Specifically:
 
-- The Wellness Guide agent **does not provide therapy.** It offers general emotional support, grounding techniques, and mindfulness exercises, but it is **not a substitute for professional mental health care.** It cannot diagnose anything. It should never be your only source of support. **If you are in crisis, contact a real mental health professional or emergency service immediately.**
+- A Food Coach-style agent **does not provide medical advice.** Its meal plans, calorie calculations, and dietary suggestions are AI-generated and may be inaccurate, incomplete, or inappropriate for your specific health situation. **Always consult a real doctor or registered dietitian** before making changes to your diet, especially if you have medical conditions.
 
-- The health agents are designed as **personal wellness companions.** Think of them as a structured journal with suggestions, not as healthcare providers. They were built because I personally needed help tracking my nutrition and processing my thoughts between therapy sessions. They helped me. They might help you. But they come with **zero guarantees.**
+- A Wellness Guide-style agent **does not provide therapy.** It offers general emotional support, grounding techniques, and mindfulness exercises, but it is **not a substitute for professional mental health care.** It cannot diagnose anything. It should never be your only source of support. **If you are in crisis, contact a real mental health professional or emergency service immediately.**
 
-- **No warranty, no liability.** This is an open-source project provided "as is". I am not responsible for any decisions you make based on the output of any agent in this system. Use your own judgment. Consult real professionals for real health decisions.
+- Health-oriented custom agents are designed as **personal wellness companions.** Think of them as a structured journal with suggestions, not as healthcare providers. They come with **zero guarantees.**
 
-Both health agents are **opt-in** during onboarding. You can use the Crew purely for knowledge management if you prefer.
+- **No warranty, no liability.** This is an open-source project provided "as is". The author is not responsible for any decisions you make based on the output of any agent in this system. Use your own judgment. Consult real professionals for real health decisions.
+
+Both health agent examples are **opt-in** and user-created. You can use the Crew purely for knowledge management if you prefer.
 
 ---
 
