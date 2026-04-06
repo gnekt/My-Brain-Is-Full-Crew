@@ -62,6 +62,16 @@ if [[ ! "$UPDATE_ANSWER" =~ ^[Cc]$ ]]; then
 fi
 echo ""
 
+# ── Pre-update backup ────────────────────────────────────────────────────────
+BACKUP_DIR="$VAULT_DIR/.claude/backups/$(date +%Y%m%d_%H%M%S)"
+mkdir -p "$BACKUP_DIR"
+[[ -d "$VAULT_DIR/.claude/agents" ]]     && cp -r "$VAULT_DIR/.claude/agents"     "$BACKUP_DIR/"
+[[ -d "$VAULT_DIR/.claude/references" ]] && cp -r "$VAULT_DIR/.claude/references" "$BACKUP_DIR/"
+[[ -d "$VAULT_DIR/.claude/skills" ]]     && cp -r "$VAULT_DIR/.claude/skills"     "$BACKUP_DIR/"
+[[ -f "$VAULT_DIR/CLAUDE.md" ]]          && cp    "$VAULT_DIR/CLAUDE.md"          "$BACKUP_DIR/"
+success "Backup created at .claude/backups/$(basename "$BACKUP_DIR")"
+echo ""
+
 # ── Deprecate removed core agents ─────────────────────────────────────────
 # Read the OLD manifest first (before rewriting it) so we know which files
 # were previously installed as core. Agents removed from the repo will still
@@ -171,15 +181,24 @@ for ref in "$REPO_DIR/references/"*.md; do
     fi
 
     # For agents-registry.md: also extract custom rows from the Registry table
-    # Custom rows are table lines whose agent name is NOT a core agent
+    # Custom rows are table lines whose agent name is NOT listed in .core-manifest
     custom_table_rows=""
     if [[ "$name" == "agents-registry.md" ]]; then
-      CORE_NAMES="architect scribe sorter seeker connector librarian transcriber postman"
+      # Use the manifest as the authoritative list of core agent names.
+      # The manifest contains filenames with .md extensions (e.g., "architect.md"),
+      # so we append .md to the registry table name before comparing.
+      MANIFEST_FILE="$VAULT_DIR/.claude/agents/.core-manifest"
       while IFS= read -r row; do
         # Extract agent name from first column: | name | ...
         agent_name=$(echo "$row" | awk -F'|' '{gsub(/^[ \t]+|[ \t]+$/, "", $2); print $2}')
-        if [[ -n "$agent_name" ]] && ! echo "$CORE_NAMES" | grep -qw "$agent_name"; then
-          custom_table_rows="${custom_table_rows}${row}"$'\n'
+        if [[ -n "$agent_name" ]]; then
+          is_core=0
+          if [[ -f "$MANIFEST_FILE" ]] && grep -qxF "${agent_name}.md" "$MANIFEST_FILE" 2>/dev/null; then
+            is_core=1
+          fi
+          if [[ $is_core -eq 0 ]]; then
+            custom_table_rows="${custom_table_rows}${row}"$'\n'
+          fi
         fi
       done < <(grep "^|" "$vault_copy" | grep -v "^|[[:space:]]*Name[[:space:]]*|" | grep -v "^|[-[:space:]]*|")
     fi

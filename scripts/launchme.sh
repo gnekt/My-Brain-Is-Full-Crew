@@ -86,6 +86,17 @@ if [[ $EXISTING -eq 1 ]]; then
   fi
 fi
 
+# ── Pre-install backup (only on reinstall) ───────────────────────────────────
+if [[ $EXISTING -eq 1 ]]; then
+  BACKUP_DIR="$VAULT_DIR/.claude/backups/$(date +%Y%m%d_%H%M%S)"
+  mkdir -p "$BACKUP_DIR"
+  [[ -d "$VAULT_DIR/.claude/agents" ]]     && cp -r "$VAULT_DIR/.claude/agents"     "$BACKUP_DIR/"
+  [[ -d "$VAULT_DIR/.claude/references" ]] && cp -r "$VAULT_DIR/.claude/references" "$BACKUP_DIR/"
+  [[ -d "$VAULT_DIR/.claude/skills" ]]     && cp -r "$VAULT_DIR/.claude/skills"     "$BACKUP_DIR/"
+  [[ -f "$VAULT_DIR/CLAUDE.md" ]]          && cp    "$VAULT_DIR/CLAUDE.md"          "$BACKUP_DIR/"
+  success "Backup created at .claude/backups/$(basename "$BACKUP_DIR")"
+fi
+
 # ── Deprecate stale core agents on reinstall ─────────────────────────────
 echo ""
 mkdir -p "$VAULT_DIR/.claude/agents"

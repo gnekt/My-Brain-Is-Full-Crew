@@ -128,12 +128,19 @@ Before writing ANY file or folder, verify you have checked off ALL of these. If 
 
 ### Before You Begin
 
-Check whether `Meta/user-profile.md` already exists. If it does, the vault has already been initialized. Ask the user if they want to:
-- Re-run onboarding (overwrite profile)
-- Update specific sections of their profile
-- Reset the vault entirely
+Check whether `Meta/user-profile.md` already exists. If it does, the vault has already been initialized. Ask the user — using `AskUserQuestion` — which of the following they want:
 
-If the file does not exist, proceed with full onboarding.
+- **(a) Update preferences only** — re-ask the Phase 1 and Phase 2 questions and overwrite `Meta/user-profile.md`, but do NOT recreate any folders, templates, or MOCs that already exist.
+- **(b) Full re-initialization** — run the complete onboarding flow from the start, recreating the vault structure. Warn the user that existing folders will be overwritten.
+- **(c) Cancel** — stop here without making any changes.
+
+If the user chooses **(a)**, skip directly to Phase 1, collect answers, and then write the updated profile only. Do NOT create or modify any vault folders or files other than `Meta/user-profile.md` and your post-it.
+
+If the user chooses **(b)**, proceed with the full onboarding flow below as if it were a first run.
+
+If the user chooses **(c)**, stop immediately and confirm to the user that nothing was changed.
+
+If `Meta/user-profile.md` does not exist, proceed with full onboarding.
 
 ---
 

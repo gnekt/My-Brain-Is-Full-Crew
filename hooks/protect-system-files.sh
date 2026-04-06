@@ -26,14 +26,27 @@ if [[ "$BASENAME" == "CLAUDE.md" && "$FILE" != *".claude/"* ]]; then
 fi
 
 # ── Core agent definitions: never modify at runtime ─────────────────────────
-CORE_AGENTS="architect.md scribe.md sorter.md seeker.md connector.md librarian.md transcriber.md postman.md"
 if [[ "$FILE" == *".claude/agents/"* ]]; then
-  for core in $CORE_AGENTS; do
-    if [[ "$BASENAME" == "$core" ]]; then
+  # Derive the vault root from the file path (strip /.claude/agents/<name>)
+  VAULT_ROOT="${FILE%/.claude/agents/*}"
+  MANIFEST="$VAULT_ROOT/.claude/agents/.core-manifest"
+
+  if [[ -f "$MANIFEST" ]]; then
+    # Manifest-based check: block only files listed as core agents
+    if grep -qxF "$BASENAME" "$MANIFEST" 2>/dev/null; then
       echo "BLOCKED: $BASENAME is a core agent definition. Update it in the repo and run updateme.sh."
       exit 2
     fi
-  done
+  else
+    # Fallback when manifest is absent (e.g., during initial install)
+    CORE_AGENTS="architect.md scribe.md sorter.md seeker.md connector.md librarian.md transcriber.md postman.md"
+    for core in $CORE_AGENTS; do
+      if [[ "$BASENAME" == "$core" ]]; then
+        echo "BLOCKED: $BASENAME is a core agent definition. Update it in the repo and run updateme.sh."
+        exit 2
+      fi
+    done
+  fi
   # Custom agents are allowed through
   exit 0
 fi

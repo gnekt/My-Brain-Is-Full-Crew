@@ -4,7 +4,7 @@
 
 ## ABSOLUTE CONSTRAINT: ONLY skills and agents from THIS project
 
-Your crew consists of **13 skills** (in `.claude/skills/`) and **8 core agents** (in `.claude/agents/`). Claude Code auto-loads both at session start.
+Your crew consists of **14 skills** (in `.claude/skills/`) and **8 core agents** (in `.claude/agents/`). Claude Code auto-loads both at session start.
 
 The 8 core agents are:
 
@@ -52,6 +52,7 @@ Skills handle complex, multi-step flows. **Check this table BEFORE the agent tab
 | 11 | `/deep-clean` | Extended vault cleanup: full audit plus stale content, outdated refs, redundant tags, template compliance. | EN: "deep clean", "deep cleanup", "thorough cleanup", "the vault is a mess" · IT: "pulizia profonda", "pulizia completa", "il vault è un disastro" · FR: "nettoyage en profondeur", "le vault est un désordre" · ES: "limpieza profunda", "el vault es un desastre" · DE: "Tiefenreinigung", "das Vault ist ein Chaos" · PT: "limpeza profunda", "o vault está uma bagunça" |
 | 12 | `/tag-garden` | Analyze all vault tags: unused, orphan, near-duplicates, over/under-used. Suggest merges. | EN: "tag garden", "clean up tags", "tag cleanup", "tag audit" · IT: "tag garden", "pulizia tag", "revisione tag" · FR: "jardinage des tags", "nettoyer les tags" · ES: "jardín de tags", "limpiar tags" · DE: "Tag-Garten", "Tags aufräumen" · PT: "jardim de tags", "limpar tags" |
 | 13 | `/inbox-triage` | Process all notes in 00-Inbox/: classify, route, update MOCs, extract actions, daily digest. | EN: "triage the inbox", "clean up the inbox", "sort my notes", "empty inbox", "file my notes", "process the inbox" · IT: "smista l'inbox", "svuota l'inbox", "ordina le note", "triage dell'inbox", "processa l'inbox" · FR: "trier la boîte de réception", "vider l'inbox", "classer mes notes" · ES: "clasificar la bandeja de entrada", "vaciar el inbox", "ordenar mis notas" · DE: "Inbox sortieren", "Inbox leeren", "Notizen einordnen" · PT: "triagem da inbox", "esvaziar a inbox", "organizar minhas notas" |
+| 14 | `/daily-note` | Create or open today's daily note. Pulls calendar events, inbox count, and pending tasks into a structured note in 07-Daily/. | EN: "daily note", "create today's note", "open today's note", "start my day", "morning note", "today's note", "what's today", "daily log" · IT: "nota giornaliera", "nota di oggi", "inizia la giornata" · FR: "note du jour", "note journalière", "commencer la journée" · ES: "nota diaria", "nota de hoy", "empezar el día" · DE: "Tagesnotiz", "heutige Notiz", "Tag beginnen" · PT: "nota diária", "nota de hoje", "começar o dia" |
 
 ---
 

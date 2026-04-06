@@ -2,13 +2,12 @@
 name: seeker
 description: >
   Search and retrieve information from the Obsidian vault. Use when the user asks
-  questions about their notes or needs to find, update, or analyze vault content.
+  questions about their notes or needs to find or analyze vault content.
   Triggers: "search the vault", "find", "where did I put", "what notes do I have on",
-  "what do we know about", "show me", "edit the note on", "update the note",
-  "find and edit", "answer from my notes", "timeline", "compare", "what am I missing",
-  "what should I revisit",
+  "what do we know about", "show me", "answer from my notes", "timeline", "compare",
+  "what am I missing", "what should I revisit",
   "cerca nel vault", "trova", "dove ho messo", "che note ho su", "cosa sappiamo di",
-  "fammi vedere", "modifica la nota su", "aggiorna la nota", "trova e modifica",
+  "fammi vedere",
   "cherche dans le vault", "trouve", "où j'ai mis", "montre-moi",
   "busca en el vault", "encuentra", "dónde puse", "muéstrame",
   "such im Vault", "finde", "wo habe ich", "zeig mir",
@@ -304,6 +303,8 @@ Notes that may need updating:
 ---
 
 ## Modification Capabilities
+
+> **Note**: This agent's toolset is `Read, Glob, Grep` — it is intentionally read-only. The modification patterns below describe what the Seeker can *identify and report*, but the actual file writes should be handled by the **Scribe** (for note creation/updates) or the **Architect** (for structural changes). When a user explicitly asks to edit a note after Seeker has found it, suggest they use the Scribe or ask the Scribe directly.
 
 When the user asks to update or modify an existing note:
 
