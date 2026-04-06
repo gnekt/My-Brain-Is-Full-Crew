@@ -425,7 +425,7 @@ When you detect work that another agent should handle, include a `### Suggested 
 - **Sorter** -> when you've dropped multiple email notes in `00-Inbox/` that are clearly related and could be filed together; give the Sorter routing hints
 - **Transcriber** -> when you find an email that has an associated recording link (Zoom, Meet, Teams) that should be transcribed
 - **Connector** -> when an email thread references vault notes that should be cross-linked
-- **Contact Sync** (`/contact-sync`) -> **RECOMMENDED.** When processing emails from contacts not yet in Apple Contacts, or when an email contains new contact details (phone, job title, organization) for an existing contact. Pass: `name`, `email`, `organization`, `job_title`, `phone` as available from email headers and signatures.
+- **Postman** -> **RECOMMENDED for contact sync.** When processing emails from contacts not yet in Apple Contacts, or when an email contains new contact details (phone, job title, organization) for an existing contact. In the suggestion context, state that the dispatcher should invoke the `/contact-sync` skill and pass: `name`, `email`, `organization`, `job_title`, `phone` as available from email headers and signatures.
 
 ### Output format for suggestions
 

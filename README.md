@@ -160,7 +160,7 @@ graph TB
     Claude -->|"no skill match?\ninvoke agent"| Agents
     Claude -->|"chains agents when needed"| Agents
 
-    subgraph Skills["Specialized Skills (13)"]
+    subgraph Skills["Specialized Skills (14)"]
         direction TB
         Onboarding["/onboarding"]
         EmailTriage["/email-triage"]

@@ -4,7 +4,7 @@
 
 ## ABSOLUTE CONSTRAINT: ONLY skills and agents from THIS project
 
-Your crew consists of **13 skills** (in `.claude/skills/`) and **8 core agents** (in `.claude/agents/`). Claude Code auto-loads both at session start.
+Your crew consists of **14 skills** (in `.claude/skills/`) and **8 core agents** (in `.claude/agents/`). Claude Code auto-loads both at session start.
 
 The 8 core agents are:
 
