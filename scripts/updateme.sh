@@ -266,14 +266,30 @@ if [[ -f "$REPO_DIR/settings.json" ]]; then
   fi
 fi
 
+# ── Deprecate removed orchestra scripts ──────────────────────────────────
+ORCH_MANIFEST="$VAULT_DIR/Meta/scripts/.core-manifest"
+if [[ -d "$REPO_DIR/orchestra" && -f "$ORCH_MANIFEST" ]]; then
+  while IFS= read -r old_script; do
+    [[ -z "$old_script" ]] && continue
+    [[ -f "$REPO_DIR/orchestra/$old_script" ]] && continue
+    vault_script="$VAULT_DIR/Meta/scripts/$old_script"
+    [[ -f "$vault_script" ]] || continue
+    rm "$vault_script"
+    warn "Removed deprecated script: $old_script"
+    DEPRECATED_COUNT=$((DEPRECATED_COUNT + 1))
+  done < "$ORCH_MANIFEST"
+fi
+
 # ── Update orchestra scripts ──────────────────────────────────────────────
 ORCH_COUNT=0
 if [[ -d "$REPO_DIR/orchestra" ]]; then
   mkdir -p "$VAULT_DIR/Meta/scripts"
+  : > "$VAULT_DIR/Meta/scripts/.core-manifest"
   for script in "$REPO_DIR/orchestra/"*; do
     [[ -f "$script" ]] || continue
     bname="$(basename "$script")"
     [[ "$bname" == "README.md" ]] && continue
+    echo "$bname" >> "$VAULT_DIR/Meta/scripts/.core-manifest"
     dst="$VAULT_DIR/Meta/scripts/$bname"
     if [[ ! -f "$dst" ]] || ! diff -q "$script" "$dst" >/dev/null 2>&1; then
       cp "$script" "$dst"

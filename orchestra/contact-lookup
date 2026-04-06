@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Search Hey tracker for all emails from/to a specific person
+# Search Hey tracker for all emails from a specific person
 # Usage: contact-lookup <name or email>
 set -euo pipefail
 
@@ -17,42 +17,41 @@ if [[ -z "${1:-}" ]]; then
     exit 1
 fi
 
-QUERY="$1"
+python3 - "$TRACKER" "$1" <<'PYEOF'
+import json, sys
 
-python3 -c "
-import json
-query = '${QUERY}'.lower()
+tracker_path, query = sys.argv[1], sys.argv[2].lower()
 results = []
-with open('$TRACKER') as f:
+with open(tracker_path) as f:
     for line in f:
         try:
             e = json.loads(line)
         except:
             continue
-        if query in e.get('sender_name', '').lower() or query in e.get('sender_email', '').lower():
+        if query in e.get("sender_name", "").lower() or query in e.get("sender_email", "").lower():
             results.append(e)
 
 # Dedupe by topic_id, keep latest
 seen = {}
 for e in results:
-    tid = e.get('topic_id')
+    tid = e.get("topic_id")
     seen[tid] = e
-results = sorted(seen.values(), key=lambda x: x.get('active_at', ''), reverse=True)
+results = sorted(seen.values(), key=lambda x: x.get("active_at", ""), reverse=True)
 
 if not results:
-    print(f'No emails found for \"{query}\"')
+    print(f'No emails found from "{query}"')
 else:
-    emails = set(e.get('sender_email', '') for e in results if e.get('sender_email'))
-    names = set(e.get('sender_name', '') for e in results if e.get('sender_name'))
-    print(f'Found {len(results)} threads from: {\", \".join(names)}')
-    print(f'Email(s): {\", \".join(emails)}')
+    emails = set(e.get("sender_email", "") for e in results if e.get("sender_email"))
+    names = set(e.get("sender_name", "") for e in results if e.get("sender_name"))
+    print(f'Found {len(results)} threads from: {", ".join(names)}')
+    print(f'Email(s): {", ".join(emails)}')
     print()
     for e in results[:20]:
-        date = e.get('active_at', '')[:10]
-        mb = e.get('mailbox', '')
-        subj = e.get('subject', '')[:60]
-        tid = e.get('topic_id', '')
-        print(f'{date} | {mb:8} | {subj} | {tid}')
+        date = e.get("active_at", "")[:10]
+        mb = e.get("mailbox", "")
+        subj = e.get("subject", "")[:60]
+        tid = e.get("topic_id", "")
+        print(f"{date} | {mb:8} | {subj} | {tid}")
     if len(results) > 20:
-        print(f'  ... and {len(results) - 20} more')
-"
+        print(f"  ... and {len(results) - 20} more")
+PYEOF

@@ -9,7 +9,21 @@ VAULT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 echo "=== Vault Statistics ==="
 echo ""
 
-for dir in 00-Inbox 01-Projects 02-Areas 03-Resources 04-Archive 05-People 06-Meetings 07-Daily MOC Templates Meta; do
+dirs=(
+    "00-Inbox"
+    "01-Projects"
+    "02-Areas"
+    "03-Resources"
+    "04-Archive"
+    "05-People"
+    "06-Meetings"
+    "07-Daily"
+    "MOC"
+    "Templates"
+    "Meta"
+)
+
+for dir in "${dirs[@]}"; do
     if [[ -d "$VAULT_DIR/$dir" ]]; then
         count=$(find "$VAULT_DIR/$dir" -name "*.md" -not -path "*/.*" 2>/dev/null | wc -l | tr -d ' ')
         printf "%-20s %s notes\n" "$dir/" "$count"

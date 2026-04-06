@@ -18,40 +18,52 @@ JSON=false
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --mailbox) MAILBOX="$2"; shift 2 ;;
+        --mailbox)
+            if [[ $# -lt 2 || "$2" == --* ]]; then
+                echo "Usage: tracker-recent [hours] [--mailbox imbox] [--json]" >&2
+                exit 1
+            fi
+            MAILBOX="$2"; shift 2 ;;
         --json) JSON=true; shift ;;
-        [0-9]*) HOURS="$1"; shift ;;
+        [0-9]*)
+            if ! [[ "$1" =~ ^[0-9]+$ ]]; then
+                echo "Error: hours must be a positive integer" >&2
+                exit 1
+            fi
+            HOURS="$1"; shift ;;
         *) shift ;;
     esac
 done
 
-python3 -c "
+AS_JSON=$([[ "$JSON" == "true" ]] && echo "1" || echo "0")
+
+python3 - "$TRACKER" "$HOURS" "$MAILBOX" "$AS_JSON" <<'PYEOF'
 import json, sys
 from datetime import datetime, timedelta, timezone
-cutoff = (datetime.now(timezone.utc) - timedelta(hours=$HOURS)).isoformat()
-mailbox_filter = '$MAILBOX'
-as_json = $([[ "$JSON" == "true" ]] && echo "True" || echo "False")
+
+tracker_path, hours, mailbox_filter, as_json_flag = sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4] == "1"
+cutoff = (datetime.now(timezone.utc) - timedelta(hours=hours)).isoformat()
 results = []
-with open('$TRACKER') as f:
+with open(tracker_path) as f:
     for line in f:
         try:
             e = json.loads(line)
         except:
             continue
-        if e.get('active_at', '') < cutoff:
+        if e.get("active_at", "") < cutoff:
             continue
-        if mailbox_filter and e.get('mailbox') != mailbox_filter:
+        if mailbox_filter and e.get("mailbox") != mailbox_filter:
             continue
         results.append(e)
 
-if as_json:
+if as_json_flag:
     print(json.dumps(results, indent=2))
 else:
     for e in results:
-        date = e.get('active_at', '')[:16]
-        mb = e.get('mailbox', '')
-        sender = e.get('sender_name', '')[:30]
-        subj = e.get('subject', '')[:60]
-        tid = e.get('topic_id', '')
-        print(f'{date} | {mb:8} | {sender:30} | {subj} | {tid}')
-"
+        date = e.get("active_at", "")[:16]
+        mb = e.get("mailbox", "")
+        sender = e.get("sender_name", "")[:30]
+        subj = e.get("subject", "")[:60]
+        tid = e.get("topic_id", "")
+        print(f"{date} | {mb:8} | {sender:30} | {subj} | {tid}")
+PYEOF

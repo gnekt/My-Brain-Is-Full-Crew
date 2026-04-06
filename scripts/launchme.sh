@@ -161,12 +161,14 @@ fi
 ORCH_COUNT=0
 if [[ -d "$REPO_DIR/orchestra" ]]; then
   mkdir -p "$VAULT_DIR/Meta/scripts"
+  : > "$VAULT_DIR/Meta/scripts/.core-manifest"
   for script in "$REPO_DIR/orchestra/"*; do
     [[ -f "$script" ]] || continue
     bname="$(basename "$script")"
     [[ "$bname" == "README.md" ]] && continue
     cp "$script" "$VAULT_DIR/Meta/scripts/"
     chmod +x "$VAULT_DIR/Meta/scripts/$bname"
+    echo "$bname" >> "$VAULT_DIR/Meta/scripts/.core-manifest"
     ORCH_COUNT=$((ORCH_COUNT + 1))
   done
   success "Copied $ORCH_COUNT orchestra scripts to Meta/scripts/"

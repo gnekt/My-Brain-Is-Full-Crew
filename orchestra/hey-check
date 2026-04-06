@@ -8,7 +8,7 @@ Usage:
   hey-check --search FOI # search subjects and senders
 """
 
-import json, sys, os
+import json, sys
 from datetime import datetime, timedelta
 from pathlib import Path
 

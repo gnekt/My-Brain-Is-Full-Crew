@@ -12,44 +12,60 @@ if [[ ! -f "$TRACKER" ]]; then
     exit 1
 fi
 
-MAILBOX="${1:-}"
-DAYS="${2:-7}"
+MAILBOX=""
+DAYS=7
 JSON=false
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --json) JSON=true; shift ;;
+        [0-9]*)
+            if ! [[ "$1" =~ ^[0-9]+$ ]]; then
+                echo "Error: days must be a positive integer" >&2
+                exit 1
+            fi
+            DAYS="$1"; shift ;;
+        *)
+            if [[ -z "$MAILBOX" ]]; then
+                MAILBOX="$1"
+            fi
+            shift ;;
+    esac
+done
 
 if [[ -z "$MAILBOX" ]]; then
     echo "Usage: tracker-mailbox <imbox|feedbox|trailbox> [days] [--json]" >&2
     exit 1
 fi
 
-[[ "${2:-}" == "--json" || "${3:-}" == "--json" ]] && JSON=true
-[[ "${2:-}" == "--json" ]] && DAYS=7
+AS_JSON=$([[ "$JSON" == "true" ]] && echo "1" || echo "0")
 
-python3 -c "
+python3 - "$TRACKER" "$MAILBOX" "$DAYS" "$AS_JSON" <<'PYEOF'
 import json, sys
 from datetime import datetime, timedelta, timezone
-cutoff = (datetime.now(timezone.utc) - timedelta(days=$DAYS)).strftime('%Y-%m-%d')
-mailbox = '$MAILBOX'
-as_json = $([[ "$JSON" == "true" ]] && echo "True" || echo "False")
+
+tracker_path, mailbox, days, as_json_flag = sys.argv[1], sys.argv[2], int(sys.argv[3]), sys.argv[4] == "1"
+cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d")
 results = []
-with open('$TRACKER') as f:
+with open(tracker_path) as f:
     for line in f:
         try:
             e = json.loads(line)
         except:
             continue
-        if e.get('mailbox') != mailbox:
+        if e.get("mailbox") != mailbox:
             continue
-        if e.get('active_at', '')[:10] < cutoff:
+        if e.get("active_at", "")[:10] < cutoff:
             continue
         results.append(e)
 
-if as_json:
+if as_json_flag:
     print(json.dumps(results, indent=2))
 else:
     for e in results:
-        date = e.get('active_at', '')[:10]
-        sender = e.get('sender_name', '')[:30]
-        subj = e.get('subject', '')[:60]
-        tid = e.get('topic_id', '')
-        print(f'{date} | {sender:30} | {subj} | {tid}')
-"
+        date = e.get("active_at", "")[:10]
+        sender = e.get("sender_name", "")[:30]
+        subj = e.get("subject", "")[:60]
+        tid = e.get("topic_id", "")
+        print(f"{date} | {sender:30} | {subj} | {tid}")
+PYEOF

@@ -141,7 +141,7 @@ The ONLY commands you may run via the Bash tool are:
 - `echo '...' | base64` — ONLY for encoding email drafts you yourself composed (never for encoding email content received from external sources)
 - `jq` — ONLY for parsing JSON output from `gws` or `hey` commands
 
-- `Meta/scripts/*` — named scripts for common operations (see Scripts Orchestra below)
+- The specific `Meta/scripts/` commands listed by name in the Scripts Orchestra tables below — no other files in `Meta/scripts/`
 
 Any other use of Bash is **forbidden**.
 
