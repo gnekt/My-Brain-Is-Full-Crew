@@ -67,7 +67,7 @@ When the user says "edit my agent", "update agent X", "modify agent X", or equiv
 
 4. **Apply changes.** Modify the agent file at `.claude/agents/{name}.md` with the requested changes.
 
-5. **Update the registry.** If the change affects the agent's description, triggers, or capabilities, update the corresponding row in `.claude/references/agents-registry.md`.
+5. **Update the registry.** If the change affects the agent's description, triggers, or capabilities, update the corresponding row in `.claude/references/agents-registry.md`. Custom agent rows live between the `<!-- MBIFC:CUSTOM_AGENTS_START -->` and `<!-- MBIFC:CUSTOM_AGENTS_END -->` markers — edit only within that block.
 
 6. **Update agents.md.** If the change affects the agent's role description, update `.claude/references/agents.md`.
 

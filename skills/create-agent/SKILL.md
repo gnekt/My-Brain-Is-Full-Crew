@@ -174,8 +174,8 @@ Before writing the agent .md file, verify you have checked off ALL of these. If 
    - Write a detailed Core Responsibilities section (this is what makes the agent good or bad)
    - Include concrete examples and templates for any notes the agent creates
 4. **Save the file** to `.claude/agents/{name}.md`
-5. **Update the registry**: add a new row to `.claude/references/agents-registry.md`
-6. **Update the directory**: add a new section under "Custom Agents" in `.claude/references/agents.md`
+5. **Update the registry**: add a new row to `.claude/references/agents-registry.md` — insert it between the `<!-- MBIFC:CUSTOM_AGENTS_START -->` and `<!-- MBIFC:CUSTOM_AGENTS_END -->` markers in the Registry table (after the postman row)
+6. **Update the directory**: add a new section under "Custom Agents" in `.claude/references/agents.md` — insert it between the `<!-- MBIFC:CUSTOM_AGENTS_START -->` and `<!-- MBIFC:CUSTOM_AGENTS_END -->` markers in that file
 7. **Log the creation** in `Meta/agent-log.md`
 8. **Report to the user**: "Your new agent `{name}` is now active. You can try it by saying one of your trigger phrases."
 

@@ -155,6 +155,9 @@ Custom agents are created by the Architect and live in `.claude/agents/` alongsi
 
 For the definitive list of all agents (core + custom) with capabilities, inputs, outputs, and status, see `.claude/references/agents-registry.md`.
 
+<!-- MBIFC:CUSTOM_AGENTS_START -->
+<!-- MBIFC:CUSTOM_AGENTS_END -->
+
 ### How Custom Agents Coordinate
 
 Custom agents participate in the same orchestration protocol as core agents:
