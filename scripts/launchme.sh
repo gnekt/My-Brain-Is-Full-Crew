@@ -9,6 +9,10 @@
 #
 # It copies agents, skills, references, hooks, and settings into the vault's
 # .claude/ directory.
+#
+# Options:
+#   --framework <name>   Framework to build for (default: claude-code)
+#   --target <path>      Override the vault destination path
 # =============================================================================
 
 set -eo pipefail
@@ -19,6 +23,18 @@ source "$SCRIPT_DIR/lib.sh"
 
 resolve_paths "${BASH_SOURCE[0]}"
 
+# ── Parse args ─────────────────────────────────────────────────────────────
+FRAMEWORK="claude-code"
+TARGET_OVERRIDE=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --framework) FRAMEWORK="$2"; shift 2 ;;
+    --target)    TARGET_OVERRIDE="$2"; shift 2 ;;
+    *) die "Unknown argument: $1 (use --framework <name> or --target <path>)" ;;
+  esac
+done
+[[ -n "$TARGET_OVERRIDE" ]] && VAULT_DIR="$TARGET_OVERRIDE"
+
 # ── Banner ────────────────────────────────────────────────────────────────────
 print_banner "Setup        "
 echo -e "   Repo:   ${BOLD}${REPO_DIR}${NC}"
@@ -26,21 +42,23 @@ echo -e "   Vault:  ${BOLD}${VAULT_DIR}${NC}"
 echo ""
 
 # ── Confirm vault location ────────────────────────────────────────────────────
-echo -e "${BOLD}Is this your Obsidian vault folder?${NC}"
-echo -e "   ${DIM}${VAULT_DIR}${NC}"
-echo ""
-echo -e "   ${BOLD}y)${NC} Yes, install here"
-echo -e "   ${BOLD}n)${NC} No, let me type the correct path"
-if ! read -r -p "   > " CONFIRM 2>/dev/null; then CONFIRM=""; fi
-
-if [[ "$CONFIRM" =~ ^[Nn]$ ]]; then
+if [[ -z "$TARGET_OVERRIDE" ]]; then
+  echo -e "${BOLD}Is this your Obsidian vault folder?${NC}"
+  echo -e "   ${DIM}${VAULT_DIR}${NC}"
   echo ""
-  echo -e "${BOLD}Enter the full path to your Obsidian vault:${NC}"
-  if ! read -r -p "   > " VAULT_DIR 2>/dev/null; then
-    die "Cannot read input — are you running in a non-interactive shell?"
+  echo -e "   ${BOLD}y)${NC} Yes, install here"
+  echo -e "   ${BOLD}n)${NC} No, let me type the correct path"
+  if ! read -r -p "   > " CONFIRM 2>/dev/null; then CONFIRM=""; fi
+
+  if [[ "$CONFIRM" =~ ^[Nn]$ ]]; then
+    echo ""
+    echo -e "${BOLD}Enter the full path to your Obsidian vault:${NC}"
+    if ! read -r -p "   > " VAULT_DIR 2>/dev/null; then
+      die "Cannot read input — are you running in a non-interactive shell?"
+    fi
+    VAULT_DIR="${VAULT_DIR/#\~/$HOME}"
+    [[ -d "$VAULT_DIR" ]] || die "Directory not found: $VAULT_DIR"
   fi
-  VAULT_DIR="${VAULT_DIR/#\~/$HOME}"
-  [[ -d "$VAULT_DIR" ]] || die "Directory not found: $VAULT_DIR"
 fi
 
 # ── Check for existing installation ──────────────────────────────────────────
@@ -66,14 +84,20 @@ fi
 
 echo ""
 
+# ── Build the framework dist ───────────────────────────────────────────────
+info "Building $FRAMEWORK adapter..."
+bash "$SCRIPT_DIR/build.sh" --framework "$FRAMEWORK"
+DIST_DIR="$REPO_DIR/dist/$FRAMEWORK"
+[[ -d "$DIST_DIR" ]] || die "Build did not produce $DIST_DIR"
+
 # ── Migrate legacy manifests (if any) ────────────────────────────────────────
 manifest_migrate
 
 # ── Deprecate agents/refs removed from repo (reinstall only) ─────────────────
 DEP_COUNT=0
 if [[ $EXISTING -eq 1 ]]; then
-  DEP_COUNT=$(deprecate_removed "agents"     "$REPO_DIR/agents"     "$VAULT_DIR/.claude/agents")
-  DEP_COUNT=$((DEP_COUNT + $(deprecate_removed "references" "$REPO_DIR/references" "$VAULT_DIR/.claude/references")))
+  DEP_COUNT=$(deprecate_removed "agents"     "$DIST_DIR/.claude/agents"     "$VAULT_DIR/.claude/agents")
+  DEP_COUNT=$((DEP_COUNT + $(deprecate_removed "references" "$DIST_DIR/.claude/references" "$VAULT_DIR/.claude/references")))
 fi
 
 # ── Ensure vault support dirs ─────────────────────────────────────────────────
@@ -81,19 +105,19 @@ mkdir -p "$VAULT_DIR/Meta/states"
 
 # ── Install components ────────────────────────────────────────────────────────
 info "Installing agents..."
-AGENT_COUNT=$(install_agents "$REPO_DIR/agents" "$VAULT_DIR/.claude/agents")
+AGENT_COUNT=$(install_agents "$DIST_DIR/.claude/agents" "$VAULT_DIR/.claude/agents")
 success "Agents: $AGENT_COUNT installed/updated"
 
 info "Installing references..."
-REF_COUNT=$(install_refs "$REPO_DIR/references" "$VAULT_DIR/.claude/references")
+REF_COUNT=$(install_refs "$DIST_DIR/.claude/references" "$VAULT_DIR/.claude/references")
 success "References: $REF_COUNT installed/updated"
 
 info "Installing skills..."
-SKILL_COUNT=$(install_skills "$REPO_DIR/skills" "$VAULT_DIR/.claude/skills")
+SKILL_COUNT=$(install_skills "$DIST_DIR/.claude/skills" "$VAULT_DIR/.claude/skills")
 success "Skills: $SKILL_COUNT installed/updated"
 
 info "Installing hooks..."
-HOOK_COUNT=$(install_hooks "$REPO_DIR/hooks" "$VAULT_DIR/.claude/hooks")
+HOOK_COUNT=$(install_hooks "$DIST_DIR/.claude/hooks" "$VAULT_DIR/.claude/hooks")
 success "Hooks: $HOOK_COUNT installed/updated"
 
 # ── Deprecate stale orchestra scripts on reinstall ──────────────────────────
@@ -132,31 +156,12 @@ if [[ -f "$REPO_DIR/CLAUDE.md" ]]; then
   success "Copied CLAUDE.md"
 fi
 
+install_settings   "$DIST_DIR/.claude/settings.json" "$VAULT_DIR/.claude"
+install_dispatcher "$DIST_DIR/CLAUDE.md"             "$VAULT_DIR/CLAUDE.md"
 
-install_settings "$REPO_DIR/settings.json" "$VAULT_DIR/.claude"
-install_claude_md "$REPO_DIR/DISPATCHER.md" "$VAULT_DIR"
-
-# ── MCP servers (Gmail + Calendar) ───────────────────────────────────────────
-echo ""
-echo -e "${BOLD}Do you use Gmail, Hey.com, or Google Calendar?${NC}"
-echo -e "   ${DIM}The Postman agent can read your inbox and calendar.${NC}"
-echo -e "   ${DIM}Gmail uses MCP connectors (read-only). For full access, set up GWS CLI later.${NC}"
-echo -e "   ${DIM}Hey.com uses the Hey CLI (install from https://github.com/basecamp/hey-cli).${NC}"
-echo -e "   ${DIM}You can always add this later.${NC}"
-echo ""
-echo -e "   ${BOLD}y)${NC} Yes, set up Gmail + Calendar (MCP connectors)"
-echo -e "   ${BOLD}n)${NC} No, skip for now"
-if ! read -r -p "   > " MCP_ANSWER 2>/dev/null; then MCP_ANSWER=""; fi
-
-if [[ "$MCP_ANSWER" =~ ^[Yy]$ ]]; then
-  if [[ -f "$VAULT_DIR/.mcp.json" ]]; then
-    warn ".mcp.json already exists — skipping (won't overwrite)"
-  else
-    cp "$REPO_DIR/.mcp.json" "$VAULT_DIR/.mcp.json"
-    success "Created .mcp.json (Gmail + Google Calendar)"
-  fi
-else
-  info "Skipped MCP setup"
+# ── MCP servers ───────────────────────────────────────────────────────────────
+if [[ -f "$DIST_DIR/.mcp.json" ]]; then
+  copy_if_changed "$DIST_DIR/.mcp.json" "$VAULT_DIR/.mcp.json"
 fi
 
 # ── Done ──────────────────────────────────────────────────────────────────────

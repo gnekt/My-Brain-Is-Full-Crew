@@ -305,7 +305,7 @@ install_agents() {
     manifest+=("$name")
     copy_if_changed "$src" "$dst_dir/$name"
     if [[ $_LAST_CHANGED -eq 1 ]]; then
-      [[ $VERBOSE_COPY -eq 1 ]] && info "Updated agent: $name"
+      [[ $VERBOSE_COPY -eq 1 ]] && info "Updated agent: $name" || true
       count=$((count + 1))
     fi
   done
@@ -328,7 +328,7 @@ install_refs() {
       copy_if_changed "$src" "$dst"
     fi
     if [[ $_LAST_CHANGED -eq 1 ]]; then
-      [[ $VERBOSE_COPY -eq 1 ]] && info "Updated reference: $name"
+      [[ $VERBOSE_COPY -eq 1 ]] && info "Updated reference: $name" || true
       count=$((count + 1))
     fi
   done
@@ -347,7 +347,7 @@ install_skills() {
     mkdir -p "$dst_dir/$name"
     copy_if_changed "${skill_src}SKILL.md" "$dst_dir/$name/SKILL.md"
     if [[ $_LAST_CHANGED -eq 1 ]]; then
-      [[ $VERBOSE_COPY -eq 1 ]] && info "Updated skill: $name"
+      [[ $VERBOSE_COPY -eq 1 ]] && info "Updated skill: $name" || true
       count=$((count + 1))
     fi
   done
@@ -368,7 +368,7 @@ install_hooks() {
     copy_if_changed "$src" "$dst"
     if [[ $_LAST_CHANGED -eq 1 ]]; then
       chmod +x "$dst"
-      [[ $VERBOSE_COPY -eq 1 ]] && info "Updated hook: $name"
+      [[ $VERBOSE_COPY -eq 1 ]] && info "Updated hook: $name" || true
       count=$((count + 1))
     fi
   done
@@ -393,19 +393,19 @@ install_settings() {
     cp "$dst" "${dst}.bak"
     cp "$src" "$dst"
     _LAST_CHANGED=1
-    [[ $VERBOSE_COPY -eq 1 ]] && info "Updated settings.json (previous version saved as settings.json.bak)"
-    [[ $VERBOSE_COPY -eq 1 ]] && info "For custom hooks, use settings.local.json instead"
+    [[ $VERBOSE_COPY -eq 1 ]] && info "Updated settings.json (previous version saved as settings.json.bak)" || true
+    [[ $VERBOSE_COPY -eq 1 ]] && info "For custom hooks, use settings.local.json instead" || true
   fi
 }
 
-# install_claude_md <src> <vault_dir>
-# Copies DISPATCHER.md (src) to vault_dir/CLAUDE.md.
+# install_dispatcher <src_file> <dst_path>
+# Copies the source dispatcher file (CLAUDE.md or AGENTS.md) to the destination.
 # Sets _LAST_CHANGED.
-install_claude_md() {
-  local src="$1" vault_dir="$2"
+install_dispatcher() {
+  local src="$1" dst="$2"
   [[ -f "$src" ]] || return 0
-  copy_if_changed "$src" "$vault_dir/CLAUDE.md"
-  [[ $_LAST_CHANGED -eq 1 && $VERBOSE_COPY -eq 1 ]] && info "Updated CLAUDE.md"
+  copy_if_changed "$src" "$dst"
+  [[ $_LAST_CHANGED -eq 1 && $VERBOSE_COPY -eq 1 ]] && info "Updated $(basename "$dst")" || true
 }
 
 # ── UI helpers ────────────────────────────────────────────────────────────────
