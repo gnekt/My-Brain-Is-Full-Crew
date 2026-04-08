@@ -1,0 +1,11 @@
+servers:
+  - name: Gmail
+    type: http
+    url: "https://gmail.mcp.claude.com/mcp"
+    env: {}
+    exclude: []
+  - name: Google Calendar
+    type: http
+    url: "https://gcal.mcp.claude.com/mcp"
+    env: {}
+    exclude: []

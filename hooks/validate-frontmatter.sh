@@ -17,7 +17,7 @@
 # =============================================================================
 
 INPUT=$(cat)
-FILE=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""' 2>/dev/null)
+FILE=$(echo "$INPUT" | jq -r '.args.file_path // ""' 2>/dev/null)
 
 # Skip if we can't extract a path
 [[ -z "$FILE" ]] && exit 0

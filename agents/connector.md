@@ -14,7 +14,8 @@ description: >
   "verbinde die Notizen", "finde Verbindungen", "Graphanalyse", "fehlende Links",
   "conecta as notas", "encontra conexões", "análise do grafo", "links em falta",
   or after a large batch of notes has been filed and needs cross-linking.
-tools: Read, Edit, Glob, Grep
+mode: subagent
+capabilities: [read, edit]
 model: sonnet
 ---
 

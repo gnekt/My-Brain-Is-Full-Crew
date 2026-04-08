@@ -1,0 +1,6 @@
+name: notify
+description: Send a desktop notification when Claude Code needs attention
+script: notify.sh
+triggers:
+  - event: on-notification
+exclude: []

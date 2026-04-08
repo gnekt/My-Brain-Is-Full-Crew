@@ -12,7 +12,7 @@
 # =============================================================================
 
 INPUT=$(cat)
-FILE=$(echo "$INPUT" | jq -r '.tool_input.file_path // .tool_input.command // ""' 2>/dev/null)
+FILE=$(echo "$INPUT" | jq -r '.args.file_path // .args.command // ""' 2>/dev/null)
 
 # If we can't extract a file path, allow the operation
 [[ -z "$FILE" ]] && exit 0

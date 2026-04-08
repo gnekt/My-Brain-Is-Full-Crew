@@ -60,7 +60,7 @@ HOOK_COUNT=$(install_hooks   "$REPO_DIR/hooks"      "$VAULT_DIR/.claude/hooks")
 install_settings  "$REPO_DIR/settings.json" "$VAULT_DIR/.claude"
 SETTINGS_CHANGED=$_LAST_CHANGED
 
-install_claude_md "$REPO_DIR/CLAUDE.md" "$VAULT_DIR"
+install_claude_md "$REPO_DIR/DISPATCHER.md" "$VAULT_DIR"
 CLAUDE_MD_CHANGED=$_LAST_CHANGED
 
 # ── Summary ───────────────────────────────────────────────────────────────────

@@ -399,6 +399,7 @@ install_settings() {
 }
 
 # install_claude_md <src> <vault_dir>
+# Copies DISPATCHER.md (src) to vault_dir/CLAUDE.md.
 # Sets _LAST_CHANGED.
 install_claude_md() {
   local src="$1" vault_dir="$2"

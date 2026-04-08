@@ -15,7 +15,8 @@ description: >
   "wöchentliche Überprüfung", "Vault prüfen", "Wartung", "Vault aufräumen",
   "revisão semanal", "verifica o vault", "manutenção", "limpeza do vault",
   or when the user suspects broken links, misplaced files, or structural problems.
-tools: Read, Write, Edit, Bash, Glob, Grep
+mode: subagent
+capabilities: [read, write, edit, bash]
 model: opus
 ---
 

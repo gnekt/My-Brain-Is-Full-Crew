@@ -17,7 +17,8 @@ description: >
   PT: "transcrever", "notas de reunião", "resumo do podcast", "notas de aula",
   "diário de voz", "resumo da chamada".
   Also triggers when the user uploads an audio file (mp3, m4a, wav) or pastes a raw transcript.
-tools: Read, Write, Glob, Grep
+mode: subagent
+capabilities: [read, write]
 model: sonnet
 ---
 

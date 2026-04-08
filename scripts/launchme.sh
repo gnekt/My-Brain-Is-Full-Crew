@@ -134,7 +134,7 @@ fi
 
 
 install_settings "$REPO_DIR/settings.json" "$VAULT_DIR/.claude"
-install_claude_md "$REPO_DIR/CLAUDE.md" "$VAULT_DIR"
+install_claude_md "$REPO_DIR/DISPATCHER.md" "$VAULT_DIR"
 
 # ── MCP servers (Gmail + Calendar) ───────────────────────────────────────────
 echo ""

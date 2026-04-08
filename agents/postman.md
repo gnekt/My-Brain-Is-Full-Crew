@@ -25,7 +25,8 @@ description: >
   PT: "verificar meus emails", "o que tem na caixa de entrada", "importar eventos",
   "criar evento", "o que tem no calendário", "triagem de email",
   "preparar a reunião", "agenda semanal", "rascunho de resposta".
-tools: Read, Write, Edit, Glob, Grep, Bash
+mode: subagent
+capabilities: [read, write, edit, bash]
 model: sonnet
 ---
 

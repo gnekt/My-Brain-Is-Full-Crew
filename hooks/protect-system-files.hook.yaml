@@ -1,0 +1,7 @@
+name: protect-system-files
+description: Block edits to core crew files at runtime
+script: protect-system-files.sh
+triggers:
+  - event: before-tool-use
+    match-tool: [edit, write]
+exclude: []

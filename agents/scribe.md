@@ -12,7 +12,8 @@ description: >
   "salva isso", "nota rápida", "escreve isso", "lembra-me que",
   or when the user pastes messy, unformatted text, speech-to-text output, or a chain
   of related thoughts that need to be turned into proper notes.
-tools: Read, Write, Edit, Glob, Grep
+mode: subagent
+capabilities: [read, write, edit]
 model: sonnet
 ---
 

@@ -1,0 +1,7 @@
+name: validate-frontmatter
+description: Warn on broken YAML frontmatter after writing .md files
+script: validate-frontmatter.sh
+triggers:
+  - event: after-tool-use
+    match-tool: [write]
+exclude: []
