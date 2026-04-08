@@ -96,7 +96,7 @@ parse_hook_yaml() {
 agent_body() {
   local file="$1"
   awk '
-    /^---$/ { fm++; next }
+    fm < 2 && /^---$/ { fm++; next }
     fm >= 2 { print }
   ' "$file"
 }

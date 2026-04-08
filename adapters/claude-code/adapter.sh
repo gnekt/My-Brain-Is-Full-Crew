@@ -14,7 +14,7 @@ FRAMEWORK="claude-code"
 cc_capability_to_tools() {
   local cap="$1"
   case "$cap" in
-    read)      echo "Read Glob Grep" ;;
+    read)      echo "Read" ;;
     write)     echo "Write" ;;
     edit)      echo "Edit" ;;
     bash)      echo "Bash" ;;
@@ -210,9 +210,11 @@ adapter_translate_agents() {
     local model; model="$(parse_frontmatter "$agent" model)"
     local caps; caps="$(parse_capabilities "$agent")"
 
-    # Build tools allowlist by expanding each capability
-    local tools=""
+    # Build tools allowlist by expanding each capability.
+    # read → Read (only); Glob and Grep are appended at the end if read is present.
+    local tools="" has_read=0
     for cap in $caps; do
+      [[ "$cap" == "read" ]] && has_read=1
       local expansion; expansion="$(cc_capability_to_tools "$cap")"
       [[ -n "$expansion" ]] || continue
       for tool in $expansion; do
@@ -223,6 +225,10 @@ adapter_translate_agents() {
         fi
       done
     done
+    # Append Glob and Grep after all other tools when read capability is present
+    if [[ $has_read -eq 1 ]]; then
+      tools="$tools, Glob, Grep"
+    fi
 
     local out_file="$out_dir/$(basename "$agent")"
     {

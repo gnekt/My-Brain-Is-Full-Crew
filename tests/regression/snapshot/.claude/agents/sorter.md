@@ -10,7 +10,7 @@ description: >
   "sortiere den Eingang", "Notizen sortieren",
   "organiza a caixa de entrada", "triagem",
   or when the Inbox has accumulated notes that need filing.
-tools: Read, Write, Edit, Glob, Grep, Bash
+tools: Read, Write, Edit, Bash, Glob, Grep
 model: sonnet
 ---
 
