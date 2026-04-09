@@ -247,6 +247,21 @@ The installer sets up the Crew for your preferred platform:
 
 All platforms support the same 8 agents and 13 skills. `launchme.sh` installs your chosen platform automatically.
 
+#### Hook support matrix
+
+The hook layer is generated and installed differently per platform. The table below reflects the current codebase and generated artifacts.
+
+| Platform | Hook support level | Generated artifacts | Installed vault artifacts | Notes |
+|---|---|---|---|---|
+| **Claude Code** | Native hook support | `build/claude/settings.json`, `build/claude/hooks/*.sh` | `<vault>/.claude/settings.json`, `<vault>/.claude/hooks/*.sh` | Baseline native hook configuration |
+| **OpenCode** | Plugin-based hook support | `build/opencode/opencode.json`, `build/opencode/.crew/crew-hooks.js`, `build/opencode/hooks/*.sh` | `<vault>/.opencode/opencode.json`, `<vault>/.opencode/.crew/crew-hooks.js`, `<vault>/.opencode/hooks/*.sh` | Uses a local managed plugin, not native hook config |
+| **Gemini CLI** | Native hook support | `build/gemini/settings.json`, `build/gemini/hooks/*.sh` | `<vault>/.gemini/settings.json`, `<vault>/.gemini/hooks/*.sh` | Generated from the same canonical hook scripts |
+| **Codex CLI** | Best-effort hook support | `build/codex/config.toml`, `build/codex/hooks.json`, `build/codex/hooks/*.sh` | `<vault>/.codex/config.toml`, `<vault>/.codex/hooks.json`, `<vault>/.codex/hooks/*.sh` | Tool-use interception is limited to Bash |
+
+- **OpenCode managed plugin rule:** the installer and updater manage exactly one Crew-owned entry in OpenCode's singular `plugin` array: `./.crew/crew-hooks.js`. They preserve unrelated `opencode.json` keys and must not add a parallel `plugins` key.
+- **OpenCode support model:** the Crew does **not** rely on `.opencode/plugins/` auto-loading. It installs a local plugin shim under `.opencode/.crew/` and routes runtime checks through the canonical shell hooks in `.opencode/hooks/`.
+- **Codex limitation:** Codex support is intentionally described as **best effort**. The generated configuration only hooks the documented Codex-supported events, and tool-use interception is restricted to the Bash tool rather than claiming full parity with Claude, Gemini, or OpenCode.
+
 Your vault follows a hybrid **PARA + Zettelkasten** structure:
 
 ```
