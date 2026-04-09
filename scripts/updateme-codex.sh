@@ -34,6 +34,8 @@ if [[ -f "$MANIFEST" ]]; then
     deprecated_name="${old_name%.md}-DEPRECATED.md"
     [[ -f "$VAULT_DIR/.codex/deprecated/$deprecated_name" ]] && continue
     mv "$dst" "$VAULT_DIR/.codex/deprecated/$deprecated_name"
+    { echo "########"; echo "DEPRECATED DO NOT USE"; echo "########"; echo ""; cat "$VAULT_DIR/.codex/deprecated/$deprecated_name"; } > "$VAULT_DIR/.codex/deprecated/$deprecated_name.tmp"
+    mv "$VAULT_DIR/.codex/deprecated/$deprecated_name.tmp" "$VAULT_DIR/.codex/deprecated/$deprecated_name"
     warn "Deprecated removed core agent: $old_name"
   done < "$MANIFEST"
 fi
@@ -68,6 +70,8 @@ if [[ -f "$REF_MANIFEST" ]]; then
     deprecated_name="${old_ref%.md}-DEPRECATED.md"
     [[ -f "$VAULT_DIR/.codex/deprecated/$deprecated_name" ]] && continue
     mv "$dst" "$VAULT_DIR/.codex/deprecated/$deprecated_name"
+    { echo "########"; echo "DEPRECATED DO NOT USE"; echo "########"; echo ""; cat "$VAULT_DIR/.codex/deprecated/$deprecated_name"; } > "$VAULT_DIR/.codex/deprecated/$deprecated_name.tmp"
+    mv "$VAULT_DIR/.codex/deprecated/$deprecated_name.tmp" "$VAULT_DIR/.codex/deprecated/$deprecated_name"
     warn "Deprecated removed core reference: $old_ref"
   done < "$REF_MANIFEST"
 fi

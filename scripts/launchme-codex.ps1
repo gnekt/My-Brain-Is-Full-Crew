@@ -54,6 +54,8 @@ if (Test-Path -LiteralPath $oldManifest) {
     $depPath = Join-Path $depDir $depName
     if (Test-Path -LiteralPath $depPath) { continue }
     Move-Item -LiteralPath $dst -Destination $depPath
+    $depContent = Get-Content -Raw -LiteralPath $depPath
+    Set-Content -LiteralPath $depPath -Value ("########`nDEPRECATED DO NOT USE`n########`n`n" + $depContent)
     Warn "Deprecated stale Codex agent: $oldName"
   }
 }

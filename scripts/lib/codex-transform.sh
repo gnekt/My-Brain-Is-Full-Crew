@@ -7,10 +7,11 @@ render_for_codex_file() {
   local src="$1"
   local dst="$2"
 
+  # NOTE: avoid \b word-boundary assertions — they are a GNU extension
+  # and silently fail on macOS BSD sed, causing Claude tokens to leak.
   sed -E \
     -e 's/\.claude\//.codex\//g' \
-    -e 's/\.claude\b/.codex/g' \
-    -e 's/\bCLAUDE\.md\b/AGENTS.md/g' \
+    -e 's/CLAUDE\.md/AGENTS.md/g' \
     -e 's/`Skill` tool/skills system/g' \
     -e 's/`Agent` tool/spawn_agent tool/g' \
     -e 's/Skill tool/skills system/g' \
@@ -20,8 +21,8 @@ render_for_codex_file() {
     -e 's/scripts\/updateme\.sh/scripts\/updateme-codex.sh/g' \
     -e 's/`launchme\.sh`/`launchme-codex.sh`/g' \
     -e 's/`updateme\.sh`/`updateme-codex.sh`/g' \
-    -e 's/\blaunchme\.sh\b/launchme-codex.sh/g' \
-    -e 's/\bupdateme\.sh\b/updateme-codex.sh/g' \
+    -e 's/launchme\.sh/launchme-codex.sh/g' \
+    -e 's/updateme\.sh/updateme-codex.sh/g' \
     -e 's/Claude Code/Codex CLI/g' \
     "$src" > "$dst"
 }

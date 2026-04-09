@@ -35,6 +35,8 @@ if (Test-Path -LiteralPath $manifest) {
     $depPath = Join-Path $depDir $depName
     if (Test-Path -LiteralPath $depPath) { continue }
     Move-Item -LiteralPath $dst -Destination $depPath
+    $depContent = Get-Content -Raw -LiteralPath $depPath
+    Set-Content -LiteralPath $depPath -Value ("########`nDEPRECATED DO NOT USE`n########`n`n" + $depContent)
     Warn "Deprecated removed core agent: $oldName"
   }
 }
@@ -69,6 +71,8 @@ if (Test-Path -LiteralPath $refManifest) {
     $depPath = Join-Path $depDir $depName
     if (Test-Path -LiteralPath $depPath) { continue }
     Move-Item -LiteralPath $dst -Destination $depPath
+    $depContent = Get-Content -Raw -LiteralPath $depPath
+    Set-Content -LiteralPath $depPath -Value ("########`nDEPRECATED DO NOT USE`n########`n`n" + $depContent)
     Warn "Deprecated removed core reference: $oldRef"
   }
 }

@@ -39,12 +39,19 @@ if grep -RInE "\\.claude/|\\bCLAUDE\\.md\\b|AskUserQuestion|Skill tool|Agent too
   exit 1
 fi
 
+# Cross-contamination guard: Codex installer must not touch Claude runtime
+CLAUDE_MD_BEFORE="$(cat "$VAULT_DIR/CLAUDE.md")"
+
 # Updater smoke tests
 printf 'c\n' | bash scripts/updateme.sh >/tmp/crew-claude-update.log
 printf 'c\n' | bash scripts/updateme-codex.sh >/tmp/crew-codex-update.log
 
 [[ -d "$VAULT_DIR/.claude/agents" ]]
 [[ -d "$VAULT_DIR/.codex/agents" ]]
+
+# Verify Claude files were not modified by Codex operations
+CLAUDE_MD_AFTER="$(cat "$VAULT_DIR/CLAUDE.md")"
+[[ "$CLAUDE_MD_BEFORE" == "$CLAUDE_MD_AFTER" ]] || { echo "Codex updater modified CLAUDE.md" >&2; exit 1; }
 
 echo "compatibility-gate.sh passed"
 popd >/dev/null

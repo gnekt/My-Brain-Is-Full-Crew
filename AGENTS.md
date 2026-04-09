@@ -244,6 +244,7 @@ The script asks a couple of questions and copies everything into `.codex/` insid
 your-vault/
 ├── .codex/
 │   ├── agents/          ← 8 crew agents (auto-loaded by Codex CLI)
+│   ├── skills/          ← 13 crew skills
 │   └── references/      ← shared docs the agents read
 ├── .mcp.json            ← Gmail + Calendar (optional, if you chose yes)
 ├── My-Brain-Is-Full-Crew/  ← the repo (for updates)
@@ -285,12 +286,14 @@ My-Brain-Is-Full-Crew/
 │   ├── librarian.md            Vault health & maintenance
 │   ├── transcriber.md          Audio & meeting transcription
 │   └── postman.md              Email & calendar integration
+├── skills/                   The 13 specialized skills
 ├── references/               Shared agent documentation
 ├── docs/                     User-facing documentation
 ├── scripts/
-│   ├── launchme-codex.sh             First-time installer
-│   └── updateme-codex.sh             Post-pull updater
-├── .codex-plugin/plugin.json  Plugin manifest (for --plugin-dir)
+│   ├── launchme-codex.sh       First-time Codex installer
+│   ├── updateme-codex.sh       Post-pull Codex updater
+│   └── lib/codex-transform.sh  Codex text transformation helpers
+├── AGENTS.md                 Codex dispatcher instructions
 ├── .mcp.json                 MCP servers (Gmail, Google Calendar)
 ├── README.md
 ├── CONTRIBUTING.md
@@ -311,25 +314,16 @@ Key design decisions:
 
 - **Seeker** is search-only (`tools: Read, Glob, Grep`) — it finds information but doesn't modify notes
 - **Architect** and **Librarian** have full access including Bash for structural operations
-- **Postman** uses Gmail and Google Calendar via MCP servers defined in `.mcp.json`
+- **Postman** uses email (Gmail via `gws`, Hey.com via `hey` CLI) and Google Calendar for full read/write access, with MCP servers (`.mcp.json`) as a read-only fallback. See `docs/gws-setup-guide.md` for GWS setup
 - All agents auto-activate based on their `description` field — just talk naturally
 - Agents reference shared docs at `.codex/references/`
 
-## Alternative: load as plugin (CLI)
-
-If you prefer not to clone into the vault:
-
-```bash
-claude --plugin-dir /path/to/My-Brain-Is-Full-Crew
-```
-
-This loads agents + MCP for the current session. You still need to run `launchme-codex.sh` to set up `.codex/references/` in the vault.
-
 ## Development
 
+To test changes locally, run the Codex installer from the repo:
+
 ```bash
-claude --plugin-dir ./
+bash scripts/launchme-codex.sh
 ```
 
-Use `/reload-plugins` to pick up changes without restarting.
-
+After modifying agent or skill files, re-run `updateme-codex.sh` to push changes into the vault's `.codex/` directory.
