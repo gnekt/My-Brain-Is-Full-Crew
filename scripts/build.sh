@@ -561,10 +561,10 @@ build_platform() {
 
   info "Processing agents..."
   local agent_count=0
-  for tmpl in "$TEMPLATES_DIR/agents/"*.md.tmpl; do
+  for tmpl in "$TEMPLATES_DIR/agents/"*.tmpl.md; do
     [[ -f "$tmpl" ]] || continue
     local basename
-    basename="$(basename "$tmpl" .md.tmpl)"
+    basename="$(basename "$tmpl" .tmpl.md)"
 
     if [[ "$platform" == "codex" ]]; then
       local expanded_agent
@@ -587,7 +587,7 @@ build_platform() {
   local skill_count=0
   for skill_dir in "$TEMPLATES_DIR/skills/"*/; do
     [[ -d "$skill_dir" ]] || continue
-    local skill_tmpl="$skill_dir/SKILL.md.tmpl"
+    local skill_tmpl="$skill_dir/SKILL.tmpl.md"
     [[ -f "$skill_tmpl" ]] || continue
     local skill_name
     skill_name="$(basename "$skill_dir")"
@@ -600,10 +600,10 @@ build_platform() {
 
   info "Processing references..."
   local ref_count=0
-  for tmpl in "$TEMPLATES_DIR/references/"*.md.tmpl; do
+  for tmpl in "$TEMPLATES_DIR/references/"*.tmpl.md; do
     [[ -f "$tmpl" ]] || continue
     local basename
-    basename="$(basename "$tmpl" .md.tmpl)"
+    basename="$(basename "$tmpl" .tmpl.md)"
     local dst="$platform_build/references/${basename}.md"
     expand_file "$tmpl" "$dst" "$sed_file"
     ref_count=$((ref_count + 1))
@@ -611,7 +611,7 @@ build_platform() {
   success "$ref_count references"
 
   info "Processing dispatcher..."
-  local dispatcher_tmpl="$TEMPLATES_DIR/dispatchers/${DISPATCHER_FILE}.tmpl"
+  local dispatcher_tmpl="$TEMPLATES_DIR/dispatchers/${DISPATCHER_FILE%.md}.tmpl.md"
   if [[ ! -f "$dispatcher_tmpl" ]]; then
     die "Dispatcher template not found: $dispatcher_tmpl"
   fi
