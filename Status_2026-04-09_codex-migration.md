@@ -43,10 +43,17 @@ Track the in-progress rewrite from Claude-first runtime assumptions to Codex-fir
 - Updated `references/agents.md` and `references/agents-registry.md` so Scribe is described as a fast capture agent with direct low-risk notes and lightweight richer modes
 - Added round-8 Scribe capture-contract smoke test: `tests/codex_scribe_capture_contract_smoke.sh`
 - Registered the round-8 smoke-test entrypoint in `func.md`
+- Added round-9 Seeker objective: align shared references and guard rails with the retrieval-first, narrow incidental-edit, and analyze-don't-edit conflict contract
+- Reworked `agents/seeker.md` into a retrieval-first contract with narrow incidental edits, explicit conflict analysis rules, optional background state reads, and a clearer Sorter-vs-Architect escalation boundary
+- Updated `references/agents.md` and `references/agents-registry.md` so Seeker is described as retrieval-first with only narrow incidental fixes on explicit request
+- Added round-9 Seeker search-update contract smoke test: `tests/codex_seeker_search_update_contract_smoke.sh`
+- Registered the round-9 smoke-test entrypoint in `func.md`
+- Updated the round-6 capability parity smoke test so Seeker's edit-capable contract is validated against the newer narrow incidental-edit boundary instead of stale broad-update wording
 
 ## In Progress
 
 - Round 8: continue deeper parity work inside the remaining active agents and skills now that the round-7A maintenance-risk contract, round-7B transcribe-intake contract, and round-8 Scribe capture contract guard rail are in place
+- Round 9: continue deeper parity work inside the remaining active agents and skills now that the round-9 Seeker retrieval-first contract guard rail is in place
 
 ## Next
 
@@ -80,3 +87,14 @@ Track the in-progress rewrite from Claude-first runtime assumptions to Codex-fir
 - `bash -n tests/codex_transcribe_intake_smoke.sh tests/codex_maintenance_risk_contract_smoke.sh tests/codex_runtime_capability_parity_smoke.sh tests/codex_runtime_inventory_smoke.sh tests/codex_active_runtime_consistency_smoke.sh tests/codex_runtime_behavior_smoke.sh tests/codex_source_reference_smoke.sh tests/install_runtime_smoke.sh` passed
 - `bash tests/codex_scribe_capture_contract_smoke.sh` passed
 - `bash -n tests/codex_scribe_capture_contract_smoke.sh tests/codex_transcribe_intake_smoke.sh tests/codex_maintenance_risk_contract_smoke.sh tests/codex_runtime_capability_parity_smoke.sh tests/codex_runtime_inventory_smoke.sh tests/codex_active_runtime_consistency_smoke.sh tests/codex_runtime_behavior_smoke.sh tests/codex_source_reference_smoke.sh tests/install_runtime_smoke.sh` passed
+- `bash tests/codex_seeker_search_update_contract_smoke.sh` passed
+- `bash tests/codex_runtime_capability_parity_smoke.sh` passed after aligning the Seeker expectation to the round-9 narrow incidental-edit contract
+- `bash tests/codex_scribe_capture_contract_smoke.sh` passed
+- `bash tests/codex_transcribe_intake_smoke.sh` passed
+- `bash tests/codex_maintenance_risk_contract_smoke.sh` passed
+- `bash tests/codex_runtime_inventory_smoke.sh` passed
+- `bash tests/codex_active_runtime_consistency_smoke.sh` passed
+- `bash tests/codex_runtime_behavior_smoke.sh` passed
+- `bash tests/codex_source_reference_smoke.sh` passed
+- `bash tests/install_runtime_smoke.sh` passed
+- `bash -n tests/codex_seeker_search_update_contract_smoke.sh tests/codex_scribe_capture_contract_smoke.sh tests/codex_transcribe_intake_smoke.sh tests/codex_maintenance_risk_contract_smoke.sh tests/codex_runtime_capability_parity_smoke.sh tests/codex_runtime_inventory_smoke.sh tests/codex_active_runtime_consistency_smoke.sh tests/codex_runtime_behavior_smoke.sh tests/codex_source_reference_smoke.sh tests/install_runtime_smoke.sh` passed

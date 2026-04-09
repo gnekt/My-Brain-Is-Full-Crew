@@ -55,10 +55,10 @@ All agents read `Meta/user-profile.md` for personalization. This file is created
 
 ### 4. Seeker
 
-**Role**: Search & Intelligence
+**Role**: Search, Retrieval & Synthesis
 **Agent file**: `seeker.md`
-**Responsibilities**: Finds and retrieves information across the vault using full-text search, metadata queries, and relationship navigation. Synthesizes answers from multiple notes with citations. Can modify notes on request. Handles timeline mode, diff mode, and missing knowledge detection.
-**Contact when**: Information needs to be found or verified before acting. A note's location is unknown. A cross-reference is needed. The user asks a factual question.
+**Responsibilities**: Finds and retrieves information across the vault using full-text search, metadata queries, and relationship navigation. Synthesizes answers from multiple notes with citations. May make narrow incidental fixes only when explicitly asked and only for obvious typos, broken wikilinks, small frontmatter mistakes, small factual corrections, or light formatting cleanup. Handles timeline mode, diff mode, and missing knowledge detection without resolving conflicts in place.
+**Contact when**: Information needs to be found or verified before acting. A note's location is unknown. A cross-reference is needed. The user asks a factual question. A tiny safe fix is needed.
 
 ---
 

@@ -11,12 +11,12 @@ if ! rg -n '^tools: Read, Edit, Glob, Grep$' agents/seeker.md >/dev/null; then
   exit 1
 fi
 
-if ! rg -n 'edit the note on|update the note|find and edit' agents/seeker.md >/dev/null; then
-  echo "Seeker no longer advertises the edit/update behaviors round 6 expects to support." >&2
+if ! rg -n 'You may directly edit an existing note only when the change is an obvious, local incidental fix that is clearly safe and the user has asked for it\.' agents/seeker.md >/dev/null; then
+  echo "Seeker no longer documents the narrow edit-capable runtime contract round 6 expects to support." >&2
   exit 1
 fi
 
-if ! rg -n 'You may edit existing vault notes and their frontmatter' agents/seeker.md >/dev/null; then
+if ! rg -n 'Allowed incidental edits are limited to:' agents/seeker.md >/dev/null; then
   echo "Seeker is missing an explicit runtime write boundary." >&2
   exit 1
 fi
