@@ -39,10 +39,14 @@ Track the in-progress rewrite from Claude-first runtime assumptions to Codex-fir
 - Aligned `agents/transcriber.md` to the new `/transcribe` contract so the agent no longer implies a parallel intake model or native raw-audio transcription support
 - Added round-7B transcribe-intake guard rail: `tests/codex_transcribe_intake_smoke.sh`
 - Registered the round-7B smoke-test entrypoint in `func.md`
+- Added round-8 objective: align the shared Scribe references with the fast text-capture contract and guard against heavyweight default capture drift
+- Updated `references/agents.md` and `references/agents-registry.md` so Scribe is described as a fast capture agent with direct low-risk notes and lightweight richer modes
+- Added round-8 Scribe capture-contract smoke test: `tests/codex_scribe_capture_contract_smoke.sh`
+- Registered the round-8 smoke-test entrypoint in `func.md`
 
 ## In Progress
 
-- Round 8: continue deeper parity work inside the remaining active agents and skills now that the round-7A maintenance-risk contract and round-7B transcribe-intake contract are verified
+- Round 8: continue deeper parity work inside the remaining active agents and skills now that the round-7A maintenance-risk contract, round-7B transcribe-intake contract, and round-8 Scribe capture contract guard rail are in place
 
 ## Next
 
@@ -74,3 +78,5 @@ Track the in-progress rewrite from Claude-first runtime assumptions to Codex-fir
 - `bash tests/codex_source_reference_smoke.sh` passed
 - `bash tests/install_runtime_smoke.sh` passed
 - `bash -n tests/codex_transcribe_intake_smoke.sh tests/codex_maintenance_risk_contract_smoke.sh tests/codex_runtime_capability_parity_smoke.sh tests/codex_runtime_inventory_smoke.sh tests/codex_active_runtime_consistency_smoke.sh tests/codex_runtime_behavior_smoke.sh tests/codex_source_reference_smoke.sh tests/install_runtime_smoke.sh` passed
+- `bash tests/codex_scribe_capture_contract_smoke.sh` passed
+- `bash -n tests/codex_scribe_capture_contract_smoke.sh tests/codex_transcribe_intake_smoke.sh tests/codex_maintenance_risk_contract_smoke.sh tests/codex_runtime_capability_parity_smoke.sh tests/codex_runtime_inventory_smoke.sh tests/codex_active_runtime_consistency_smoke.sh tests/codex_runtime_behavior_smoke.sh tests/codex_source_reference_smoke.sh tests/install_runtime_smoke.sh` passed

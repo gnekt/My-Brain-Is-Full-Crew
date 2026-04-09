@@ -43,6 +43,7 @@ Rule:
 | `codex-runtime-capability-parity-smoke` | `tests/codex_runtime_capability_parity_smoke.sh` | Smoke-test active runtime files for capability/tool parity, Sorter boundary consistency, and custom-agent inventory drift | Guards round-6 capability parity cleanup |
 | `codex-maintenance-risk-contract-smoke` | `tests/codex_maintenance_risk_contract_smoke.sh` | Smoke-test maintenance-chain risk contracts and round-7A wording drift in Librarian, Vault Audit, Deep Clean, Defrag, and Tag Garden | Guards round-7A maintenance risk cleanup |
 | `codex-transcribe-intake-smoke` | `tests/codex_transcribe_intake_smoke.sh` | Smoke-test the round-7B raw-audio gate, two-layer transcript intake, and transcriber alignment contract | Guards round-7B transcribe intake cleanup |
+| `codex-scribe-capture-contract-smoke` | `tests/codex_scribe_capture_contract_smoke.sh` | Smoke-test the round-8 Scribe fast-capture contract, shared reference wording, and lightweight mode defaults | Guards round-8 Scribe capture cleanup |
 
 ## Migration Notes
 

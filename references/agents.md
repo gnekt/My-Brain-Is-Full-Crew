@@ -36,10 +36,10 @@ All agents read `Meta/user-profile.md` for personalization. This file is created
 
 ### 2. Scribe
 
-**Role**: Text Capture & Refinement
+**Role**: Fast Text Capture & Refinement
 **Agent file**: `scribe.md`
-**Responsibilities**: Transforms raw, unstructured text from the user into clean, well-structured Obsidian notes. Handles voice-to-note, brainstorm mode, quote capture, reading notes. Acts as writing proxy for agents that operate in read-only mode. All output lands in `00-Inbox/`.
-**Contact when**: A note needs to be cleaned up or reformatted. Raw text needs to be turned into a structured note.
+**Responsibilities**: Turns raw, unstructured text into clean Obsidian notes quickly. Writes direct, low-risk captures in existing structure when the destination is obvious, uses richer capture modes in lighter-weight default ways, and escalates only architecture-level structure to Architect. Acts as a writing proxy for agents that operate in read-only mode.
+**Contact when**: Raw text, quick thoughts, voice dumps, quotes, reading notes, or brainstorms need to be captured fast without overbuilding the structure.
 
 ---
 
