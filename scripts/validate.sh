@@ -41,15 +41,155 @@ ERROR_COUNT=0
 OPENCODE_MANAGED_PLUGIN_PATTERN='^(file://)?(\./)?\.crew/.+\.(cjs|mjs|js|ts|tsx)$'
 
 error() {
-  echo "[ERROR] $1"
+  echo "[ERROR] $1" >&2
   ERROR_COUNT=$((ERROR_COUNT + 1))
 }
 
 json_eval() {
   local file="$1"
   local expr="$2"
+  local output
 
-  yq eval -oy -p json "$expr" "$file" 2>/dev/null
+  if ! output=$(yq eval -oy -p json "$expr" "$file" 2>/dev/null); then
+    return 1
+  fi
+
+  printf '%s\n' "$output"
+}
+
+infer_build_platform() {
+  local build_dir_name
+
+  build_dir_name=$(basename "$BUILD_DIR")
+
+  case "$build_dir_name" in
+    *claude*)
+      printf 'claude\n'
+      ;;
+    *gemini*)
+      printf 'gemini\n'
+      ;;
+    *opencode*)
+      printf 'opencode\n'
+      ;;
+    *codex*)
+      printf 'codex\n'
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+resolve_settings_platform() {
+  local settings_file="$1"
+  local platform_name=""
+  local inferred_platform=""
+
+  if ! platform_name=$(json_eval "$settings_file" '.platform'); then
+    error "${settings_file}: invalid JSON"
+    return 1
+  fi
+
+  case "$platform_name" in
+    "Claude Code")
+      printf 'claude\n'
+      return 0
+      ;;
+    "Gemini CLI")
+      printf 'gemini\n'
+      return 0
+      ;;
+    ""|"null")
+      ;;
+    *)
+      error "${settings_file}: unsupported settings.json platform metadata: ${platform_name}"
+      return 1
+      ;;
+  esac
+
+  if inferred_platform=$(infer_build_platform); then
+    printf '%s\n' "$inferred_platform"
+    return 0
+  fi
+
+  error "${settings_file}: unable to determine hook platform from settings.json or build directory"
+  return 1
+}
+
+validate_native_hook_directory() {
+  local platform_label="$1"
+  local expected_hooks="protect-system-files.sh validate-frontmatter.sh notify.sh"
+  local hook_name
+
+  if [[ -d "${BUILD_DIR}/hooks" ]]; then
+    for hook_name in $expected_hooks; do
+      if [[ ! -f "${BUILD_DIR}/hooks/${hook_name}" ]]; then
+        error "${BUILD_DIR}/hooks/${hook_name}: expected ${platform_label} hook script is missing"
+      fi
+    done
+  else
+    error "${BUILD_DIR}/hooks/: ${platform_label} hooks directory is missing"
+  fi
+}
+
+validate_native_settings_hooks() {
+  local settings_file="$1"
+  local platform_label="$2"
+  local required_events="$3"
+  local hooks_type
+  local event
+
+  if ! hooks_type=$(json_eval "$settings_file" '.hooks | type'); then
+    error "${settings_file}: invalid JSON"
+    return
+  fi
+  if [[ "$hooks_type" == "!!null" ]]; then
+    error "${settings_file}: ${platform_label} settings.json is missing the hooks object"
+    return
+  fi
+  if [[ "$hooks_type" != "!!map" ]]; then
+    error "${settings_file}: ${platform_label} settings.json hooks must be an object"
+    return
+  fi
+
+  for event in $required_events; do
+    local event_type
+    local entry_count
+    local first_hook_type
+
+    if ! event_type=$(json_eval "$settings_file" ".hooks.${event} | type"); then
+      error "${settings_file}: invalid JSON"
+      return
+    fi
+    if [[ "$event_type" == "!!null" ]]; then
+      error "${settings_file}: ${platform_label} hooks missing required event: ${event}"
+      continue
+    fi
+    if [[ "$event_type" != "!!seq" ]]; then
+      error "${settings_file}: ${platform_label} hooks.${event} must be an array"
+      continue
+    fi
+
+    if ! entry_count=$(json_eval "$settings_file" ".hooks.${event} | length"); then
+      error "${settings_file}: invalid JSON"
+      return
+    fi
+    if [[ "$entry_count" -lt 1 ]]; then
+      error "${settings_file}: ${platform_label} hooks.${event} must have at least one entry"
+      continue
+    fi
+
+    if ! first_hook_type=$(json_eval "$settings_file" ".hooks.${event}[0].hooks[0].type"); then
+      error "${settings_file}: invalid JSON"
+      return
+    fi
+    if [[ "$first_hook_type" != "command" ]]; then
+      error "${settings_file}: ${platform_label} hooks.${event}[0] must use type \"command\""
+    fi
+  done
+
+  validate_native_hook_directory "$platform_label"
 }
 
 is_managed_opencode_plugin_spec() {
@@ -82,13 +222,19 @@ validate_opencode_hook_artifacts() {
     return 0
   fi
 
-  plugin_type=$(json_eval "$config_file" '.plugin | type')
+  if ! plugin_type=$(json_eval "$config_file" '.plugin | type'); then
+    error "${config_file}: invalid JSON"
+    return
+  fi
   if [[ "$plugin_type" != "!!null" ]] && [[ "$plugin_type" != "!!seq" ]]; then
     error "${config_file}: singular plugin key must be an array when present"
     return
   fi
 
-  plugins_type=$(json_eval "$config_file" '.plugins | type')
+  if ! plugins_type=$(json_eval "$config_file" '.plugins | type'); then
+    error "${config_file}: invalid JSON"
+    return
+  fi
   if [[ "$plugins_type" != "!!null" ]]; then
     error "${config_file}: use singular plugin key, not plugins, for the managed OpenCode plugin"
   fi
@@ -141,72 +287,44 @@ validate_opencode_hook_artifacts() {
 }
 
 validate_gemini_hook_artifacts() {
+  local settings_file="$1"
+
+  local has_models
+  if ! has_models=$(json_eval "$settings_file" '.models | type'); then
+    error "${settings_file}: invalid JSON"
+    return
+  fi
+  if [[ "$has_models" == "!!null" ]]; then
+    error "${settings_file}: Gemini settings.json is missing the models object"
+  fi
+
+  validate_native_settings_hooks "$settings_file" "Gemini" "BeforeTool AfterTool Notification"
+}
+
+validate_claude_hook_artifacts() {
+  local settings_file="$1"
+
+  validate_native_settings_hooks "$settings_file" "Claude" "PreToolUse PostToolUse Notification"
+}
+
+validate_settings_hook_artifacts() {
   local settings_file="${BUILD_DIR}/settings.json"
-  local platform_name
+  local settings_platform
 
   if [[ ! -f "$settings_file" ]]; then
     return 0
   fi
 
-  platform_name=$(json_eval "$settings_file" '.platform')
-  if [[ "$platform_name" != "Gemini CLI" ]]; then
-    return 0
-  fi
+  settings_platform=$(resolve_settings_platform "$settings_file") || return
 
-  local has_models
-  has_models=$(json_eval "$settings_file" '.models | type')
-  if [[ "$has_models" == "!!null" ]]; then
-    error "${settings_file}: Gemini settings.json is missing the models object"
-  fi
-
-  local hooks_type
-  hooks_type=$(json_eval "$settings_file" '.hooks | type')
-  if [[ "$hooks_type" == "!!null" ]]; then
-    error "${settings_file}: Gemini settings.json is missing the hooks object"
-    return
-  fi
-  if [[ "$hooks_type" != "!!map" ]]; then
-    error "${settings_file}: Gemini settings.json hooks must be an object"
-    return
-  fi
-
-  local required_events="BeforeTool AfterTool Notification"
-  for event in $required_events; do
-    local event_type
-    event_type=$(json_eval "$settings_file" ".hooks.${event} | type")
-    if [[ "$event_type" == "!!null" ]]; then
-      error "${settings_file}: Gemini hooks missing required event: ${event}"
-      continue
-    fi
-    if [[ "$event_type" != "!!seq" ]]; then
-      error "${settings_file}: Gemini hooks.${event} must be an array"
-      continue
-    fi
-
-    local entry_count
-    entry_count=$(json_eval "$settings_file" ".hooks.${event} | length")
-    if [[ "$entry_count" -lt 1 ]]; then
-      error "${settings_file}: Gemini hooks.${event} must have at least one entry"
-      continue
-    fi
-
-    local first_hook_type
-    first_hook_type=$(json_eval "$settings_file" ".hooks.${event}[0].hooks[0].type")
-    if [[ "$first_hook_type" != "command" ]]; then
-      error "${settings_file}: Gemini hooks.${event}[0] must use type \"command\""
-    fi
-  done
-
-  if [[ -d "${BUILD_DIR}/hooks" ]]; then
-    local expected_hooks="protect-system-files.sh validate-frontmatter.sh notify.sh"
-    for hook_name in $expected_hooks; do
-      if [[ ! -f "${BUILD_DIR}/hooks/${hook_name}" ]]; then
-        error "${BUILD_DIR}/hooks/${hook_name}: expected Gemini hook script is missing"
-      fi
-    done
-  else
-    error "${BUILD_DIR}/hooks/: Gemini hooks directory is missing"
-  fi
+  case "$settings_platform" in
+    claude)
+      validate_claude_hook_artifacts "$settings_file"
+      ;;
+    gemini)
+      validate_gemini_hook_artifacts "$settings_file"
+      ;;
+  esac
 }
 
 validate_codex_hook_artifacts() {
@@ -242,7 +360,10 @@ validate_codex_hook_artifacts() {
   fi
 
   local hooks_obj_type
-  hooks_obj_type=$(json_eval "$hooks_file" '.hooks | type')
+  if ! hooks_obj_type=$(json_eval "$hooks_file" '.hooks | type'); then
+    error "${hooks_file}: invalid JSON"
+    return
+  fi
   if [[ "$hooks_obj_type" == "!!null" ]]; then
     error "${hooks_file}: Codex hooks.json is missing the hooks object"
     return
@@ -251,14 +372,20 @@ validate_codex_hook_artifacts() {
   local required_events="PreToolUse PostToolUse Stop"
   for event in $required_events; do
     local event_type
-    event_type=$(json_eval "$hooks_file" ".hooks.${event} | type")
+    if ! event_type=$(json_eval "$hooks_file" ".hooks.${event} | type"); then
+      error "${hooks_file}: invalid JSON"
+      return
+    fi
     if [[ "$event_type" == "!!null" ]]; then
       error "${hooks_file}: Codex hooks.json missing required event: ${event}"
       continue
     fi
 
     local entry_count
-    entry_count=$(json_eval "$hooks_file" ".hooks.${event} | length")
+    if ! entry_count=$(json_eval "$hooks_file" ".hooks.${event} | length"); then
+      error "${hooks_file}: invalid JSON"
+      return
+    fi
     if [[ "$entry_count" -lt 1 ]]; then
       error "${hooks_file}: Codex hooks.${event} must have at least one entry"
       continue
@@ -266,7 +393,10 @@ validate_codex_hook_artifacts() {
 
     if [[ "$event" == "PreToolUse" || "$event" == "PostToolUse" ]]; then
       local matcher
-      matcher=$(json_eval "$hooks_file" ".hooks.${event}[0].matcher")
+      if ! matcher=$(json_eval "$hooks_file" ".hooks.${event}[0].matcher"); then
+        error "${hooks_file}: invalid JSON"
+        return
+      fi
       if [[ "$matcher" != "Bash" ]]; then
         error "${hooks_file}: Codex hooks.${event}[0].matcher must be \"Bash\" (Codex only supports Bash tool interception)"
       fi
@@ -385,7 +515,7 @@ while IFS= read -r -d '' file; do
 done < <(find "$BUILD_DIR" -type f \( -name '*.md' -o -name '*.toml' -o -name '*.json' -o -name '*.sh' \) -empty -print0)
 
 validate_opencode_hook_artifacts
-validate_gemini_hook_artifacts
+validate_settings_hook_artifacts
 validate_codex_hook_artifacts
 
 # ── Result ───────────────────────────────────────────────────────────────────
