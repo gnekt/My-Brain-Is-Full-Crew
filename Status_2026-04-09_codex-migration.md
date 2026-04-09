@@ -57,6 +57,14 @@ Track the in-progress rewrite from Claude-first runtime assumptions to Codex-fir
 - Reworked `agents/sorter.md` and `skills/inbox-triage/SKILL.md` so safe work proceeds immediately, ambiguous items stay in `00-Inbox/`, and Project Pulse remains reporting-only
 - Added round-11 Sorter autonomy-contract smoke test: `tests/codex_sorter_autonomy_contract_smoke.sh`
 - Registered the round-11 smoke-test entrypoint in `func.md`
+- Deployed the current Codex runtime into `/Users/pigo/Documents/Pigo_Obsidian/.codex/` and refreshed the vault-root `AGENTS.md`
+- Backed up the pre-deployment vault-root `AGENTS.md` to `AGENTS.pre-codex-migration-2026-04-09.bak.md`
+- Added a concrete vault deployment test plan at `docs/testing/2026-04-09-vault-deployment-test-plan.md`
+- Added a real-vault acceptance script: `tests/vault_deployment_acceptance.sh`
+- Registered the deployment acceptance entrypoint in `func.md`
+- Added a deployed-runtime journey acceptance script: `tests/vault_runtime_journey_acceptance.sh`
+- Repaired the local `gstack` installation and ran gstack-based deployment QA against a local probe page that verified the deployed dispatcher, registry, and pre-migration backup artifacts
+- Registered the runtime journey acceptance entrypoint in `func.md`
 
 ## In Progress
 
@@ -64,6 +72,7 @@ Track the in-progress rewrite from Claude-first runtime assumptions to Codex-fir
 - Round 9: continue deeper parity work inside the remaining active agents and skills now that the round-9 Seeker retrieval-first contract guard rail is in place
 - Round 10: continue deeper parity work inside the remaining active agents and skills now that the round-10 Connector graph-contract guard rail is in place
 - Round 11: continue deeper parity work inside the remaining active agents and skills now that the round-11 Sorter autonomy contract guard rail is in place
+- Deployment validation, gstack QA, and final goal-achievement acceptance
 
 ## Next
 
@@ -133,3 +142,9 @@ Track the in-progress rewrite from Claude-first runtime assumptions to Codex-fir
 - `bash tests/codex_source_reference_smoke.sh` passed
 - `bash tests/install_runtime_smoke.sh` passed
 - `bash -n tests/codex_sorter_autonomy_contract_smoke.sh tests/codex_connector_graph_contract_smoke.sh tests/codex_seeker_search_update_contract_smoke.sh tests/codex_scribe_capture_contract_smoke.sh tests/codex_transcribe_intake_smoke.sh tests/codex_maintenance_risk_contract_smoke.sh tests/codex_runtime_capability_parity_smoke.sh tests/codex_runtime_inventory_smoke.sh tests/codex_active_runtime_consistency_smoke.sh tests/codex_runtime_behavior_smoke.sh tests/codex_source_reference_smoke.sh tests/install_runtime_smoke.sh` passed
+- `bash tests/vault_deployment_acceptance.sh /Users/pigo/Documents/Pigo_Obsidian` passed
+- `bash tests/vault_runtime_journey_acceptance.sh /Users/pigo/Documents/Pigo_Obsidian` passed
+- gstack QA probe passed with:
+  - `PASS — Vault AGENTS is Codex dispatcher`
+  - `PASS — Vault registry includes Seeker + Connector contract`
+  - `PASS — Backup AGENTS preserves pre-migration file`

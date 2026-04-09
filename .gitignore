@@ -9,3 +9,4 @@ Test-SecondBrain/
 *.zip
 # Dev config
 .codex/settings.local.json
+.gstack/
