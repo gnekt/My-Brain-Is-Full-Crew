@@ -411,6 +411,11 @@ My-Brain-Is-Full-Crew/               ← cloned inside your vault
 │   ├── deep-clean/SKILL.md            Extended vault cleanup
 │   ├── tag-garden/SKILL.md            Tag analysis and cleanup
 │   └── inbox-triage/SKILL.md          Process and route inbox notes
+├── orchestra/                       Named scripts for permission-free agent operations
+│   ├── hey-imbox, hey-feed, ...       Hey mailbox wrappers
+│   ├── tracker-today, tracker-search  Local tracker queries
+│   ├── contact-lookup                 Person-based email search
+│   └── vault-stats, vault-inbox       Vault health helpers
 ├── references/                      Shared agent documentation
 ├── scripts/
 │   ├── launchme.sh                    First-time installer
@@ -434,6 +439,8 @@ your-vault/
 │   ├── agents/          ← lightweight reactive agents
 │   ├── skills/          ← specialized multi-step skills
 │   └── references/      ← shared docs
+├── Meta/
+│   └── scripts/         ← orchestra scripts (permission-free agent commands)
 ├── CLAUDE.md            ← project instructions (dispatcher routing)
 ├── .mcp.json            ← Gmail + Calendar read-only fallback (if enabled)
 ├── My-Brain-Is-Full-Crew/  ← the repo (for updates)

@@ -45,7 +45,7 @@ with open(tracker_path) as f:
     for line in f:
         try:
             e = json.loads(line)
-        except:
+        except Exception:
             continue
         if mailbox_filter and e.get("mailbox") != mailbox_filter:
             continue

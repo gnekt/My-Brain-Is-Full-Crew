@@ -48,7 +48,7 @@ with open(tracker_path) as f:
     for line in f:
         try:
             e = json.loads(line)
-        except:
+        except Exception:
             continue
         if e.get("active_at", "") < cutoff:
             continue

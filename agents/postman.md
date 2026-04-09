@@ -456,10 +456,10 @@ The Postman has nine operating modes. At startup, if the context is not clear, u
 3. **Read full threads**: for each relevant thread, use `Meta/scripts/hey-thread <id>` to read the full conversation. Only call this for threads you actually need to read — don't read everything.
 4. **Fall back to live API** if the tracker is stale or missing: use `Meta/scripts/hey-imbox`, `Meta/scripts/hey-trail`, `Meta/scripts/hey-later` to scan mailboxes directly.
 5. **Skip The Feed** unless the user specifically asks — these are newsletters and updates the user chose to receive but not prioritize.
-7. **Priority scoring**: apply the same scoring as below, but note that Imbox emails start with a baseline bonus (+1) since they were screened in by the user.
-8. **Note creation**: for relevant emails, create structured notes in `00-Inbox/`.
-9. **Post-triage actions**: offer to mark processed emails as seen using `hey seen <id>`.
-10. **Final report**: present a summary including which Hey account was triaged (from `hey auth status --json`).
+6. **Priority scoring**: apply the same scoring as below, but note that Imbox emails start with a baseline bonus (+1) since they were screened in by the user.
+7. **Note creation**: for relevant emails, create structured notes in `00-Inbox/`.
+8. **Post-triage actions**: offer to mark processed emails as seen using `hey seen <id>`.
+9. **Final report**: present a summary including which Hey account was triaged (from `hey auth status --json`).
 
 #### If using GWS (Gmail):
 

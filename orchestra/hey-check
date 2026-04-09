@@ -9,7 +9,7 @@ Usage:
 """
 
 import json, sys
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 # Derive vault root from script location: Meta/scripts/ -> vault root
@@ -37,7 +37,7 @@ def main():
     elif args and args[0].isdigit():
         days = int(args[0])
 
-    cutoff = (datetime.utcnow() - timedelta(days=days)).strftime("%Y-%m-%d")
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d")
 
     lines = read_tracker()
     if not lines:
@@ -48,7 +48,7 @@ def main():
     for line in lines:
         try:
             entries.append(json.loads(line))
-        except:
+        except Exception:
             continue
 
     for e in entries:
