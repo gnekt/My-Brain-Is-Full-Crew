@@ -1,0 +1,43 @@
+{
+  "platform": "Gemini CLI",
+  "models": {
+    "fast": "gemini-2.5-flash",
+    "powerful": "gemini-2.5-pro",
+    "light": "gemini-2.5-flash"
+  },
+  "hooks": {
+    "BeforeTool": [
+      {
+        "matcher": "write_file|replace",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "CREW_PLATFORM_DIR=.gemini bash .gemini/hooks/protect-system-files.sh"
+          }
+        ]
+      }
+    ],
+    "AfterTool": [
+      {
+        "matcher": "write_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "CREW_PLATFORM_DIR=.gemini bash .gemini/hooks/validate-frontmatter.sh"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .gemini/hooks/notify.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
