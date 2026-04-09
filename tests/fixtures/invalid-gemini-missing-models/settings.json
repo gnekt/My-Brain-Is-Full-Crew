@@ -1,0 +1,38 @@
+{
+  "platform": "Gemini CLI",
+  "hooks": {
+    "BeforeTool": [
+      {
+        "matcher": "write_file|replace",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "CREW_PLATFORM_DIR=.gemini bash .gemini/hooks/protect-system-files.sh"
+          }
+        ]
+      }
+    ],
+    "AfterTool": [
+      {
+        "matcher": "write_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "CREW_PLATFORM_DIR=.gemini bash .gemini/hooks/validate-frontmatter.sh"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .gemini/hooks/notify.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

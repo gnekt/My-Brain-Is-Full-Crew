@@ -67,6 +67,7 @@ normalize_opencode_plugin_spec() {
 
 validate_opencode_hook_artifacts() {
   local config_file="${BUILD_DIR}/opencode.json"
+  local managed_plugin_dir="${BUILD_DIR}/.crew"
   local plugin_type
   local plugins_type
   local managed_count=0
@@ -75,6 +76,9 @@ validate_opencode_hook_artifacts() {
   local -a managed_entries=()
 
   if [[ ! -f "$config_file" ]]; then
+    if [[ -d "$managed_plugin_dir" ]]; then
+      error "${config_file}: OpenCode config is missing while managed plugin artifacts exist"
+    fi
     return 0
   fi
 
@@ -100,7 +104,7 @@ validate_opencode_hook_artifacts() {
 
   managed_count=${#managed_entries[@]}
 
-  if [[ -d "${BUILD_DIR}/.crew" ]] && [[ "$managed_count" -eq 0 ]]; then
+  if [[ "$managed_count" -eq 0 ]]; then
     error "${config_file}: missing managed OpenCode plugin entry in singular plugin key"
     return
   fi
@@ -138,14 +142,22 @@ validate_opencode_hook_artifacts() {
 
 validate_gemini_hook_artifacts() {
   local settings_file="${BUILD_DIR}/settings.json"
+  local platform_name
 
   if [[ ! -f "$settings_file" ]]; then
     return 0
   fi
 
+  platform_name=$(json_eval "$settings_file" '.platform')
+  if [[ "$platform_name" != "Gemini CLI" ]]; then
+    return 0
+  fi
+
   local has_models
   has_models=$(json_eval "$settings_file" '.models | type')
-  [[ "$has_models" == "!!null" ]] && return 0
+  if [[ "$has_models" == "!!null" ]]; then
+    error "${settings_file}: Gemini settings.json is missing the models object"
+  fi
 
   local hooks_type
   hooks_type=$(json_eval "$settings_file" '.hooks | type')
@@ -207,7 +219,9 @@ validate_codex_hook_artifacts() {
 
   local has_models
   has_models=$(yq eval -p toml '.models | type' "$config_file" 2>/dev/null)
-  [[ "$has_models" == "!!null" ]] && return 0
+  if [[ "$has_models" == "!!null" ]]; then
+    error "${config_file}: Codex config.toml is missing the [models] table"
+  fi
 
   local hooks_enabled
   hooks_enabled=$(yq eval -p toml '.features.codex_hooks' "$config_file" 2>/dev/null)

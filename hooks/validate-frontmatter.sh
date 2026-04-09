@@ -22,6 +22,27 @@ INPUT=$(cat)
 FILE=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""' 2>/dev/null)
 COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""' 2>/dev/null)
 
+PLATFORM_DIR="${CREW_PLATFORM_DIR:-.claude}"
+PLATFORM_DIRS=".claude .gemini .codex .opencode"
+
+resolve_platform_dir() {
+  if [[ -n "${CREW_PLATFORM_DIR:-}" ]]; then
+    printf '%s' "$CREW_PLATFORM_DIR"
+    return 0
+  fi
+
+  for pd in $PLATFORM_DIRS; do
+    if [[ "$FILE" == *"${pd}/"* || "$COMMAND" == *"${pd}/"* ]]; then
+      printf '%s' "$pd"
+      return 0
+    fi
+  done
+
+  printf '%s' "$PLATFORM_DIR"
+}
+
+ACTIVE_PD="$(resolve_platform_dir)"
+
 validate_markdown_file() {
   local file="$1"
   local first_line delimiter_count frontmatter tab_char tab_lines problem_lines
@@ -29,9 +50,7 @@ validate_markdown_file() {
   [[ -n "$file" ]] || return 0
   [[ "$file" == *.md ]] || return 0
 
-  for _pd in .claude .gemini .codex .opencode; do
-    [[ "$file" == *"${_pd}/"* ]] && return 0
-  done
+  [[ "$file" == *"${ACTIVE_PD}/"* ]] && return 0
 
   [[ -f "$file" ]] || return 0
 
