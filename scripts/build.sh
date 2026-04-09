@@ -243,6 +243,40 @@ convert_tools_to_yaml_list() {
   } > "$file"
 }
 
+convert_tools_to_yaml_record() {
+  local file="$1"
+
+  local first_line
+  first_line=$(head -n 1 "$file")
+  [[ "$first_line" != "---" ]] && return 0
+
+  local frontmatter
+  frontmatter=$(extract_frontmatter "$file")
+
+  if ! printf '%s\n' "$frontmatter" | grep -q '^tools:'; then
+    return 0
+  fi
+
+  local tools_type
+  tools_type=$(printf '%s\n' "$frontmatter" | yq eval '.tools | type' -)
+
+  [[ "$tools_type" == "!!str" ]] || return 0
+
+  local new_frontmatter
+  # shellcheck disable=SC2016
+  new_frontmatter=$(printf '%s\n' "$frontmatter" | yq eval '(.tools | split(",") | map(. | sub("^[[:space:]]+"; "") | sub("[[:space:]]+$"; "")) | map(select(. != ""))) as $tools | .tools = ($tools | map({"key": ., "value": true}) | from_entries)' -)
+
+  local body
+  body=$(extract_body_after_frontmatter "$file")
+
+  {
+    printf '%s\n' "---"
+    printf '%s\n' "$new_frontmatter"
+    printf '%s\n' "---"
+    printf '%s\n' "$body"
+  } > "$file"
+}
+
 write_models_json_config() {
   local dst="$1"
   local platform_name="$2"
@@ -263,6 +297,158 @@ write_models_json_config() {
     printf '    "fast": "%s",\n' "$escaped_fast"
     printf '    "powerful": "%s",\n' "$escaped_powerful"
     printf '    "light": "%s"\n' "$escaped_light"
+    printf '  }\n'
+    printf '}\n'
+  } > "$dst"
+}
+
+write_opencode_config() {
+  local dst="$1"
+  local platform_name="$2"
+  local managed_plugin_spec="./.crew/crew-hooks.js"
+  local escaped_fast
+  local escaped_light
+  local escaped_plugin_spec
+
+  escaped_fast=$(escape_json_string "$MODEL_FAST")
+  escaped_light=$(escape_json_string "$MODEL_LIGHT")
+  escaped_plugin_spec=$(escape_json_string "$managed_plugin_spec")
+
+  {
+    printf '{\n'
+    # shellcheck disable=SC2016
+    printf '  "$schema": "https://opencode.ai/config.json",\n'
+    printf '  "model": "%s",\n' "$escaped_fast"
+    printf '  "small_model": "%s",\n' "$escaped_light"
+    printf '  "plugin": [\n'
+    printf '    "%s"\n' "$escaped_plugin_spec"
+    printf '  ]\n'
+    printf '}\n'
+  } > "$dst"
+}
+
+write_opencode_plugin() {
+  local dst="$1"
+  local plugin_source="$PLATFORMS_DIR/opencode-plugin.js"
+
+  [[ -f "$plugin_source" ]] || die "OpenCode plugin source not found: $plugin_source"
+  mkdir -p "$(dirname "$dst")"
+  cp "$plugin_source" "$dst"
+}
+
+write_gemini_settings_with_hooks() {
+  local dst="$1"
+  local platform_name="$2"
+  local escaped_platform_name
+  local escaped_fast
+  local escaped_powerful
+  local escaped_light
+
+  escaped_platform_name=$(escape_json_string "$platform_name")
+  escaped_fast=$(escape_json_string "$MODEL_FAST")
+  escaped_powerful=$(escape_json_string "$MODEL_POWERFUL")
+  escaped_light=$(escape_json_string "$MODEL_LIGHT")
+
+  {
+    printf '{\n'
+    printf '  "platform": "%s",\n' "$escaped_platform_name"
+    printf '  "models": {\n'
+    printf '    "fast": "%s",\n' "$escaped_fast"
+    printf '    "powerful": "%s",\n' "$escaped_powerful"
+    printf '    "light": "%s"\n' "$escaped_light"
+    printf '  },\n'
+    printf '  "hooks": {\n'
+    printf '    "BeforeTool": [\n'
+    printf '      {\n'
+    printf '        "matcher": "write_file|replace",\n'
+    printf '        "hooks": [\n'
+    printf '          {\n'
+    printf '            "type": "command",\n'
+    printf '            "command": "CREW_PLATFORM_DIR=.gemini bash .gemini/hooks/protect-system-files.sh"\n'
+    printf '          }\n'
+    printf '        ]\n'
+    printf '      }\n'
+    printf '    ],\n'
+    printf '    "AfterTool": [\n'
+    printf '      {\n'
+    printf '        "matcher": "write_file",\n'
+    printf '        "hooks": [\n'
+    printf '          {\n'
+    printf '            "type": "command",\n'
+    printf '            "command": "CREW_PLATFORM_DIR=.gemini bash .gemini/hooks/validate-frontmatter.sh"\n'
+    printf '          }\n'
+    printf '        ]\n'
+    printf '      }\n'
+    printf '    ],\n'
+    printf '    "Notification": [\n'
+    printf '      {\n'
+    printf '        "matcher": "",\n'
+    printf '        "hooks": [\n'
+    printf '          {\n'
+    printf '            "type": "command",\n'
+    printf '            "command": "bash .gemini/hooks/notify.sh"\n'
+    printf '          }\n'
+    printf '        ]\n'
+    printf '      }\n'
+    printf '    ]\n'
+    printf '  }\n'
+    printf '}\n'
+  } > "$dst"
+}
+
+write_codex_config_toml() {
+  local dst="$1"
+
+  {
+    printf '[models]\n'
+    printf 'fast = "%s"\n' "$(escape_toml_basic_string "$MODEL_FAST")"
+    printf 'powerful = "%s"\n' "$(escape_toml_basic_string "$MODEL_POWERFUL")"
+    printf 'light = "%s"\n' "$(escape_toml_basic_string "$MODEL_LIGHT")"
+    printf '\n'
+    printf '[features]\n'
+    printf 'codex_hooks = true\n'
+  } > "$dst"
+}
+
+write_codex_hooks_json() {
+  local dst="$1"
+
+  {
+    printf '{\n'
+    printf '  "hooks": {\n'
+    printf '    "PreToolUse": [\n'
+    printf '      {\n'
+    printf '        "matcher": "Bash",\n'
+    printf '        "hooks": [\n'
+    printf '          {\n'
+    printf '            "type": "command",\n'
+    printf '            "command": "CREW_PLATFORM_DIR=.codex bash .codex/hooks/protect-system-files.sh"\n'
+    printf '          }\n'
+    printf '        ]\n'
+    printf '      }\n'
+    printf '    ],\n'
+    printf '    "PostToolUse": [\n'
+    printf '      {\n'
+    printf '        "matcher": "Bash",\n'
+    printf '        "hooks": [\n'
+    printf '          {\n'
+    printf '            "type": "command",\n'
+    printf '            "command": "CREW_PLATFORM_DIR=.codex bash .codex/hooks/validate-frontmatter.sh"\n'
+    printf '          }\n'
+    printf '        ]\n'
+    printf '      }\n'
+    printf '    ],\n'
+    printf '    "Stop": [\n'
+    printf '      {\n'
+    printf '        "matcher": "",\n'
+    printf '        "hooks": [\n'
+    printf '          {\n'
+    printf '            "type": "command",\n'
+    printf '            "command": "bash .codex/hooks/notify.sh"\n'
+    printf '          }\n'
+    printf '        ]\n'
+    printf '      }\n'
+    printf '    ]\n'
     printf '  }\n'
     printf '}\n'
   } > "$dst"
@@ -293,21 +479,46 @@ generate_platform_config() {
       success "Created Claude config files and copied $hook_count hooks"
       ;;
     opencode)
-      write_models_json_config "$platform_build/opencode.json" "$platform_name"
-      success "Created opencode.json"
+      write_opencode_config "$platform_build/opencode.json" "$platform_name"
+      write_opencode_plugin "$platform_build/.crew/crew-hooks.js"
+      mkdir -p "$platform_build/hooks"
+      hook_count=0
+      for hook_file in "$REPO_DIR/hooks/"*.sh; do
+        [[ -f "$hook_file" ]] || continue
+        cp "$hook_file" "$platform_build/hooks/"
+        chmod +x "$platform_build/hooks/$(basename "$hook_file")"
+        hook_count=$((hook_count + 1))
+      done
+      success "Created opencode.json, managed plugin artifact, and copied $hook_count hooks"
       ;;
     gemini)
-      write_models_json_config "$platform_build/settings.json" "$platform_name"
-      success "Created settings.json"
+      mkdir -p "$platform_build/hooks"
+
+      local hook_count=0
+      local hook_file
+      for hook_file in "$REPO_DIR/hooks/"*.sh; do
+        [[ -f "$hook_file" ]] || continue
+        cp "$hook_file" "$platform_build/hooks/"
+        hook_count=$((hook_count + 1))
+      done
+
+      write_gemini_settings_with_hooks "$platform_build/settings.json" "$platform_name"
+      success "Created settings.json with native hooks and copied $hook_count hooks"
       ;;
     codex)
-      {
-        printf '[models]\n'
-        printf 'fast = "%s"\n' "$(escape_toml_basic_string "$MODEL_FAST")"
-        printf 'powerful = "%s"\n' "$(escape_toml_basic_string "$MODEL_POWERFUL")"
-        printf 'light = "%s"\n' "$(escape_toml_basic_string "$MODEL_LIGHT")"
-      } > "$platform_build/config.toml"
-      success "Created config.toml"
+      mkdir -p "$platform_build/hooks"
+
+      local hook_count=0
+      local hook_file
+      for hook_file in "$REPO_DIR/hooks/"*.sh; do
+        [[ -f "$hook_file" ]] || continue
+        cp "$hook_file" "$platform_build/hooks/"
+        hook_count=$((hook_count + 1))
+      done
+
+      write_codex_config_toml "$platform_build/config.toml"
+      write_codex_hooks_json "$platform_build/hooks.json"
+      success "Created config.toml, hooks.json, and copied $hook_count hooks"
       ;;
   esac
 }
@@ -415,6 +626,13 @@ build_platform() {
     for agent_file in "$platform_build/agents/"*.md; do
       [[ -f "$agent_file" ]] || continue
       convert_tools_to_yaml_list "$agent_file"
+    done
+    success "Tools converted"
+  elif [[ "$platform" == "opencode" ]]; then
+    info "Converting tools to YAML records..."
+    for agent_file in "$platform_build/agents/"*.md; do
+      [[ -f "$agent_file" ]] || continue
+      convert_tools_to_yaml_record "$agent_file"
     done
     success "Tools converted"
   fi
