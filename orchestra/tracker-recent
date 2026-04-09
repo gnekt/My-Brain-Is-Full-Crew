@@ -42,7 +42,7 @@ import json, sys
 from datetime import datetime, timedelta, timezone
 
 tracker_path, hours, mailbox_filter, as_json_flag = sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4] == "1"
-cutoff = (datetime.now(timezone.utc) - timedelta(hours=hours)).isoformat()
+cutoff = (datetime.now(timezone.utc) - timedelta(hours=hours)).strftime("%Y-%m-%dT%H:%M:%S")
 results = []
 with open(tracker_path) as f:
     for line in f:
@@ -50,7 +50,7 @@ with open(tracker_path) as f:
             e = json.loads(line)
         except Exception:
             continue
-        if e.get("active_at", "") < cutoff:
+        if e.get("active_at", "")[:19] < cutoff:
             continue
         if mailbox_filter and e.get("mailbox") != mailbox_filter:
             continue

@@ -10,24 +10,32 @@ Claude Code prompts the user for permission on every novel Bash command. When ag
 
 The installer (`scripts/launchme.sh`) copies these to `Meta/scripts/` inside your vault. They derive their vault path from their own location, so no configuration is needed.
 
-After installation, add these to your Claude Code settings (`~/.claude/settings.json`) under `permissions.allow`:
+After installation, add the orchestra scripts to your Claude Code permission allowlist. In `~/.claude/settings.json`, merge these entries into the `permissions.allow` array:
 
 ```json
-"Bash(Meta/scripts/hey-imbox:*)",
-"Bash(Meta/scripts/hey-feed:*)",
-"Bash(Meta/scripts/hey-trail:*)",
-"Bash(Meta/scripts/hey-later:*)",
-"Bash(Meta/scripts/hey-thread:*)",
-"Bash(Meta/scripts/hey-seen:*)",
-"Bash(Meta/scripts/hey-check:*)",
-"Bash(Meta/scripts/tracker-today:*)",
-"Bash(Meta/scripts/tracker-recent:*)",
-"Bash(Meta/scripts/tracker-search:*)",
-"Bash(Meta/scripts/tracker-mailbox:*)",
-"Bash(Meta/scripts/vault-stats:*)",
-"Bash(Meta/scripts/vault-inbox:*)",
-"Bash(Meta/scripts/contact-lookup:*)"
+{
+  "permissions": {
+    "allow": [
+      "Bash(Meta/scripts/hey-imbox:*)",
+      "Bash(Meta/scripts/hey-feed:*)",
+      "Bash(Meta/scripts/hey-trail:*)",
+      "Bash(Meta/scripts/hey-later:*)",
+      "Bash(Meta/scripts/hey-thread:*)",
+      "Bash(Meta/scripts/hey-seen:*)",
+      "Bash(Meta/scripts/hey-check:*)",
+      "Bash(Meta/scripts/tracker-today:*)",
+      "Bash(Meta/scripts/tracker-recent:*)",
+      "Bash(Meta/scripts/tracker-search:*)",
+      "Bash(Meta/scripts/tracker-mailbox:*)",
+      "Bash(Meta/scripts/vault-stats:*)",
+      "Bash(Meta/scripts/vault-inbox:*)",
+      "Bash(Meta/scripts/contact-lookup:*)"
+    ]
+  }
+}
 ```
+
+> If you already have a `permissions.allow` array, add the entries to it rather than replacing it.
 
 ## Scripts
 

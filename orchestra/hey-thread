@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Read a specific Hey thread by ID
-# Usage: hey-thread <topic_id>
+# Usage: hey-thread <posting_id>
 set -euo pipefail
 if [[ -z "${1:-}" ]]; then
-    echo "Usage: hey-thread <topic_id>" >&2
+    echo "Usage: hey-thread <posting_id>" >&2
     exit 1
 fi
 hey threads "$1" --json

@@ -31,10 +31,12 @@ with open(tracker_path) as f:
         if query in e.get("sender_name", "").lower() or query in e.get("sender_email", "").lower():
             results.append(e)
 
-# Dedupe by topic_id, keep latest
+# Dedupe by topic_id, keep latest (skip entries with no topic_id)
 seen = {}
 for e in results:
     tid = e.get("topic_id")
+    if not tid:
+        continue
     seen[tid] = e
 results = sorted(seen.values(), key=lambda x: x.get("active_at", ""), reverse=True)
 

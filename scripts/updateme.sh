@@ -266,8 +266,9 @@ if [[ -f "$REPO_DIR/settings.json" ]]; then
   fi
 fi
 
-# ── Deprecate removed orchestra scripts ──────────────────────────────────
+# ── Remove stale orchestra scripts ────────────────────────────────────────
 ORCH_MANIFEST="$VAULT_DIR/Meta/scripts/.core-manifest"
+REMOVED_SCRIPTS=0
 if [[ -d "$REPO_DIR/orchestra" && -f "$ORCH_MANIFEST" ]]; then
   while IFS= read -r old_script; do
     [[ -z "$old_script" ]] && continue
@@ -275,8 +276,8 @@ if [[ -d "$REPO_DIR/orchestra" && -f "$ORCH_MANIFEST" ]]; then
     vault_script="$VAULT_DIR/Meta/scripts/$old_script"
     [[ -f "$vault_script" ]] || continue
     rm "$vault_script"
-    warn "Removed deprecated script: $old_script"
-    DEPRECATED_COUNT=$((DEPRECATED_COUNT + 1))
+    warn "Removed stale script: $old_script"
+    REMOVED_SCRIPTS=$((REMOVED_SCRIPTS + 1))
   done < "$ORCH_MANIFEST"
 fi
 
@@ -312,12 +313,15 @@ fi
 
 # ── Summary ─────────────────────────────────────────────────────────────────
 echo ""
-if [[ $AGENT_COUNT -eq 0 && $REF_COUNT -eq 0 && $SKILL_COUNT -eq 0 && $HOOK_COUNT -eq 0 && $ORCH_COUNT -eq 0 && $DEPRECATED_COUNT -eq 0 && -z "$CLAUDE_MD_UPDATED" && -z "$SETTINGS_UPDATED" ]]; then
+if [[ $AGENT_COUNT -eq 0 && $REF_COUNT -eq 0 && $SKILL_COUNT -eq 0 && $HOOK_COUNT -eq 0 && $ORCH_COUNT -eq 0 && $DEPRECATED_COUNT -eq 0 && $REMOVED_SCRIPTS -eq 0 && -z "$CLAUDE_MD_UPDATED" && -z "$SETTINGS_UPDATED" ]]; then
   success "Everything is already up to date!"
 else
   success "Updated $AGENT_COUNT agent(s), $SKILL_COUNT skill(s), $REF_COUNT reference(s), $HOOK_COUNT hook(s), $ORCH_COUNT script(s)"
   if [[ $DEPRECATED_COUNT -gt 0 ]]; then
     warn "Deprecated $DEPRECATED_COUNT file(s) no longer in the project"
+  fi
+  if [[ $REMOVED_SCRIPTS -gt 0 ]]; then
+    warn "Removed $REMOVED_SCRIPTS stale script(s) from Meta/scripts/"
   fi
 fi
 echo ""

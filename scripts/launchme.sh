@@ -157,6 +157,19 @@ if [[ -d "$REPO_DIR/skills" ]]; then
   success "Copied $SKILL_COUNT skills"
 fi
 
+# ── Deprecate stale orchestra scripts on reinstall ──────────────────────────
+OLD_ORCH_MANIFEST="$VAULT_DIR/Meta/scripts/.core-manifest"
+if [[ $EXISTING -eq 1 && -f "$OLD_ORCH_MANIFEST" ]]; then
+  while IFS= read -r old_script; do
+    [[ -z "$old_script" ]] && continue
+    [[ -f "$REPO_DIR/orchestra/$old_script" ]] && continue
+    vault_script="$VAULT_DIR/Meta/scripts/$old_script"
+    [[ -f "$vault_script" ]] || continue
+    rm "$vault_script"
+    warn "Removed stale script: $old_script"
+  done < "$OLD_ORCH_MANIFEST"
+fi
+
 # ── Copy orchestra scripts ──────────────────────────────────────────────────
 ORCH_COUNT=0
 if [[ -d "$REPO_DIR/orchestra" ]]; then
