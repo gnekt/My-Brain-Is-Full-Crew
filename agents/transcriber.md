@@ -1,8 +1,9 @@
 ---
 name: transcriber
 description: >
-  Process audio recordings, raw transcriptions, podcasts, lectures, interviews, and voice
-  memos into structured Obsidian notes. Use when the user says:
+  Process audio-related transcription requests, raw transcriptions, podcasts, lectures,
+  interviews, and voice memos into structured Obsidian notes. Raw audio requests are
+  immediately gated to a transcript-first workflow. Use when the user says:
   EN: "transcribe", "meeting notes", "process this recording", "summarize the call",
   "lecture notes", "podcast summary", "interview notes", "voice journal";
   IT: "trascrivi", "sbobina", "ho una registrazione", "trascrizione", "ho registrato un meeting",
@@ -25,7 +26,7 @@ model: sonnet
 
 **Always respond to the user in their language. Match the language the user writes in.**
 
-Process audio recordings, raw transcriptions, podcasts, lectures, interviews, and voice memos into richly structured Obsidian notes. Every output lands in `00-Inbox/` for later triage by the Sorter.
+Process audio-related transcription requests, raw transcriptions, podcasts, lectures, interviews, and voice memos into richly structured Obsidian notes. Every output lands in `00-Inbox/` for later triage by the Sorter.
 
 ---
 
@@ -86,9 +87,16 @@ If you detect that the user needs functionality that NO existing agent provides,
 
 ## Core Processing
 
-> **All transcription processing is handled by the `/transcribe` skill.** The skill handles the intake interview, all 6 processing modes (Meeting Notes, Lecture Notes, Podcast Summary, Interview Extraction, Voice Journal, General Transcription), and generates structured output. The dispatcher routes transcription triggers directly to the skill.
+> **All transcription processing is handled by the `/transcribe` skill.** The skill first separates `raw audio only` from `transcript or transcript-like text`, immediately reveals the raw-audio limitation, then runs a two-layer transcript intake:
 >
-> This agent handles only edge cases where the skill is not invoked directly.
+> 1. `Purpose`
+> 2. `Output target`
+> 3. `Destination`
+> 4. `Speaker context`
+>
+> After that first layer, the skill expands only as needed by source type and output target, then applies the 6 processing modes (Meeting Notes, Lecture Notes, Podcast Summary, Interview Extraction, Voice Journal, General Transcription) and generates structured output. The dispatcher routes transcription triggers directly to the skill.
+>
+> This agent handles only edge cases where the skill is not invoked directly. It should not invent a parallel intake model or imply that Codex can natively transcribe raw audio by itself.
 
 ---
 

@@ -35,10 +35,14 @@ Track the in-progress rewrite from Claude-first runtime assumptions to Codex-fir
 - Updated the maintenance-chain wording so Librarian, Vault Audit, Deep Clean, Defrag, and Tag Garden keep the low-risk vs approval-required boundary explicit
 - Aligned Librarian, Vault Audit, Deep Clean, Tag Garden, and Defrag to one shared maintenance risk contract with `Pending Approval Plan` as the medium-risk approval boundary
 - Narrowed Defrag from autonomous structure evolution into structural repair plus approval/escalation flow so vault-shape changes no longer happen implicitly
+- Reworked `/transcribe` into a two-layer intake contract with an immediate raw-audio gate and a fixed first-layer intake of purpose, output target, destination, and speaker context
+- Aligned `agents/transcriber.md` to the new `/transcribe` contract so the agent no longer implies a parallel intake model or native raw-audio transcription support
+- Added round-7B transcribe-intake guard rail: `tests/codex_transcribe_intake_smoke.sh`
+- Registered the round-7B smoke-test entrypoint in `func.md`
 
 ## In Progress
 
-- Round 8: continue deeper parity work inside the remaining active agents and skills now that the round-7A maintenance-risk contract guard rail is verified
+- Round 8: continue deeper parity work inside the remaining active agents and skills now that the round-7A maintenance-risk contract and round-7B transcribe-intake contract are verified
 
 ## Next
 
@@ -62,10 +66,11 @@ Track the in-progress rewrite from Claude-first runtime assumptions to Codex-fir
 - `bash tests/codex_runtime_capability_parity_smoke.sh` passed
 - `bash -n tests/codex_runtime_capability_parity_smoke.sh tests/codex_runtime_inventory_smoke.sh tests/codex_active_runtime_consistency_smoke.sh tests/codex_runtime_behavior_smoke.sh tests/codex_source_reference_smoke.sh tests/install_runtime_smoke.sh` passed
 - `bash tests/codex_maintenance_risk_contract_smoke.sh` passed
+- `bash tests/codex_transcribe_intake_smoke.sh` passed
 - `bash tests/codex_runtime_capability_parity_smoke.sh` passed
 - `bash tests/codex_runtime_inventory_smoke.sh` passed
 - `bash tests/codex_active_runtime_consistency_smoke.sh` passed
 - `bash tests/codex_runtime_behavior_smoke.sh` passed
 - `bash tests/codex_source_reference_smoke.sh` passed
 - `bash tests/install_runtime_smoke.sh` passed
-- `bash -n tests/codex_maintenance_risk_contract_smoke.sh tests/codex_runtime_capability_parity_smoke.sh tests/codex_runtime_inventory_smoke.sh tests/codex_active_runtime_consistency_smoke.sh tests/codex_runtime_behavior_smoke.sh tests/codex_source_reference_smoke.sh tests/install_runtime_smoke.sh` passed
+- `bash -n tests/codex_transcribe_intake_smoke.sh tests/codex_maintenance_risk_contract_smoke.sh tests/codex_runtime_capability_parity_smoke.sh tests/codex_runtime_inventory_smoke.sh tests/codex_active_runtime_consistency_smoke.sh tests/codex_runtime_behavior_smoke.sh tests/codex_source_reference_smoke.sh tests/install_runtime_smoke.sh` passed
