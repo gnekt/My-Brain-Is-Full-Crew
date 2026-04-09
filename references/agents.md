@@ -66,7 +66,7 @@ All agents read `Meta/user-profile.md` for personalization. This file is created
 
 **Role**: Knowledge Graph & Link Analysis
 **Agent file**: `connector.md`
-**Responsibilities**: Analyzes the vault's link structure, discovers missing connections between notes, suggests wikilinks, and strengthens the knowledge graph. Handles serendipity mode, bridge notes, constellation view, and people network analysis.
+**Responsibilities**: Analyzes the vault's link structure, discovers missing connections between notes, suggests wikilinks, updates existing MOCs, and strengthens the knowledge graph inside existing structure. Handles serendipity mode, bridge-note opportunities, constellation view, and people network analysis without taking over structural governance. Bridge notes are explicit follow-through artifacts, not the default outcome of graph analysis.
 **Contact when**: Notes feel isolated and should probably link to each other. After a batch of notes is filed. MOC coverage seems low.
 
 ---

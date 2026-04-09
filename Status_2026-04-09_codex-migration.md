@@ -49,11 +49,16 @@ Track the in-progress rewrite from Claude-first runtime assumptions to Codex-fir
 - Added round-9 Seeker search-update contract smoke test: `tests/codex_seeker_search_update_contract_smoke.sh`
 - Registered the round-9 smoke-test entrypoint in `func.md`
 - Updated the round-6 capability parity smoke test so Seeker's edit-capable contract is validated against the newer narrow incidental-edit boundary instead of stale broad-update wording
+- Added round-10 Connector objective: align graph-first behavior, explicit bridge-note creation, and narrow structural escalation across the agent and shared references
+- Reworked `agents/connector.md` into an existing-structure-first graph contract and updated shared references so Connector no longer reads like a structural-governance agent
+- Added round-10 Connector graph-contract smoke test: `tests/codex_connector_graph_contract_smoke.sh`
+- Registered the round-10 smoke-test entrypoint in `func.md`
 
 ## In Progress
 
 - Round 8: continue deeper parity work inside the remaining active agents and skills now that the round-7A maintenance-risk contract, round-7B transcribe-intake contract, and round-8 Scribe capture contract guard rail are in place
 - Round 9: continue deeper parity work inside the remaining active agents and skills now that the round-9 Seeker retrieval-first contract guard rail is in place
+- Round 10: continue deeper parity work inside the remaining active agents and skills now that the round-10 Connector graph-contract guard rail is in place
 
 ## Next
 
@@ -98,3 +103,15 @@ Track the in-progress rewrite from Claude-first runtime assumptions to Codex-fir
 - `bash tests/codex_source_reference_smoke.sh` passed
 - `bash tests/install_runtime_smoke.sh` passed
 - `bash -n tests/codex_seeker_search_update_contract_smoke.sh tests/codex_scribe_capture_contract_smoke.sh tests/codex_transcribe_intake_smoke.sh tests/codex_maintenance_risk_contract_smoke.sh tests/codex_runtime_capability_parity_smoke.sh tests/codex_runtime_inventory_smoke.sh tests/codex_active_runtime_consistency_smoke.sh tests/codex_runtime_behavior_smoke.sh tests/codex_source_reference_smoke.sh tests/install_runtime_smoke.sh` passed
+- `bash tests/codex_connector_graph_contract_smoke.sh` passed
+- `bash tests/codex_runtime_capability_parity_smoke.sh` passed after aligning the Connector expectation to the round-10 explicit bridge-note contract
+- `bash tests/codex_seeker_search_update_contract_smoke.sh` passed
+- `bash tests/codex_scribe_capture_contract_smoke.sh` passed
+- `bash tests/codex_transcribe_intake_smoke.sh` passed
+- `bash tests/codex_maintenance_risk_contract_smoke.sh` passed
+- `bash tests/codex_runtime_inventory_smoke.sh` passed
+- `bash tests/codex_active_runtime_consistency_smoke.sh` passed
+- `bash tests/codex_runtime_behavior_smoke.sh` passed
+- `bash tests/codex_source_reference_smoke.sh` passed
+- `bash tests/install_runtime_smoke.sh` passed
+- `bash -n tests/codex_connector_graph_contract_smoke.sh tests/codex_seeker_search_update_contract_smoke.sh tests/codex_scribe_capture_contract_smoke.sh tests/codex_transcribe_intake_smoke.sh tests/codex_maintenance_risk_contract_smoke.sh tests/codex_runtime_capability_parity_smoke.sh tests/codex_runtime_inventory_smoke.sh tests/codex_active_runtime_consistency_smoke.sh tests/codex_runtime_behavior_smoke.sh tests/codex_source_reference_smoke.sh tests/install_runtime_smoke.sh` passed

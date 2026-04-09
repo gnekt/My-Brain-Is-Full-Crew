@@ -45,6 +45,7 @@ Rule:
 | `codex-transcribe-intake-smoke` | `tests/codex_transcribe_intake_smoke.sh` | Smoke-test the round-7B raw-audio gate, two-layer transcript intake, and transcriber alignment contract | Guards round-7B transcribe intake cleanup |
 | `codex-scribe-capture-contract-smoke` | `tests/codex_scribe_capture_contract_smoke.sh` | Smoke-test the round-8 Scribe fast-capture contract, shared reference wording, and lightweight mode defaults | Guards round-8 Scribe capture cleanup |
 | `codex-seeker-search-update-contract-smoke` | `tests/codex_seeker_search_update_contract_smoke.sh` | Smoke-test the round-9 Seeker retrieval-first contract, narrow incidental-edit boundary, conflict-analyze rules, and shared reference wording | Guards round-9 Seeker search-update cleanup |
+| `codex-connector-graph-contract-smoke` | `tests/codex_connector_graph_contract_smoke.sh` | Smoke-test the round-10 Connector graph-first contract, explicit bridge-note creation rule, and shared reference wording | Guards round-10 Connector graph-contract cleanup |
 
 ## Migration Notes
 

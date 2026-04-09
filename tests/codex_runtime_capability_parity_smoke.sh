@@ -26,8 +26,8 @@ if ! rg -n '^tools: Read, Write, Edit, Glob, Grep$' agents/connector.md >/dev/nu
   exit 1
 fi
 
-if ! rg -n 'create the bridge note if the user wants|create bridge notes when the workflow explicitly calls for one' agents/connector.md >/dev/null; then
-  echo "Connector no longer documents bridge-note creation despite round 6 graph-write scope." >&2
+if ! rg -n 'create bridge notes only when the user explicitly requests a bridge-note workflow or the current mode is Bridge Notes' agents/connector.md >/dev/null; then
+  echo "Connector no longer documents the explicit bridge-note creation contract despite round 6 graph-write scope." >&2
   exit 1
 fi
 
