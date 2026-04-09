@@ -323,6 +323,74 @@ load_platform_env() {
   source "$env_file"
 }
 
+dispatcher_conflict_platform_name() {
+  case "$1" in
+    opencode)
+      printf '%s' 'Codex CLI'
+      ;;
+    codex)
+      printf '%s' 'OpenCode'
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+dispatcher_conflict_install_root() {
+  case "$1" in
+    opencode)
+      printf '%s' "$VAULT_DIR/.codex"
+      ;;
+    codex)
+      printf '%s' "$VAULT_DIR/.opencode"
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+dispatcher_conflict_config_file() {
+  case "$1" in
+    opencode)
+      printf '%s' "$VAULT_DIR/.codex/config.toml"
+      ;;
+    codex)
+      printf '%s' "$VAULT_DIR/.opencode/opencode.json"
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+enforce_dispatcher_platform_exclusion() {
+  local conflicting_platform_name=""
+  local conflicting_install_root=""
+  local conflicting_config_file=""
+
+  case "$PLATFORM" in
+    opencode|codex)
+      ;;
+    *)
+      return 0
+      ;;
+  esac
+
+  conflicting_platform_name="$(dispatcher_conflict_platform_name "$PLATFORM")"
+  conflicting_install_root="$(dispatcher_conflict_install_root "$PLATFORM")"
+  conflicting_config_file="$(dispatcher_conflict_config_file "$PLATFORM")"
+
+  [[ -f "$VAULT_DIR/AGENTS.md" ]] || return 0
+  [[ -d "$conflicting_install_root/agents" ]] || return 0
+  [[ -d "$conflicting_install_root/references" ]] || return 0
+  [[ -f "$conflicting_install_root/references/agents.md" ]] || return 0
+  [[ -f "$conflicting_config_file" ]] || return 0
+
+  die "$PLATFORM_NAME and $conflicting_platform_name cannot be installed together in the same vault because both manage the root AGENTS.md dispatcher. Remove the existing $conflicting_platform_name install or configure a custom dispatcher setup before running launchme.sh."
+}
+
 prepend_deprecation_header() {
   local file_path="$1"
   local tmp_file=""
@@ -954,6 +1022,8 @@ if [[ -z "$VAULT_OVERRIDE" && $YES_MODE -eq 0 ]]; then
     [[ -d "$VAULT_DIR" ]] || die "Directory not found: $VAULT_DIR"
   fi
 fi
+
+enforce_dispatcher_platform_exclusion
 
 INSTALL_ROOT="$VAULT_DIR/$PLATFORM_DIR"
 DISPATCHER_TARGET="$VAULT_DIR/$DISPATCHER_FILE"

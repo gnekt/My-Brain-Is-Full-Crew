@@ -247,6 +247,8 @@ The installer sets up the Crew for your preferred platform:
 
 All platforms support the same 8 agents and 14 skills. `launchme.sh` installs your chosen platform automatically.
 
+> **Current limitation:** OpenCode and Codex CLI both use the root `AGENTS.md` dispatcher. The stock installer/updater supports only one of them per vault at a time unless you configure a custom dispatcher setup yourself.
+
 #### Hook support matrix
 
 The hook layer is generated and installed differently per platform. The table below reflects the current codebase and generated artifacts.
@@ -321,6 +323,8 @@ In `--yes` mode without `--platform`, the installer defaults to **Claude Code**.
 During interactive installation for specific platforms, the script will prompt you for your preferred models (Fast, Powerful, and Light). These choices are persisted in `<vault>/<platform-dir>/.installer-models.env` and reused during updates.
 
 The script copies the agents and skills into your vault's platform directory (e.g., `.claude/` or `.opencode/`). When your AI tool is open in your vault folder, the agents activate automatically.
+
+If you use OpenCode or Codex CLI, install only one of them per vault with the stock scripts. They both manage the root `AGENTS.md` file, so `launchme.sh` blocks co-installation unless you bring your own custom dispatcher configuration.
 
 > **Never used a terminal before?** See the [step-by-step guide for beginners](docs/getting-started.md). It walks you through everything, or just show this page to a tech-savvy friend. It takes 60 seconds.
 
@@ -433,6 +437,8 @@ bash scripts/updateme.sh
 
 The updater detects all installed platforms in your vault, preserves your custom agents, and rebuilds the core agents using your saved model preferences. Only changed files are updated; your vault notes are never touched.
 
+If a vault contains both OpenCode and Codex installs, the stock updater now stops and asks you to resolve the shared `AGENTS.md` ownership first.
+
 ---
 
 ## Requirements
@@ -536,7 +542,7 @@ your-vault/
 └── ... your Obsidian notes
 ```
 
-Other platforms follow the same structure using their own directory and dispatcher names (e.g., `.gemini/` and `GEMINI.md`).
+Other platforms follow the same structure with their own platform directory. Claude uses `CLAUDE.md`, Gemini uses `GEMINI.md`, and OpenCode/Codex each use `AGENTS.md` when installed individually.
 
 ---
 

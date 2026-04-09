@@ -8,9 +8,11 @@ A step-by-step guide for setting up your AI-powered vault. No technical backgrou
 
 ### Required
 - **Obsidian**: A free note-taking app. Download it at [obsidian.md](https://obsidian.md)
-- **Claude Code**: Anthropic's coding assistant. You need a Claude Pro, Max, or Team subscription.
+- **A supported AI platform**: **Claude Code**, **OpenCode**, **Gemini CLI**, or **Codex CLI**
 - **An Obsidian vault**: This is just a folder on your computer where Obsidian stores your notes. If you don't have one yet, Obsidian will create one for you when you first open it.
 - **Git**: A tool to download the project. On Mac, the terminal will prompt you to install it automatically the first time you use it. On Windows, download it from [git-scm.com](https://git-scm.com).
+
+If you choose **Claude Code**, you need a Claude Pro, Max, or Team subscription.
 
 ### Optional (but recommended)
 - **Gmail account**: If you want the Postman agent to process your Gmail inbox (via GWS CLI or MCP)
@@ -57,11 +59,16 @@ Don't worry if this feels like a lot. The Architect agent will remind you about 
 
 ---
 
-## Step 2: Install Claude Code
+## Step 2: Install your AI tool
 
-1. Go to [claude.ai/code](https://claude.ai/code) and follow the instructions to install Claude Code
-2. You need a **Claude Pro**, **Max**, or **Team** subscription
-3. You can use either the **Desktop app** (Cowork) or the **CLI** (command-line interface). The Crew works on both
+Install the AI tool you want to use with the Crew:
+
+- **Claude Code**: [claude.ai/code](https://claude.ai/code)
+- **OpenCode**
+- **Gemini CLI**
+- **Codex CLI**
+
+The installer supports all four platforms. Claude Code works with either the Desktop app (Cowork) or the CLI.
 
 ---
 
@@ -88,17 +95,37 @@ cd My-Brain-Is-Full-Crew
 bash scripts/launchme.sh
 ```
 
-The script will ask two quick questions:
-1. **Is this your vault folder?** Confirm or enter the correct path
-2. **Do you use Gmail, Hey.com, or Google Calendar?** Choose yes to set up the Postman integration
+In the stock interactive flow, the installer will:
+1. Ask which supported platform you want to install
+2. Confirm your vault folder (or let you enter a different path)
+3. If you choose OpenCode, Gemini CLI, or Codex CLI, prompt for model preferences for that platform
+4. For Claude installs, optionally offer Gmail + Calendar MCP setup
 
-When it's done, your vault will look like this:
+If you want more control, `launchme.sh` also supports advanced flags such as:
+
+```bash
+# Install for a specific platform without prompts
+bash scripts/launchme.sh --platform claude --yes
+
+# Point the installer at a specific vault
+bash scripts/launchme.sh --vault /path/to/vault
+
+# Override model selections directly
+bash scripts/launchme.sh --platform gemini --model-fast gemini-2.5-flash
+
+# Load model overrides from a file
+bash scripts/launchme.sh --platform opencode --overrides ./my-models.env
+```
+
+> **Platform note:** OpenCode and Codex CLI both use the root `AGENTS.md` dispatcher. With the stock installer, use only one of them per vault.
+
+When it's done, your vault will contain a platform directory plus the matching dispatcher file. For a Claude Code install, it looks like this:
 
 ```
 your-vault/
 ├── .claude/
 │   ├── agents/          ← 8 lightweight crew agents
-│   ├── skills/          ← 13 specialized skills for complex flows
+│   ├── skills/          ← 14 specialized skills for complex flows
 │   └── references/      ← shared docs the agents read
 ├── CLAUDE.md            ← project instructions
 ├── .mcp.json            ← Gmail + Calendar (only if you said yes)
@@ -108,18 +135,16 @@ your-vault/
 
 > **Something went wrong?** The most common issue is that `git` isn't installed. On Mac, the terminal will prompt you to install it automatically. On Windows, download it from [git-scm.com](https://git-scm.com). If you're stuck, just show this page to a tech-savvy friend. It takes 60 seconds.
 
+Other platforms follow the same general structure with their own platform directory. Claude uses `CLAUDE.md`, Gemini uses `GEMINI.md`, and OpenCode/Codex each use `AGENTS.md` when installed individually.
+
 ---
 
 ## Step 4: Connect your vault
 
-1. Open Claude Code (CLI or Desktop)
-2. Open it **inside your Obsidian vault folder**. This is important: Claude needs to be in your vault to read and write your notes.
+1. Open your chosen AI tool
+2. Open it **inside your Obsidian vault folder**. This is important: the tool needs to be in your vault to read and write your notes.
 
-If you're using the CLI:
-```bash
-cd /path/to/your-vault
-claude
-```
+If you're using a CLI tool, open your terminal in the vault folder before launching it.
 
 If you're using Claude Code Desktop (Cowork), open the vault folder as your working directory.
 
@@ -160,7 +185,7 @@ You don't need to manage these files — agents handle them automatically. Each 
 
 ## Step 6: Start using it
 
-From now on, you just talk to Claude. Here are some things to try on your first day:
+From now on, you just talk to your AI tool. Here are some things to try on your first day:
 
 ### Capture some thoughts
 > "Save this: I had an idea about reorganizing the team standup. Maybe we should do async updates on Mondays and only meet on Wednesdays"
@@ -211,10 +236,10 @@ The Crew works best with simple daily routines:
 ## Troubleshooting
 
 ### "The agent doesn't seem to activate"
-Make sure Claude Code is open inside your vault folder (not a different directory). Verify agent files exist at `.claude/agents/` and skill files at `.claude/skills/` in your vault. Try saying the trigger phrase differently. Agents and skills understand natural language in multiple languages.
+Make sure your AI tool is open inside your vault folder (not a different directory). Verify the installed platform directory exists in your vault (for example, `.claude/agents/` and `.claude/skills/` for Claude Code). Try saying the trigger phrase differently. Agents and skills understand natural language in multiple languages.
 
 ### "Email/Calendar isn't working"
-The Postman needs at least one email backend: GWS CLI (`gws`), Hey CLI (`hey`), or MCP connectors. For GWS, see `docs/gws-setup-guide.md`. For Hey, install from [github.com/basecamp/hey-cli](https://github.com/basecamp/hey-cli) and run `hey auth login`. For MCP, run the installer again (`bash scripts/launchme.sh`) and answer **yes** to the Gmail/Calendar question, or manually copy `.mcp.json` from the repo to your vault root.
+The Postman needs at least one email backend: GWS CLI (`gws`), Hey CLI (`hey`), or MCP connectors. For GWS, see `docs/gws-setup-guide.md`. For Hey, install from [github.com/basecamp/hey-cli](https://github.com/basecamp/hey-cli) and run `hey auth login`. For Claude Code installs, you can run the installer again (`bash scripts/launchme.sh`) and answer **yes** to the Gmail/Calendar question, or manually copy `.mcp.json` from the repo to your vault root.
 
 ### "My vault structure looks different from the docs"
 The Architect customizes the structure based on your onboarding answers.
@@ -228,6 +253,9 @@ bash scripts/updateme.sh
 ```
 
 Only changed files are updated. Your vault notes are never touched.
+
+### "The installer says OpenCode and Codex can't be used together"
+That message is expected with the stock scripts. OpenCode and Codex CLI both manage the root `AGENTS.md` dispatcher, so the installer and updater allow only one of them per vault at a time. If you want to switch, remove the existing stock install first. If you want both in one vault, you need your own custom dispatcher setup.
 
 ### "An agent did something weird"
 Open an issue on GitHub with:

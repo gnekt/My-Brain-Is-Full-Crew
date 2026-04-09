@@ -148,6 +148,23 @@ detect_installed_platforms() {
   done
 }
 
+installed_platform_list_contains() {
+  local needle="$1"
+  local platform=""
+
+  for platform in "${INSTALLED_PLATFORMS[@]}"; do
+    [[ "$platform" == "$needle" ]] && return 0
+  done
+
+  return 1
+}
+
+enforce_dispatcher_platform_exclusion() {
+  if installed_platform_list_contains opencode && installed_platform_list_contains codex; then
+    die "OpenCode and Codex CLI cannot be updated together in the same vault because both manage the root AGENTS.md dispatcher. Remove one install or configure a custom dispatcher setup before running updateme.sh."
+  fi
+}
+
 join_by_comma() {
   local joined=""
   local item=""
@@ -726,6 +743,8 @@ prepare_platform_source() {
 }
 
 detect_installed_platforms
+
+enforce_dispatcher_platform_exclusion
 
 if [[ ${#INSTALLED_PLATFORMS[@]} -eq 0 ]]; then
   die "No managed platform installs found in $VAULT_DIR — expected project markers for .claude, .opencode, .gemini, or .codex"
