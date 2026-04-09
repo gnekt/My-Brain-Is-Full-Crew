@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# Hook: Validate Frontmatter (PostToolUse on Write)
+# Hook: Validate Frontmatter (PostToolUse / AfterTool on Write)
 # =============================================================================
 # After writing a .md file to the vault, checks that YAML frontmatter is
 # properly formed. Obsidian relies on frontmatter for metadata, Dataview
@@ -11,6 +11,8 @@
 #   2. No tabs in frontmatter (YAML uses spaces only)
 #   3. Colons in values must be quoted
 #
+# Cross-platform: CREW_PLATFORM_DIR selects the platform directory to skip.
+#
 # Exit codes:
 #   0 = all good
 #   1 = warning (issue found, but operation is not blocked)
@@ -18,47 +20,68 @@
 
 INPUT=$(cat)
 FILE=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""' 2>/dev/null)
+COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""' 2>/dev/null)
 
-# Skip if we can't extract a path
-[[ -z "$FILE" ]] && exit 0
+validate_markdown_file() {
+  local file="$1"
+  local first_line delimiter_count frontmatter tab_char tab_lines problem_lines
 
-# Only check .md files
-[[ "$FILE" == *.md ]] || exit 0
+  [[ -n "$file" ]] || return 0
+  [[ "$file" == *.md ]] || return 0
 
-# Skip system files (agents, skills, references)
-[[ "$FILE" == *".claude/"* ]] && exit 0
+  for _pd in .claude .gemini .codex .opencode; do
+    [[ "$file" == *"${_pd}/"* ]] && return 0
+  done
 
-# Skip if file doesn't exist (deleted or moved)
-[[ -f "$FILE" ]] || exit 0
+  [[ -f "$file" ]] || return 0
 
-# ── Check 1: frontmatter delimiters ─────────────────────────────────────────
-FIRST_LINE=$(head -1 "$FILE")
-if [[ "$FIRST_LINE" == "---" ]]; then
-  # Count opening and closing delimiters (lines that are exactly ---)
-  DELIMITER_COUNT=$(grep -c "^---$" "$FILE" 2>/dev/null || echo "0")
-  if [[ "$DELIMITER_COUNT" -lt 2 ]]; then
-    echo "WARNING: Frontmatter in $(basename "$FILE") is missing the closing '---' delimiter. Obsidian will not parse metadata correctly."
-    exit 1
+  first_line=$(head -1 "$file")
+  if [[ "$first_line" == "---" ]]; then
+    delimiter_count=$(grep -c "^---$" "$file" 2>/dev/null || echo "0")
+    if [[ "$delimiter_count" -lt 2 ]]; then
+      echo "WARNING: Frontmatter in $(basename "$file") is missing the closing '---' delimiter. Obsidian will not parse metadata correctly."
+      return 1
+    fi
+
+    frontmatter=$(sed -n '2,/^---$/p' "$file" | head -n -1)
+
+    tab_char="$(printf '\t')"
+    if echo "$frontmatter" | grep -q "$tab_char"; then
+      tab_lines=$(echo "$frontmatter" | grep -n "$tab_char" | head -3)
+      echo "WARNING: Frontmatter in $(basename "$file") contains tabs. YAML requires spaces for indentation. Lines with tabs: $tab_lines"
+      return 1
+    fi
+
+    if echo "$frontmatter" | grep -qE '^[a-zA-Z_-]+: .+: '; then
+      problem_lines=$(echo "$frontmatter" | grep -nE '^[a-zA-Z_-]+: .+: ' | head -3)
+      echo "WARNING: Frontmatter in $(basename "$file") may have unquoted colons in values. Wrap the value in quotes to avoid YAML parse errors. Problem lines: $problem_lines"
+      return 1
+    fi
   fi
 
-  # Extract frontmatter content (between first and second ---)
-  FRONTMATTER=$(sed -n '2,/^---$/p' "$FILE" | head -n -1)
+  return 0
+}
 
-  # ── Check 2: tabs in frontmatter ────────────────────────────────────────
-  TAB_CHAR="$(printf '\t')"
-  if echo "$FRONTMATTER" | grep -q "$TAB_CHAR"; then
-    TAB_LINES=$(echo "$FRONTMATTER" | grep -n "$TAB_CHAR" | head -3)
-    echo "WARNING: Frontmatter in $(basename "$FILE") contains tabs. YAML requires spaces for indentation. Lines with tabs: $TAB_LINES"
-    exit 1
-  fi
+extract_markdown_paths_from_command() {
+  local command="$1"
 
-  # ── Check 3: common YAML errors ────────────────────────────────────────
-  # Unquoted values with colons (e.g., "title: My Note: Part 2" breaks YAML)
-  if echo "$FRONTMATTER" | grep -qE '^[a-zA-Z_-]+: .+: '; then
-    PROBLEM_LINES=$(echo "$FRONTMATTER" | grep -nE '^[a-zA-Z_-]+: .+: ' | head -3)
-    echo "WARNING: Frontmatter in $(basename "$FILE") may have unquoted colons in values. Wrap the value in quotes to avoid YAML parse errors. Problem lines: $PROBLEM_LINES"
-    exit 1
-  fi
+  [[ -n "$command" ]] || return 0
+  printf '%s\n' "$command" | grep -oE '([.]{1,2}/)?[[:alnum:]_./-]+\.md' | sort -u || true
+}
+
+if [[ -n "$FILE" ]]; then
+  validate_markdown_file "$FILE"
+  exit $?
 fi
+
+candidate_paths=$(extract_markdown_paths_from_command "$COMMAND")
+[[ -n "$candidate_paths" ]] || exit 0
+
+while IFS= read -r candidate; do
+  [[ -n "$candidate" ]] || continue
+  if ! validate_markdown_file "$candidate"; then
+    exit 1
+  fi
+done <<< "$candidate_paths"
 
 exit 0
