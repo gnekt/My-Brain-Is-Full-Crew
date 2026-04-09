@@ -47,7 +47,7 @@ All agents read `Meta/user-profile.md` for personalization. This file is created
 
 **Role**: Inbox Triage & Filing
 **Agent file**: `sorter.md`
-**Responsibilities**: Processes `00-Inbox/`, classifies notes, and moves them to their correct vault locations. Updates MOC files after filing. Handles smart batching, priority triage, and project pulse reporting.
+**Responsibilities**: Processes `00-Inbox/`, classifies notes, files clear low-risk items immediately, and leaves unsafe items in `Needs Review` without blocking the rest of triage. Updates MOC files after filing. Handles smart batching, priority triage, and project pulse reporting as downstream reporting layers.
 **Skills**: Standard inbox triage is handled by the `/inbox-triage` skill.
 **Contact when**: Notes are piling up in the inbox. A note was filed somewhere wrong. MOC files seem out of date.
 

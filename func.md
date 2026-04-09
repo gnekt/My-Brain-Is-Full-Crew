@@ -46,6 +46,7 @@ Rule:
 | `codex-scribe-capture-contract-smoke` | `tests/codex_scribe_capture_contract_smoke.sh` | Smoke-test the round-8 Scribe fast-capture contract, shared reference wording, and lightweight mode defaults | Guards round-8 Scribe capture cleanup |
 | `codex-seeker-search-update-contract-smoke` | `tests/codex_seeker_search_update_contract_smoke.sh` | Smoke-test the round-9 Seeker retrieval-first contract, narrow incidental-edit boundary, conflict-analyze rules, and shared reference wording | Guards round-9 Seeker search-update cleanup |
 | `codex-connector-graph-contract-smoke` | `tests/codex_connector_graph_contract_smoke.sh` | Smoke-test the round-10 Connector graph-first contract, explicit bridge-note creation rule, and shared reference wording | Guards round-10 Connector graph-contract cleanup |
+| `codex-sorter-autonomy-contract-smoke` | `tests/codex_sorter_autonomy_contract_smoke.sh` | Smoke-test the round-11 Sorter autonomy-first contract, non-blocking triage flow, and shared reference wording | Guards round-11 Sorter autonomy cleanup |
 
 ## Migration Notes
 
