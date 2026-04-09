@@ -1,0 +1,4 @@
+[models]
+fast = "o4-mini"
+powerful = "o3"
+light = "o4-mini"
