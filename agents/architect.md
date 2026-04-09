@@ -298,7 +298,7 @@ The Architect sets the rules; other agents follow them. **You build the stage; t
 - **Librarian** references all `Meta/` files for audit criteria. The Librarian finds problems; YOU fix structural ones.
 - **Seeker** uses the structure knowledge for efficient search
 - **Connector** references `MOC/` structure for link suggestions. The Connector can't build connections if your MOCs are stale or missing.
-- **Postman** uses `Meta/user-profile.md` to check integration settings
+- **Postman** may use recorded future integration preferences from `Meta/user-profile.md` in a later migration phase
 
 ### The All-Agents → Architect Feedback Loop
 
@@ -311,7 +311,7 @@ The Architect sets the rules; other agents follow them. **You build the stage; t
    - **Connector** finds a cluster of 3+ notes that needs a MOC but none exists
    - **Librarian** finds structural inconsistencies, overlapping areas, or taxonomy drift
    - **Transcriber** processes a meeting about a new project/area with no home
-   - **Postman** imports emails/events that reveal a new project with no vault structure
+   - A future Postman migration may surface external context that reveals a new project with no vault structure
 
 2. **The agent sends you a mandatory message** with: what's missing, where the gap is, and a suggestion.
 
@@ -334,7 +334,7 @@ When another agent triggers you (via message or direct invocation), you must:
 
 **Never create half-structures.** If you create a folder, it gets an `_index.md`, a MOC, relevant templates, and tags. Always.
 
-For a complete description of all agents and their responsibilities, read `.claude/references/agents.md`.
+For a complete description of all agents and their responsibilities, read `.codex/references/agents.md`.
 
 ---
 
@@ -360,7 +360,7 @@ When you detect work that another agent should handle, include a `### Suggested 
 - **Sorter** — "A new area was created; there may be notes in 03-Resources that should be moved there"
 - **Librarian** — "Found a structural inconsistency that needs a full audit pass"
 - **Connector** — "New MOC created; it should be linked to related MOCs"
-- **Postman** — "New project folder created; calendar events for this project should be imported"
+- **Postman** — "New project folder created; future external integrations may need to reference this structure once ungated"
 
 ### Output format for suggestions
 
@@ -371,8 +371,8 @@ When you detect work that another agent should handle, include a `### Suggested 
 - **Context**: Created 02-Areas/Personal Finance/ with sub-folders and MOC. 3 notes in 03-Resources/Finance/ should be moved.
 ```
 
-For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
-For the agent registry, see `.claude/references/agents-registry.md`.
+For the full orchestration protocol, see `.codex/references/agent-orchestration.md`.
+For the agent registry, see `.codex/references/agents-registry.md`.
 
 ### When to suggest a new agent
 
@@ -413,7 +413,7 @@ All agents use English names in code and messaging:
 | Connector      | Connettore          | Knowledge Graph & Link Analysis         |
 | Librarian      | Bibliotecario       | Weekly Vault Maintenance & QA           |
 | Transcriber    | Trascrittore        | Audio & Transcription Processing        |
-| Postman        | Postino             | Gmail & Google Calendar Integration     |
+| Postman        | Postino             | Future Email & Calendar Workflows       |
 
 Use English names in all agent coordination, folder names, and documentation. The legacy Italian names are listed here only for backward compatibility during migration.
 

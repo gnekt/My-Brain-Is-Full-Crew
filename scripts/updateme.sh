@@ -30,12 +30,14 @@ die()     { echo -e "\n   ${RED}Error: $*${NC}\n" >&2; exit 1; }
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 VAULT_DIR="$(cd "$REPO_DIR/.." && pwd)"
+RUNTIME_DIR="$VAULT_DIR/.codex"
 
 [[ -d "$REPO_DIR/agents" ]] || die "Can't find agents/ — are you running this from the repo?"
+[[ -f "$REPO_DIR/AGENTS.md" ]] || die "Can't find AGENTS.md — are you running this from the repo?"
 
 # ── Check vault has been set up ─────────────────────────────────────────────
-if [[ ! -d "$VAULT_DIR/.claude/agents" ]]; then
-  die "No .claude/agents/ found in $VAULT_DIR — run launchme.sh first"
+if [[ ! -d "$RUNTIME_DIR/agents" ]]; then
+  die "No .codex/agents/ found in $VAULT_DIR — run launchme.sh first"
 fi
 
 # ── Banner ──────────────────────────────────────────────────────────────────
@@ -46,8 +48,8 @@ echo -e "${BOLD}╚════════════════════�
 echo ""
 
 # ── Confirm overwrite ────────────────────────────────────────────────────
-echo -e "${BOLD}This will overwrite core agent files, references, and CLAUDE.md.${NC}"
-echo -e "   ${DIM}Custom agent files in .claude/agents/ will not be deleted or overwritten.${NC}"
+echo -e "${BOLD}This will overwrite core agent files, references, and AGENTS.md.${NC}"
+echo -e "   ${DIM}Custom agent files in .codex/agents/ will not be deleted or overwritten.${NC}"
 echo -e "   ${DIM}Custom agent entries in registry/directory will be preserved during update.${NC}"
 echo -e "   ${DIM}Your vault notes are never touched.${NC}"
 echo ""
@@ -66,9 +68,9 @@ echo ""
 # Read the OLD manifest first (before rewriting it) so we know which files
 # were previously installed as core. Agents removed from the repo will still
 # be in the old manifest and can be correctly deprecated.
-MANIFEST="$VAULT_DIR/.claude/agents/.core-manifest"
+MANIFEST="$RUNTIME_DIR/agents/.core-manifest"
 DEPRECATED_COUNT=0
-for vault_agent in "$VAULT_DIR/.claude/agents/"*.md; do
+for vault_agent in "$RUNTIME_DIR/agents/"*.md; do
   [[ -f "$vault_agent" ]] || continue
   name="$(basename "$vault_agent")"
   # Skip if it still exists in repo
@@ -84,13 +86,13 @@ for vault_agent in "$VAULT_DIR/.claude/agents/"*.md; do
     continue
   fi
   deprecated_name="${name%.md}-DEPRECATED.md"
-  mkdir -p "$VAULT_DIR/.claude/deprecated"
+  mkdir -p "$RUNTIME_DIR/deprecated"
   # Skip if already deprecated in a previous run
-  [[ -f "$VAULT_DIR/.claude/deprecated/$deprecated_name" ]] && continue
-  mv "$vault_agent" "$VAULT_DIR/.claude/deprecated/$deprecated_name"
+  [[ -f "$RUNTIME_DIR/deprecated/$deprecated_name" ]] && continue
+  mv "$vault_agent" "$RUNTIME_DIR/deprecated/$deprecated_name"
   # Prepend deprecation header
-  { echo "########"; echo "DEPRECATED DO NOT USE"; echo "########"; echo ""; cat "$VAULT_DIR/.claude/deprecated/$deprecated_name"; } > "$VAULT_DIR/.claude/deprecated/$deprecated_name.tmp"
-  mv "$VAULT_DIR/.claude/deprecated/$deprecated_name.tmp" "$VAULT_DIR/.claude/deprecated/$deprecated_name"
+  { echo "########"; echo "DEPRECATED DO NOT USE"; echo "########"; echo ""; cat "$RUNTIME_DIR/deprecated/$deprecated_name"; } > "$RUNTIME_DIR/deprecated/$deprecated_name.tmp"
+  mv "$RUNTIME_DIR/deprecated/$deprecated_name.tmp" "$RUNTIME_DIR/deprecated/$deprecated_name"
   warn "Deprecated agent: $name -> deprecated/$deprecated_name"
   DEPRECATED_COUNT=$((DEPRECATED_COUNT + 1))
   # Remove deprecated agent from manifest
@@ -102,18 +104,18 @@ done
 
 # ── Update agents and rewrite manifest ────────────────────────────────────
 AGENT_COUNT=0
-: > "$VAULT_DIR/.claude/agents/.core-manifest"
+: > "$RUNTIME_DIR/agents/.core-manifest"
 for agent in "$REPO_DIR/agents/"*.md; do
   name="$(basename "$agent")"
-  basename "$agent" >> "$VAULT_DIR/.claude/agents/.core-manifest"
-  if [[ -f "$VAULT_DIR/.claude/agents/$name" ]]; then
-    if ! diff -q "$agent" "$VAULT_DIR/.claude/agents/$name" >/dev/null 2>&1; then
-      cp "$agent" "$VAULT_DIR/.claude/agents/"
+  basename "$agent" >> "$RUNTIME_DIR/agents/.core-manifest"
+  if [[ -f "$RUNTIME_DIR/agents/$name" ]]; then
+    if ! diff -q "$agent" "$RUNTIME_DIR/agents/$name" >/dev/null 2>&1; then
+      cp "$agent" "$RUNTIME_DIR/agents/"
       info "Updated $name"
       AGENT_COUNT=$((AGENT_COUNT + 1))
     fi
   else
-    cp "$agent" "$VAULT_DIR/.claude/agents/"
+    cp "$agent" "$RUNTIME_DIR/agents/"
     info "Added $name (new agent)"
     AGENT_COUNT=$((AGENT_COUNT + 1))
   fi
@@ -121,8 +123,8 @@ done
 
 # ── Deprecate removed references ──────────────────────────────────────────
 # Read the old manifest before rewriting, same logic as agents.
-REF_MANIFEST="$VAULT_DIR/.claude/references/.core-manifest"
-for vault_ref in "$VAULT_DIR/.claude/references/"*.md; do
+REF_MANIFEST="$RUNTIME_DIR/references/.core-manifest"
+for vault_ref in "$RUNTIME_DIR/references/"*.md; do
   [[ -f "$vault_ref" ]] || continue
   name="$(basename "$vault_ref")"
   [[ -f "$REPO_DIR/references/$name" ]] && continue
@@ -136,11 +138,11 @@ for vault_ref in "$VAULT_DIR/.claude/references/"*.md; do
     continue
   fi
   deprecated_name="${name%.md}-DEPRECATED.md"
-  mkdir -p "$VAULT_DIR/.claude/deprecated"
-  [[ -f "$VAULT_DIR/.claude/deprecated/$deprecated_name" ]] && continue
-  mv "$vault_ref" "$VAULT_DIR/.claude/deprecated/$deprecated_name"
-  { echo "########"; echo "DEPRECATED DO NOT USE"; echo "########"; echo ""; cat "$VAULT_DIR/.claude/deprecated/$deprecated_name"; } > "$VAULT_DIR/.claude/deprecated/$deprecated_name.tmp"
-  mv "$VAULT_DIR/.claude/deprecated/$deprecated_name.tmp" "$VAULT_DIR/.claude/deprecated/$deprecated_name"
+  mkdir -p "$RUNTIME_DIR/deprecated"
+  [[ -f "$RUNTIME_DIR/deprecated/$deprecated_name" ]] && continue
+  mv "$vault_ref" "$RUNTIME_DIR/deprecated/$deprecated_name"
+  { echo "########"; echo "DEPRECATED DO NOT USE"; echo "########"; echo ""; cat "$RUNTIME_DIR/deprecated/$deprecated_name"; } > "$RUNTIME_DIR/deprecated/$deprecated_name.tmp"
+  mv "$RUNTIME_DIR/deprecated/$deprecated_name.tmp" "$RUNTIME_DIR/deprecated/$deprecated_name"
   warn "Deprecated reference: $name -> deprecated/$deprecated_name"
   DEPRECATED_COUNT=$((DEPRECATED_COUNT + 1))
 done
@@ -154,12 +156,12 @@ USER_MUTABLE_REFS="agents-registry.md agents.md"
 mkdir -p "$VAULT_DIR/Meta/states"
 
 REF_COUNT=0
-mkdir -p "$VAULT_DIR/.claude/references"
-: > "$VAULT_DIR/.claude/references/.core-manifest"
+mkdir -p "$RUNTIME_DIR/references"
+: > "$RUNTIME_DIR/references/.core-manifest"
 for ref in "$REPO_DIR/references/"*.md; do
   name="$(basename "$ref")"
-  basename "$ref" >> "$VAULT_DIR/.claude/references/.core-manifest"
-  vault_copy="$VAULT_DIR/.claude/references/$name"
+  basename "$ref" >> "$RUNTIME_DIR/references/.core-manifest"
+  vault_copy="$RUNTIME_DIR/references/$name"
 
   # For user-mutable files: preserve custom agent content
   if [[ " $USER_MUTABLE_REFS " == *" $name "* ]] && [[ -f "$vault_copy" ]]; then
@@ -227,9 +229,9 @@ if [[ -d "$REPO_DIR/skills" ]]; then
     [[ -f "$skill_dir/SKILL.md" ]] || continue
     skill_name="$(basename "$skill_dir")"
     src="$skill_dir/SKILL.md"
-    dst="$VAULT_DIR/.claude/skills/$skill_name/SKILL.md"
+    dst="$RUNTIME_DIR/skills/$skill_name/SKILL.md"
     if [[ ! -f "$dst" ]] || ! diff -q "$src" "$dst" >/dev/null 2>&1; then
-      mkdir -p "$VAULT_DIR/.claude/skills/$skill_name"
+      mkdir -p "$RUNTIME_DIR/skills/$skill_name"
       cp "$src" "$dst"
       info "Updated skill: $skill_name"
       SKILL_COUNT=$((SKILL_COUNT + 1))
@@ -240,11 +242,11 @@ fi
 # ── Update hooks ──────────────────────────────────────────────────────────
 HOOK_COUNT=0
 if [[ -d "$REPO_DIR/hooks" ]]; then
-  mkdir -p "$VAULT_DIR/.claude/hooks"
+  mkdir -p "$RUNTIME_DIR/hooks"
   for hook in "$REPO_DIR/hooks/"*.sh; do
     [[ -f "$hook" ]] || continue
     name="$(basename "$hook")"
-    dst="$VAULT_DIR/.claude/hooks/$name"
+    dst="$RUNTIME_DIR/hooks/$name"
     if [[ ! -f "$dst" ]] || ! diff -q "$hook" "$dst" >/dev/null 2>&1; then
       cp "$hook" "$dst"
       chmod +x "$dst"
@@ -257,28 +259,28 @@ fi
 # ── Update settings.json ──────────────────────────────────────────────────
 SETTINGS_UPDATED=""
 if [[ -f "$REPO_DIR/settings.json" ]]; then
-  dst="$VAULT_DIR/.claude/settings.json"
+  dst="$RUNTIME_DIR/settings.json"
   if [[ ! -f "$dst" ]] || ! diff -q "$REPO_DIR/settings.json" "$dst" >/dev/null 2>&1; then
-    mkdir -p "$VAULT_DIR/.claude"
+    mkdir -p "$RUNTIME_DIR"
     cp "$REPO_DIR/settings.json" "$dst"
     info "Updated settings.json"
     SETTINGS_UPDATED="1"
   fi
 fi
 
-# ── Update CLAUDE.md ──────────────────────────────────────────────────────
-CLAUDE_MD_UPDATED=""
-if [[ -f "$REPO_DIR/CLAUDE.md" ]]; then
-  if [[ ! -f "$VAULT_DIR/CLAUDE.md" ]] || ! diff -q "$REPO_DIR/CLAUDE.md" "$VAULT_DIR/CLAUDE.md" >/dev/null 2>&1; then
-    cp "$REPO_DIR/CLAUDE.md" "$VAULT_DIR/CLAUDE.md"
-    info "Updated CLAUDE.md"
-    CLAUDE_MD_UPDATED="1"
+# ── Update AGENTS.md ──────────────────────────────────────────────────────
+AGENTS_MD_UPDATED=""
+if [[ -f "$REPO_DIR/AGENTS.md" ]]; then
+  if [[ ! -f "$VAULT_DIR/AGENTS.md" ]] || ! diff -q "$REPO_DIR/AGENTS.md" "$VAULT_DIR/AGENTS.md" >/dev/null 2>&1; then
+    cp "$REPO_DIR/AGENTS.md" "$VAULT_DIR/AGENTS.md"
+    info "Updated AGENTS.md"
+    AGENTS_MD_UPDATED="1"
   fi
 fi
 
 # ── Summary ─────────────────────────────────────────────────────────────────
 echo ""
-if [[ $AGENT_COUNT -eq 0 && $REF_COUNT -eq 0 && $SKILL_COUNT -eq 0 && $HOOK_COUNT -eq 0 && $DEPRECATED_COUNT -eq 0 && -z "$CLAUDE_MD_UPDATED" && -z "$SETTINGS_UPDATED" ]]; then
+if [[ $AGENT_COUNT -eq 0 && $REF_COUNT -eq 0 && $SKILL_COUNT -eq 0 && $HOOK_COUNT -eq 0 && $DEPRECATED_COUNT -eq 0 && -z "$AGENTS_MD_UPDATED" && -z "$SETTINGS_UPDATED" ]]; then
   success "Everything is already up to date!"
 else
   success "Updated $AGENT_COUNT agent(s), $SKILL_COUNT skill(s), $REF_COUNT reference(s), $HOOK_COUNT hook(s)"
@@ -287,5 +289,5 @@ else
   fi
 fi
 echo ""
-echo -e "   ${DIM}Restart Claude Code to pick up the changes.${NC}"
+echo -e "   ${DIM}Restart Codex to pick up the changes.${NC}"
 echo ""

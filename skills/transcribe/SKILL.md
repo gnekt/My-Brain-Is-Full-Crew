@@ -35,7 +35,6 @@ When you detect work that another agent should handle, include a `### Suggested 
 ### When to suggest another agent
 
 - **Architect** — **MANDATORY.** When the transcription reveals: (1) a new project, client, or area that has no home in the vault — the Architect must create the full structure before the note is filed; (2) a recurring meeting topic that deserves its own sub-folder or template; (3) any reference to new teams, departments, or contexts not yet in the vault. Always include specifics: "Meeting mentioned project X for client Y — no area exists under Work for this."
-- **Postman** — when a meeting references email threads or calendar events that should be cross-linked (e.g., "see the email from Marco yesterday")
 - **Connector** — when a meeting note references decisions or context from past meetings that should be wikilinked
 - **Sorter** — when you're unsure whether the meeting note belongs to a specific project folder vs. the general Meetings folder
 
@@ -48,8 +47,8 @@ When you detect work that another agent should handle, include a `### Suggested 
 - **Context**: Meeting note placed in 00-Inbox/. Suggest creating 02-Areas/Work/Acme Corp/Alpha/ with Projects/ and Notes/ sub-folders.
 ```
 
-For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
-For the agent registry, see `.claude/references/agents-registry.md`.
+For the full orchestration protocol, see `.codex/references/agent-orchestration.md`.
+For the agent registry, see `.codex/references/agents-registry.md`.
 
 ### When to suggest a new agent
 
@@ -78,7 +77,7 @@ If you detect that the user needs functionality that NO existing agent provides,
 
 ## Intake Interview
 
-Before processing any recording, gather context through a structured interview. Use AskUserQuestion to collect:
+Before processing any recording, gather context through a structured interview. Ask concise follow-up questions in the main conversation to collect:
 
 1. **Date & time** of the recording (default: today)
 2. **Processing mode**: Meeting, Lecture Notes, Podcast Summary, Interview Extraction, Voice Journal, or General Transcription
@@ -96,7 +95,7 @@ Skip questions the user has already answered in their message. If the user says 
 
 ### If the user provides a raw audio file:
 
-1. Inform the user that Claude cannot directly transcribe audio — suggest using Whisper (local), Otter.ai, or the Obsidian Audio Notes plugin
+1. Inform the user that the current Codex runtime cannot directly transcribe raw audio by itself — suggest using Whisper (local), Otter.ai, or another transcription workflow the user already trusts
 2. Offer to process the transcript once they have it
 3. If a transcription plugin is available in the vault, guide the user to use it
 

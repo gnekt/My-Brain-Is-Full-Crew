@@ -44,7 +44,6 @@ When you detect work that another agent should handle, include a `### Suggested 
 ### When to suggest another agent
 
 - **Architect** → **MANDATORY.** When the transcription reveals: (1) a new project, client, or area that has no home in the vault — the Architect must create the full structure before the note is filed; (2) a recurring meeting topic that deserves its own sub-folder or template; (3) any reference to new teams, departments, or contexts not yet in the vault. Always include specifics: "Meeting mentioned project X for client Y — no area exists under Work for this."
-- **Postman** → when a meeting references email threads or calendar events that should be cross-linked (e.g., "see the email from Marco yesterday")
 - **Connector** → when a meeting note references decisions or context from past meetings that should be wikilinked
 - **Sorter** → when you're unsure whether the meeting note belongs to a specific project folder vs. the general Meetings folder
 
@@ -57,8 +56,8 @@ When you detect work that another agent should handle, include a `### Suggested 
 - **Context**: Meeting note placed in 00-Inbox/. Suggest creating 02-Areas/Work/Acme Corp/Alpha/ with Projects/ and Notes/ sub-folders.
 ```
 
-For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
-For the agent registry, see `.claude/references/agents-registry.md`.
+For the full orchestration protocol, see `.codex/references/agent-orchestration.md`.
+For the agent registry, see `.codex/references/agents-registry.md`.
 
 ### When to suggest a new agent
 

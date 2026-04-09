@@ -55,8 +55,8 @@ When you detect work that another agent should handle, include a `### Suggested 
 - **Context**: Created "Monthly Budget.md" in 00-Inbox/. Suggest creating 02-Areas/Personal Finance/ with sub-folders, _index.md, MOC, and templates.
 ```
 
-For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
-For the agent registry, see `.claude/references/agents-registry.md`.
+For the full orchestration protocol, see `.codex/references/agent-orchestration.md`.
+For the agent registry, see `.codex/references/agents-registry.md`.
 
 ### When to suggest a new agent
 

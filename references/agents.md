@@ -6,7 +6,7 @@ This reference is shared across all agents. Every agent knows the others, their 
 
 ## Agent Registry
 
-For the definitive list of agents with capabilities, inputs, outputs, and status, see `.claude/references/agents-registry.md`. That file is the single source of truth — it supports both core and custom agents.
+For the definitive list of agents with capabilities, inputs, outputs, and status, see `.codex/references/agents-registry.md`. That file is the single source of truth — it supports both core and custom agents.
 
 ---
 
@@ -22,7 +22,7 @@ All agents read `Meta/user-profile.md` for personalization. This file is created
 
 ---
 
-## The Eight Agents
+## Agent Catalog
 
 ### 1. Architect
 
@@ -95,10 +95,10 @@ All agents read `Meta/user-profile.md` for personalization. This file is created
 
 **Role**: Email & Calendar Intelligence
 **Agent file**: `postman.md`
-**Requires**: One of: Google Workspace CLI (`gws`), Hey CLI (`hey`), or MCP connectors (read-only fallback). See `docs/gws-setup-guide.md` for GWS setup; see [Hey CLI](https://github.com/basecamp/hey-cli) for Hey setup.
-**Responsibilities**: Scans email (Gmail or Hey.com) for actionable emails, archives/deletes/labels emails, imports Google Calendar events, creates calendar events. Handles VIP filtering and contact enrichment. When using Hey, leverages pre-sorted mailboxes (Imbox, Feed, Paper Trail, Reply Later, Set Aside, Bubble Up).
-**Skills**: Email triage, meeting prep, weekly agenda, and deadline radar are handled by skills: `/email-triage`, `/meeting-prep`, `/weekly-agenda`, `/deadline-radar`.
-**Contact when**: Important information may have arrived by email. Meeting notes should be cross-referenced with calendar events. An event needs to be created from a note.
+**Status**: `migration-gated` in the current Codex runtime.
+**Responsibilities**: This role is preserved for future parity, but active email/calendar integrations are intentionally disabled during the current Codex migration.
+**Skills**: `/email-triage`, `/meeting-prep`, `/weekly-agenda`, and `/deadline-radar` remain documented for future migration work, but they are not part of the active Codex dispatch surface yet.
+**Contact when**: Not through active dispatch yet. If a user asks for these workflows, the dispatcher should explain that external integrations are still migration-gated.
 
 ---
 
@@ -114,10 +114,10 @@ The dispatcher routes triggers to skills FIRST, then falls through to agents.
 | `/create-agent` | Architect | Custom agent creation (6-phase interview) |
 | `/manage-agent` | Architect | Edit, remove, list custom agents |
 | `/defrag` | Architect | Weekly vault defragmentation |
-| `/email-triage` | Postman | Email scanning and prioritization |
-| `/meeting-prep` | Postman | Meeting brief preparation |
-| `/weekly-agenda` | Postman | Week-at-a-glance overview |
-| `/deadline-radar` | Postman | Deadline timeline from all sources |
+| `/email-triage` | Postman | Migration-gated placeholder for future email scanning and prioritization |
+| `/meeting-prep` | Postman | Migration-gated placeholder for future meeting brief preparation |
+| `/weekly-agenda` | Postman | Migration-gated placeholder for future week-at-a-glance aggregation |
+| `/deadline-radar` | Postman | Migration-gated placeholder for future deadline aggregation |
 | `/transcribe` | Transcriber | Audio/transcript processing |
 | `/vault-audit` | Librarian | Full 7-phase vault audit |
 | `/deep-clean` | Librarian | Extended vault cleanup |
@@ -128,7 +128,7 @@ The dispatcher routes triggers to skills FIRST, then falls through to agents.
 
 ## Quick Reference: When to Suggest Another Agent
 
-When an agent detects work for another agent, it includes a `### Suggested next agent` section in its output. The dispatcher reads this and decides whether to chain the next agent. See `.claude/references/agent-orchestration.md` for the full protocol.
+When an agent detects work for another agent, it includes a `### Suggested next agent` section in its output. The dispatcher reads this and decides whether to chain the next agent. See `.codex/references/agent-orchestration.md` for the full protocol.
 
 | Situation | Suggest |
 |-----------|---------|
@@ -144,16 +144,16 @@ When an agent detects work for another agent, it includes a `### Suggested next 
 | "This note should link to others" | Connector |
 | "Found related but unlinked notes" | Connector |
 | "Need to find an existing note" | Seeker |
-| "Cross-reference this with email" | Postman |
+| "Cross-reference this with email" | Postman (migration-gated) |
 | "This came from a meeting recording" | Transcriber |
 
 ---
 
 ## Custom Agents
 
-Custom agents are created by the Architect and live in `.claude/agents/` alongside the core agents. They follow the same conventions: YAML frontmatter, trigger phrases written in the user's language, inter-agent coordination sections, and dispatcher-driven orchestration.
+Custom agents are created by the Architect and live in `.codex/agents/` alongside the core agents. They follow the same conventions: YAML frontmatter, trigger phrases written in the user's language, inter-agent coordination sections, and dispatcher-driven orchestration.
 
-For the definitive list of all agents (core + custom) with capabilities, inputs, outputs, and status, see `.claude/references/agents-registry.md`.
+For the definitive list of all agents (core + custom) with capabilities, inputs, outputs, and status, see `.codex/references/agents-registry.md`.
 
 ### How Custom Agents Coordinate
 
@@ -172,4 +172,4 @@ Say "create a new agent" or "I need a custom agent" to start the process. The `/
 Use the `/manage-agent` skill:
 - "Edit my custom agent X" -> modifies it
 - "Remove custom agent X" -> deactivates it (with user confirmation)
-- "List all agents" -> shows core 8 + any custom agents
+- "List all agents" -> shows the active crew, the migration-gated Postman role, and any custom agents

@@ -23,6 +23,16 @@ The Deep Clean is the most thorough maintenance mode. It runs the full 7-phase a
 
 Before starting any audit, read `Meta/user-profile.md` to understand the user's context, preferences, and active projects.
 
+## Risk-Tier Contract
+
+Deep Clean follows the same approval boundary as Vault Audit. It scans deeper, but it does not get broader auto-execution rights.
+
+- **Low-risk**: auto-apply directly when the change is deterministic, reversible, and limited to hygiene. Examples include unambiguous internal link fixes, date normalization, tag format cleanup, frontmatter normalization, report generation, and coordination notes that do not change content meaning.
+- **Medium-risk**: do not apply directly. Put these items into a `Pending Approval Plan` first. This includes duplicate merges, archive moves, taxonomy decisions, major MOC rewrites, and batch notes moves.
+- **High-risk**: do not auto-execute in this skill. Architecture evolution, structural redesign, and other vault-shape changes stay out of Deep Clean and should be surfaced for dispatcher routing instead of being executed here.
+
+`Pending Approval Plan` means: group the medium-risk items, list exact paths, describe the proposed change and rollback path, then wait for user approval before applying anything.
+
 ---
 
 ## Inter-Agent Coordination
@@ -52,8 +62,8 @@ If the vault still has a `Meta/agent-messages.md` file from the old messaging sy
 - **Context**: 02-Areas/Health/ missing _index.md. 02-Areas/Finance/ missing _index.md. 03-Resources/Old Projects/ and 03-Resources/Archive/ have no purpose in vault-structure.md.
 ```
 
-For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
-For the agent registry, see `.claude/references/agents-registry.md`.
+For the full orchestration protocol, see `.codex/references/agent-orchestration.md`.
+For the agent registry, see `.codex/references/agents-registry.md`.
 
 ### When to suggest a new agent
 
@@ -82,7 +92,7 @@ If you detect that the user needs functionality that NO existing agent provides,
 
 ## Deep Clean Workflow
 
-The Deep Clean runs in two stages: first the full 7-phase audit, then the extended deep-clean passes.
+The Deep Clean runs in two stages: first the full 7-phase audit, then the extended deep-clean passes. The second stage increases scan depth only; it does not expand auto-execution or approval rights beyond Vault Audit.
 
 ---
 
@@ -131,7 +141,7 @@ Analysis: B is more recent and contains all of A's content + 17 new lines.
 Recommendation: Keep B, rename to "Project Plan.md", archive A.
 ```
 
-Ask the user for confirmation before merging or deleting.
+Prepare a `Pending Approval Plan` for any merge or archive action. Include exact paths, proposed change, and rollback path, then wait for approval before applying anything.
 
 #### Phase 3: Link Integrity
 
@@ -165,9 +175,9 @@ Fix automatically:
 - Tag format normalization (lowercase, hyphenated)
 - Add missing `status` field based on file location
 
-Ask before fixing:
-- Missing `type` field (need user input)
-- Unknown tags (add to taxonomy or correct?)
+Pending Approval Plan:
+- Missing `type` field — exact paths, proposed change, and rollback path required before any edit
+- Unknown tags — exact paths, proposed taxonomy decision, and rollback path required before any edit
 
 #### Phase 5: MOC Review
 
@@ -288,7 +298,7 @@ Recommendation:
 - Review {{N}} notes
 - Keep {{N}} old-but-referenced notes
 
-Want me to move the stale notes to Archive?
+I can prepare a `Pending Approval Plan` to move the stale notes to Archive, with exact paths, proposed change, and rollback path.
 ```
 
 #### Pass 2: Outdated References
@@ -345,17 +355,39 @@ Check if notes follow the expected template for their type:
 
 ## Automated Fix Suggestions
 
-When presenting issues, always offer a clear fix path:
+When presenting issues, split low-risk auto-fixes from medium-risk plan items.
 
 ```
-Found {{N}} auto-fixable issues:
+Found {{N}} low-risk auto-fixable issues:
 
-1. [Fix] Rename "note (updated).md" -> "note.md" (archive old version)
+1. [Fix] Repair a broken internal link in 3 notes
 2. [Fix] Add missing `status: filed` to 5 notes in 01-Projects/
 3. [Fix] Normalize 8 dates from DD/MM/YYYY to YYYY-MM-DD
-4. [Fix] Merge tags: #dev -> #development (3 notes)
+4. [Fix] Normalize tag format on 3 notes in 01-Projects/
+```
 
-Apply all {{N}} fixes? [Yes / Let me review each / Skip]
+```
+Pending Approval Plan:
+1. [Plan] Merge duplicate notes
+   - Exact paths: 01-Projects/Project Plan.md, 01-Projects/Project Plan (updated).md
+   - Proposed change: keep one canonical note and archive the duplicate
+   - Rollback path: restore the archived file and revert the rename
+2. [Plan] Move notes to Archive
+   - Exact paths: 03-Resources/Old Project.md, 03-Resources/Legacy Notes.md
+   - Proposed change: move the listed notes into Archive
+   - Rollback path: move each file back to its original path
+3. [Plan] Update taxonomy decisions
+   - Exact paths: Meta/tag-taxonomy.md, 05-People/Tagged Notes/
+   - Proposed change: reconcile or merge the listed tags
+   - Rollback path: restore prior taxonomy entries and note tags
+4. [Plan] Rework major MOC structure
+   - Exact paths: 02-Areas/Finance/MOC.md, 02-Areas/Health/MOC.md
+   - Proposed change: rewrite the listed MOCs to match the new structure
+   - Rollback path: restore the previous MOC versions
+5. [Plan] Batch move notes
+   - Exact paths: list the notes to be moved in the plan
+   - Proposed change: relocate the batch of notes together
+   - Rollback path: move each note back to its original folder
 ```
 
 ---
@@ -374,7 +406,7 @@ When the Librarian has generated 2+ health reports, it should compare them:
 
 ## Operating Principles
 
-1. **Conservative by default** — never delete, only archive. Never auto-merge, always ask.
+1. **Risk-tiered by default** — auto-apply low-risk hygiene, queue medium-risk work for approval, and do not attempt high-risk architecture changes here.
 2. **Transparent** — always show what was found and what was changed
 3. **Batch confirmations** — group similar changes together for user approval instead of asking one by one
 4. **Respect existing structure** — adapt to the vault as it is, suggest improvements, don't force changes

@@ -7,7 +7,7 @@
 #   cd /path/to/your-vault/My-Brain-Is-Full-Crew
 #   bash scripts/launchme.sh
 #
-# It copies agents and references into your vault's .claude/ directory.
+# It copies runtime assets into your vault's .codex/ directory.
 # =============================================================================
 
 set -eo pipefail
@@ -29,10 +29,12 @@ die()     { echo -e "\n   ${RED}Error: $*${NC}\n" >&2; exit 1; }
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 VAULT_DIR="$(cd "$REPO_DIR/.." && pwd)"
+RUNTIME_DIR="$VAULT_DIR/.codex"
 
 # Sanity checks
 [[ -d "$REPO_DIR/agents" ]] || die "Can't find agents/ in $REPO_DIR — are you running this from the repo?"
 [[ -d "$REPO_DIR/references" ]] || die "Can't find references/ in $REPO_DIR"
+[[ -f "$REPO_DIR/AGENTS.md" ]] || die "Can't find AGENTS.md in $REPO_DIR"
 
 # ── Banner ──────────────────────────────────────────────────────────────────
 echo ""
@@ -59,20 +61,21 @@ if [[ "$CONFIRM" =~ ^[Nn]$ ]]; then
   VAULT_DIR="${VAULT_DIR/#\~/$HOME}"
   [[ -d "$VAULT_DIR" ]] || die "Directory not found: $VAULT_DIR"
 fi
+RUNTIME_DIR="$VAULT_DIR/.codex"
 
 # ── Check for existing installation ───────────────────────────────────────
 echo ""
 EXISTING=0
-if [[ -d "$VAULT_DIR/.claude" ]]; then EXISTING=1; fi
-if [[ -f "$VAULT_DIR/CLAUDE.md" ]]; then EXISTING=1; fi
+if [[ -d "$RUNTIME_DIR" ]]; then EXISTING=1; fi
+if [[ -f "$VAULT_DIR/AGENTS.md" ]]; then EXISTING=1; fi
 
 if [[ $EXISTING -eq 1 ]]; then
   warn "An existing installation was detected:"
-  [[ -d "$VAULT_DIR/.claude" ]] && warn "  .claude/ directory exists"
-  [[ -f "$VAULT_DIR/CLAUDE.md" ]] && warn "  CLAUDE.md exists"
+  [[ -d "$RUNTIME_DIR" ]] && warn "  .codex/ directory exists"
+  [[ -f "$VAULT_DIR/AGENTS.md" ]] && warn "  AGENTS.md exists"
   echo ""
   echo -e "   ${BOLD}The installer needs to overwrite these files.${NC}"
-  echo -e "   ${DIM}Custom agents in .claude/agents/ will NOT be deleted.${NC}"
+  echo -e "   ${DIM}Custom agents in .codex/agents/ will NOT be deleted.${NC}"
   echo -e "   ${DIM}Your vault notes are never touched.${NC}"
   echo ""
   echo -e "   ${BOLD}c)${NC} Continue (overwrite core files, keep custom agents)"
@@ -88,32 +91,32 @@ fi
 
 # ── Deprecate stale core agents on reinstall ─────────────────────────────
 echo ""
-mkdir -p "$VAULT_DIR/.claude/agents"
-OLD_MANIFEST="$VAULT_DIR/.claude/agents/.core-manifest"
+mkdir -p "$RUNTIME_DIR/agents"
+OLD_MANIFEST="$RUNTIME_DIR/agents/.core-manifest"
 if [[ $EXISTING -eq 1 && -f "$OLD_MANIFEST" ]]; then
   while IFS= read -r old_name; do
     [[ -z "$old_name" ]] && continue
     [[ -f "$REPO_DIR/agents/$old_name" ]] && continue
-    vault_file="$VAULT_DIR/.claude/agents/$old_name"
+    vault_file="$RUNTIME_DIR/agents/$old_name"
     [[ -f "$vault_file" ]] || continue
     deprecated_name="${old_name%.md}-DEPRECATED.md"
-    mkdir -p "$VAULT_DIR/.claude/deprecated"
-    [[ -f "$VAULT_DIR/.claude/deprecated/$deprecated_name" ]] && continue
-    mv "$vault_file" "$VAULT_DIR/.claude/deprecated/$deprecated_name"
-    { echo "########"; echo "DEPRECATED DO NOT USE"; echo "########"; echo ""; cat "$VAULT_DIR/.claude/deprecated/$deprecated_name"; } > "$VAULT_DIR/.claude/deprecated/$deprecated_name.tmp"
-    mv "$VAULT_DIR/.claude/deprecated/$deprecated_name.tmp" "$VAULT_DIR/.claude/deprecated/$deprecated_name"
+    mkdir -p "$RUNTIME_DIR/deprecated"
+    [[ -f "$RUNTIME_DIR/deprecated/$deprecated_name" ]] && continue
+    mv "$vault_file" "$RUNTIME_DIR/deprecated/$deprecated_name"
+    { echo "########"; echo "DEPRECATED DO NOT USE"; echo "########"; echo ""; cat "$RUNTIME_DIR/deprecated/$deprecated_name"; } > "$RUNTIME_DIR/deprecated/$deprecated_name.tmp"
+    mv "$RUNTIME_DIR/deprecated/$deprecated_name.tmp" "$RUNTIME_DIR/deprecated/$deprecated_name"
     warn "Deprecated stale agent: $old_name -> deprecated/$deprecated_name"
   done < "$OLD_MANIFEST"
 fi
 
 # ── Copy agents ─────────────────────────────────────────────────────────────
-info "Creating .claude/agents/ in vault..."
+info "Creating .codex/agents/ in vault..."
 
 AGENT_COUNT=0
-: > "$VAULT_DIR/.claude/agents/.core-manifest"
+: > "$RUNTIME_DIR/agents/.core-manifest"
 for agent in "$REPO_DIR/agents/"*.md; do
-  cp "$agent" "$VAULT_DIR/.claude/agents/"
-  basename "$agent" >> "$VAULT_DIR/.claude/agents/.core-manifest"
+  cp "$agent" "$RUNTIME_DIR/agents/"
+  basename "$agent" >> "$RUNTIME_DIR/agents/.core-manifest"
   AGENT_COUNT=$((AGENT_COUNT + 1))
 done
 success "Copied $AGENT_COUNT agents"
@@ -123,24 +126,24 @@ mkdir -p "$VAULT_DIR/Meta/states"
 info "Created Meta/states/ (agent post-it directory)"
 
 # ── Copy references ─────────────────────────────────────────────────────────
-info "Creating .claude/references/ in vault..."
-mkdir -p "$VAULT_DIR/.claude/references"
+info "Creating .codex/references/ in vault..."
+mkdir -p "$RUNTIME_DIR/references"
 # User-mutable references (modified by Architect when creating custom agents)
 USER_MUTABLE_REFS="agents-registry.md agents.md"
 
-: > "$VAULT_DIR/.claude/references/.core-manifest"
+: > "$RUNTIME_DIR/references/.core-manifest"
 for ref in "$REPO_DIR/references/"*.md; do
   ref_name="$(basename "$ref")"
   # On reinstall, preserve user-mutable reference files
-  if [[ $EXISTING -eq 1 && -f "$VAULT_DIR/.claude/references/$ref_name" ]]; then
+  if [[ $EXISTING -eq 1 && -f "$RUNTIME_DIR/references/$ref_name" ]]; then
     if [[ " $USER_MUTABLE_REFS " == *" $ref_name "* ]]; then
       warn "Preserving existing $ref_name (run updateme.sh to merge upstream changes)"
-      echo "$ref_name" >> "$VAULT_DIR/.claude/references/.core-manifest"
+      echo "$ref_name" >> "$RUNTIME_DIR/references/.core-manifest"
       continue
     fi
   fi
-  cp "$ref" "$VAULT_DIR/.claude/references/"
-  echo "$ref_name" >> "$VAULT_DIR/.claude/references/.core-manifest"
+  cp "$ref" "$RUNTIME_DIR/references/"
+  echo "$ref_name" >> "$RUNTIME_DIR/references/.core-manifest"
 done
 success "Copied references"
 
@@ -150,27 +153,27 @@ if [[ -d "$REPO_DIR/skills" ]]; then
   for skill_dir in "$REPO_DIR/skills/"*/; do
     [[ -f "$skill_dir/SKILL.md" ]] || continue
     skill_name="$(basename "$skill_dir")"
-    mkdir -p "$VAULT_DIR/.claude/skills/$skill_name"
-    cp "$skill_dir"SKILL.md "$VAULT_DIR/.claude/skills/$skill_name/"
+    mkdir -p "$RUNTIME_DIR/skills/$skill_name"
+    cp "$skill_dir"SKILL.md "$RUNTIME_DIR/skills/$skill_name/"
     SKILL_COUNT=$((SKILL_COUNT + 1))
   done
   success "Copied $SKILL_COUNT skills"
 fi
 
-# ── Copy CLAUDE.md ───────────────────────────────────────────────────────────
-if [[ -f "$REPO_DIR/CLAUDE.md" ]]; then
-  cp "$REPO_DIR/CLAUDE.md" "$VAULT_DIR/CLAUDE.md"
-  success "Copied CLAUDE.md"
+# ── Copy AGENTS.md ───────────────────────────────────────────────────────────
+if [[ -f "$REPO_DIR/AGENTS.md" ]]; then
+  cp "$REPO_DIR/AGENTS.md" "$VAULT_DIR/AGENTS.md"
+  success "Copied AGENTS.md"
 fi
 
 # ── Copy hooks ───────────────────────────────────────────────────────────────
 HOOK_COUNT=0
 if [[ -d "$REPO_DIR/hooks" ]]; then
-  mkdir -p "$VAULT_DIR/.claude/hooks"
+  mkdir -p "$RUNTIME_DIR/hooks"
   for hook in "$REPO_DIR/hooks/"*.sh; do
     [[ -f "$hook" ]] || continue
-    cp "$hook" "$VAULT_DIR/.claude/hooks/"
-    chmod +x "$VAULT_DIR/.claude/hooks/$(basename "$hook")"
+    cp "$hook" "$RUNTIME_DIR/hooks/"
+    chmod +x "$RUNTIME_DIR/hooks/$(basename "$hook")"
     HOOK_COUNT=$((HOOK_COUNT + 1))
   done
   success "Copied $HOOK_COUNT hooks"
@@ -178,11 +181,11 @@ fi
 
 # ── Copy settings.json ───────────────────────────────────────────────────────
 if [[ -f "$REPO_DIR/settings.json" ]]; then
-  if [[ -f "$VAULT_DIR/.claude/settings.json" ]]; then
-    warn ".claude/settings.json already exists — skipping (won't overwrite)"
+  if [[ -f "$RUNTIME_DIR/settings.json" ]]; then
+    warn ".codex/settings.json already exists — skipping (won't overwrite)"
   else
-    mkdir -p "$VAULT_DIR/.claude"
-    cp "$REPO_DIR/settings.json" "$VAULT_DIR/.claude/settings.json"
+    mkdir -p "$RUNTIME_DIR"
+    cp "$REPO_DIR/settings.json" "$RUNTIME_DIR/settings.json"
     success "Copied settings.json (hooks configuration)"
   fi
 fi
@@ -217,19 +220,19 @@ echo ""
 echo -e "   Your vault is ready. Here's what was installed:"
 echo ""
 echo -e "   ${VAULT_DIR}/"
-echo -e "   ├── .claude/"
+echo -e "   ├── .codex/"
 echo -e "   │   ├── agents/          ${DIM}← ${AGENT_COUNT} crew agents${NC}"
-echo -e "   │   ├── skills/          ${DIM}← ${SKILL_COUNT:-0} crew skills (Desktop/Cowork)${NC}"
+echo -e "   │   ├── skills/          ${DIM}← ${SKILL_COUNT:-0} crew skills${NC}"
 echo -e "   │   ├── hooks/           ${DIM}← ${HOOK_COUNT:-0} hooks${NC}"
 echo -e "   │   ├── settings.json    ${DIM}← hooks configuration${NC}"
 echo -e "   │   └── references/      ${DIM}← shared docs${NC}"
-echo -e "   ├── CLAUDE.md            ${DIM}← project instructions${NC}"
+echo -e "   ├── AGENTS.md            ${DIM}← Codex workspace instructions${NC}"
 if [[ "$MCP_ANSWER" =~ ^[Yy]$ ]]; then
 echo -e "   └── .mcp.json            ${DIM}← Gmail + Calendar${NC}"
 fi
 echo ""
 echo -e "   ${BOLD}Next steps:${NC}"
-echo -e "   1. Open Claude Code in your vault folder"
+echo -e "   1. Open Codex in your vault folder"
 echo -e "   2. Say: ${BOLD}\"Initialize my vault\"${NC}"
 echo -e "   3. The Architect will guide you through setup"
 echo ""

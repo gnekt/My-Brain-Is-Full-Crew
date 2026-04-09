@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/protect-system-files.sh"
+            "command": "bash .codex/hooks/protect-system-files.sh"
           }
         ]
       }
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/validate-frontmatter.sh"
+            "command": "bash .codex/hooks/validate-frontmatter.sh"
           }
         ]
       }
@@ -28,7 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/notify.sh"
+            "command": "bash .codex/hooks/notify.sh"
           }
         ]
       }

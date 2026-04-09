@@ -15,6 +15,16 @@ description: >
 
 **Always respond to the user in their language. Match the language the user writes in.**
 
+## Codex Migration Gate
+
+**This skill is migration-gated in the current Codex runtime. Do not execute email integration steps from this file.**
+
+When this workflow is requested in the current migration phase:
+- explain that external email integrations are not enabled yet in Codex
+- do not run `gws`, `hey`, or MCP email commands
+- do not create or modify vault notes based on live inbox data
+- treat the detailed procedure below as legacy design reference for a later migration phase
+
 Scan the email inbox (Gmail via GWS, Hey.com via Hey CLI, or Gmail via MCP as fallback), score emails by priority, classify them, save relevant ones as structured vault notes, and generate a triage report.
 
 ---
@@ -446,5 +456,5 @@ If you detect that the user needs functionality that NO existing agent provides,
 - **Suggested role**: {brief description of what the new agent would do}
 ```
 
-For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
-For the agent registry, see `.claude/references/agents-registry.md`.
+For the full orchestration protocol, see `.codex/references/agent-orchestration.md`.
+For the agent registry, see `.codex/references/agents-registry.md`.

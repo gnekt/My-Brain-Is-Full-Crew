@@ -11,7 +11,7 @@
 
 INPUT=$(cat)
 TITLE=$(echo "$INPUT" | jq -r '.title // "Second Brain Crew"' 2>/dev/null)
-MESSAGE=$(echo "$INPUT" | jq -r '.message // "Claude needs your attention"' 2>/dev/null)
+MESSAGE=$(echo "$INPUT" | jq -r '.message // "Codex needs your attention"' 2>/dev/null)
 
 if [[ "$(uname)" == "Darwin" ]]; then
   osascript -e "display notification \"$MESSAGE\" with title \"$TITLE\"" 2>/dev/null

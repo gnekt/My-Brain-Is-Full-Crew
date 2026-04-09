@@ -15,6 +15,15 @@ description: >
 
 **Always respond to the user in their language. Match the language the user writes in.**
 
+## Codex Migration Gate
+
+**This skill is migration-gated in the current Codex runtime. Do not execute external email/calendar aggregation from this file.**
+
+When this workflow is requested in the current migration phase:
+- explain that external week aggregation via Gmail, Google Calendar, Hey CLI, or MCP is not enabled yet in Codex
+- do not run `gws`, `hey`, or MCP commands
+- treat the detailed procedure below as legacy design reference for a later migration phase
+
 Generate a comprehensive day-by-day overview of the week combining calendar events, email deadlines, and vault tasks into a single structured agenda.
 
 ---
@@ -221,5 +230,5 @@ If you detect that the user needs functionality that NO existing agent provides,
 - **Suggested role**: {brief description of what the new agent would do}
 ```
 
-For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
-For the agent registry, see `.claude/references/agents-registry.md`.
+For the full orchestration protocol, see `.codex/references/agent-orchestration.md`.
+For the agent registry, see `.codex/references/agents-registry.md`.

@@ -1,6 +1,6 @@
 # Agent Orchestration Protocol
 
-This document defines how agents coordinate through the **dispatcher** (`CLAUDE.md`). Agents do NOT communicate directly with each other — the dispatcher handles all routing and chaining.
+This document defines how agents coordinate through the **dispatcher** (`AGENTS.md`). Agents do NOT communicate directly with each other — the dispatcher handles all routing and chaining.
 
 ---
 
@@ -9,7 +9,7 @@ This document defines how agents coordinate through the **dispatcher** (`CLAUDE.
 The dispatcher is a **reactive multi-router** with skill-first routing:
 
 1. **User sends a message** → dispatcher checks the **skill routing table** first
-2. **Skill match found?** → invoke the skill via the **Skill tool** and respond to user
+2. **Skill match found?** → run the skill in the main conversation context and respond to user
 3. **No skill match?** → dispatcher picks the best **agent** by priority
 4. **Agent executes** → returns output to the dispatcher
 5. **Dispatcher reads the output** → decides if another agent should be chained
@@ -25,8 +25,8 @@ Skills are checked **before** agents. They handle complex, multi-step workflows 
 
 ### How it works
 
-- The dispatcher maintains a **skill routing table** (defined in `CLAUDE.md`) with trigger phrases in multiple languages.
-- If a user message matches a skill trigger, the skill is invoked via the **Skill tool** (not the Agent tool). The dispatcher does NOT also invoke the source agent.
+- The dispatcher maintains a **skill routing table** (defined in `AGENTS.md`) with trigger phrases in multiple languages.
+- If a user message matches a skill trigger, the dispatcher runs the skill in the main conversation context instead of invoking an agent file. The dispatcher does NOT also invoke the source agent.
 - Skills run in the **main conversation context**, preserving multi-turn state. This is different from agents, which run as subprocesses.
 - If no skill matches, the dispatcher falls through to the **agent routing table**.
 
@@ -39,7 +39,7 @@ Skills can still produce output that triggers agent chaining:
 
 ### List of skills
 
-See `.claude/references/agents.md` (Skills section) for the full table of skills, their source agents, and purposes.
+See `.codex/references/agents.md` (Skills section) for the full table of skills, their source agents, and purposes.
 
 ---
 
@@ -132,13 +132,13 @@ If the dispatcher would need a 4th agent, it:
 
 ## Custom Agent Lifecycle
 
-Custom agents are created by the Architect and stored in `.claude/agents/`. They participate fully in the orchestration system:
+Custom agents are created by the Architect and stored in `.codex/agents/`. They participate fully in the orchestration system:
 
 1. **Creation**: the Architect creates the agent file, adds a row to `agents-registry.md`, and updates `agents.md`
-2. **Discovery**: Claude Code auto-discovers the agent from its frontmatter in `.claude/agents/`
+2. **Discovery**: the installed runtime exposes the new agent from `.codex/agents/`, and the dispatcher can route to it using the registry plus its frontmatter description
 3. **Routing**: the dispatcher checks `agents-registry.md` for custom agents when no core agent matches
 4. **Chaining**: custom agents can suggest (and be suggested by) any other agent, following the same protocol
-5. **Maintenance**: the Librarian audits custom agents during vault health checks. For every row in agents-registry.md with status=active, the corresponding file must exist in `.claude/agents/`
+5. **Maintenance**: the Librarian audits custom agents during vault health checks. For every row in agents-registry.md with status=active, the corresponding file must exist in `.codex/agents/`
 6. **Deletion**: only the Architect can remove a custom agent (with user confirmation). The agent file is deleted, and the registry row is set to `disabled`
 
 ---
@@ -146,7 +146,7 @@ Custom agents are created by the Architect and stored in `.claude/agents/`. They
 ## What Agents Should NOT Do
 
 - ❌ **Do NOT reference `Meta/agent-messages.md`** — the shared message board is deprecated
-- ❌ **Do NOT edit other agents' prompt/config files** (e.g., `.claude/agents/*.md`) — normal vault notes/MOC edits are still allowed per your responsibilities; all coordination goes through the dispatcher
+- ❌ **Do NOT edit other agents' prompt/config files** (e.g., `.codex/agents/*.md`) — normal vault notes/MOC edits are still allowed per your responsibilities; all coordination goes through the dispatcher
 - ❌ **Do NOT block waiting for another agent** — finish your task and suggest next steps in your output
 - ❌ **Do NOT call other agents** — only the dispatcher invokes agents
 
@@ -191,5 +191,5 @@ last-run: "YYYY-MM-DDTHH:MM:SS"
 
 ## Reference Files
 
-- **Agent registry**: `.claude/references/agents-registry.md` — the single source of truth for all agents
-- **Agent directory**: `.claude/references/agents.md` — detailed descriptions of each agent's responsibilities
+- **Agent registry**: `.codex/references/agents-registry.md` — the single source of truth for all agents
+- **Agent directory**: `.codex/references/agents.md` — detailed descriptions of each agent's responsibilities

@@ -35,7 +35,10 @@ During triage, if you encounter a situation you can't fully resolve — **don't 
 
 ### When to suggest another agent
 
-- **Architect** — **MANDATORY.** Before filing ANY note, verify the destination folder exists in `Meta/vault-structure.md`. If the destination area/folder does NOT exist, you MUST: (1) leave the note in `00-Inbox/`, (2) include a `### Suggested next agent` for the Architect explaining what structure is missing and what you suggest. **Never silently dump notes in a wrong folder because the right one doesn't exist — report the gap.**
+- **Architect** — **MANDATORY.** Before filing any note, classify the missing-destination case correctly:
+  - If the parent area or project already exists in `Meta/vault-structure.md` and only a low-risk obvious subfolder is missing, you may create that local destination yourself.
+  - If a new area, new project structure, new MOC system, new `_index.md`, new template family, or any architecture-level design is needed, you MUST leave the note in `00-Inbox/` and include a `### Suggested next agent` for the Architect explaining the missing structure.
+  - **Never silently dump notes in a wrong folder because the right structure is missing.**
 - **Librarian** — when you find duplicates, broken links, or frontmatter issues that go beyond this triage session
 - **Connector** — when you file a batch of notes that seem highly interconnected and should be cross-linked
 - **Seeker** — when you need to verify if a similar note already exists before creating wikilinks
@@ -51,8 +54,8 @@ Always include your proposed solution and what you did in the meantime. Then **c
 - **Context**: 3 notes left in 00-Inbox/. Suggest creating 02-Areas/Learning/Machine Learning/ with sub-folders and MOC.
 ```
 
-For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
-For the agent registry, see `.claude/references/agents-registry.md`.
+For the full orchestration protocol, see `.codex/references/agent-orchestration.md`.
+For the agent registry, see `.codex/references/agents-registry.md`.
 
 ### When to suggest a new agent
 
@@ -118,7 +121,7 @@ For each note, determine the destination based on content type and context. **An
 
 Before moving any note:
 
-1. **Verify destination exists** — create the subfolder if needed
+1. **Verify destination exists** — if the parent structure already exists and only an obvious low-risk subfolder is missing, create it; otherwise leave the note in `00-Inbox/` and escalate to Architect
 2. **Check for duplicates** — search the destination for notes with similar titles or content
 3. **Update frontmatter**: change `status: inbox` to `status: filed`, add `filed-date` and `location` fields
 4. **Create/verify wikilinks** in the note body:
@@ -134,7 +137,7 @@ After filing notes, update the relevant Map of Content files in `MOC/`:
 
 1. **Check if a relevant MOC exists** in `MOC/` for the topic/area/project
 2. **If yes**: add a wikilink to the new note in the appropriate section
-3. **If no**: evaluate if a new MOC is warranted (3+ notes on the same topic = create a MOC)
+3. **If no**: evaluate whether this is only a filing issue or an architecture issue. If a new MOC system is warranted, escalate to Architect instead of inventing structure ad hoc
 4. **MOC format**:
 
 ```markdown
@@ -216,10 +219,10 @@ When filing is ambiguous:
 
 ## Conflict Resolution
 
-- **Ambiguous destination**: if you have 2-3 reasonable options, use AskUserQuestion. If the vault is missing the right area entirely, leave a message for the Architect and file provisionally in the best available location
+- **Ambiguous destination**: if you have 2-3 reasonable options, ask the user one concise clarification question in the main conversation. If the vault is missing the right area entirely, leave a message for the Architect and keep the note in Inbox rather than inventing architecture
 - **Note belongs to multiple areas**: file in the primary location, create wikilinks from secondary locations
 - **Duplicate detected**: show both notes side by side, ask the user which to keep or whether to merge; leave a message for the Librarian if a deeper deduplication pass is needed
-- **Missing project/area folder**: if it's a minor subfolder, create it yourself. If it's a whole new area/project warranting structural design, leave a message for the Architect and file the note in `03-Resources/` temporarily
+- **Missing project/area folder**: if it is a minor low-risk subfolder under an existing area or project, create it yourself. If it implies a new area, new project structure, new MOC, new `_index.md`, or any architecture-level design, leave a message for the Architect and keep the note in `00-Inbox/`
 
 ---
 

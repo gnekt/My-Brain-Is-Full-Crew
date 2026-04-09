@@ -1,7 +1,7 @@
 {
   "name": "my-brain-is-full-crew",
   "version": "1.0.1",
-  "description": "A crew of 10 AI agents that run your Obsidian vault like a team of personal assistants — capturing notes, triaging your inbox, managing your calendar and email, tracking your nutrition, supporting your mental health, and keeping everything connected. Works in any language.",
+  "description": "Legacy manifest retained during Codex migration. Mirrors a multilingual Obsidian crew with 8 core agents and 13 skills for capture, triage, search, linking, transcription, and calendar or email workflows.",
   "author": {
     "name": "@gnekt (Christian Di Maio)",
     "url": "https://github.com/gnekt"
@@ -17,20 +17,13 @@
     "note-taking",
     "second-brain",
     "AI-agents",
-    "claude",
+    "codex",
+    "skills",
     "transcription",
     "gmail",
     "google-calendar",
     "email",
-    "nutrition",
-    "diet",
-    "health",
-    "mindfulness",
-    "cbt",
-    "act",
-    "mental-health",
     "productivity",
-    "multilingual",
-    "cowork"
+    "multilingual"
   ]
 }
