@@ -359,8 +359,8 @@ fi
 
 if [[ -d "${BUILD_DIR}/skills" ]]; then
   skill_count=$(find "${BUILD_DIR}/skills" -mindepth 1 -maxdepth 1 -type d | wc -l)
-  if [[ "$skill_count" -ne 13 ]]; then
-    echo "[WARN] skills/ has ${skill_count} subdirectories (expected 13)"
+  if [[ "$skill_count" -ne 14 ]]; then
+    echo "[WARN] skills/ has ${skill_count} subdirectories (expected 14)"
   fi
 fi
 
