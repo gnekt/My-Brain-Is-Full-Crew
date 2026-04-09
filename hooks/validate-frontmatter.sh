@@ -83,9 +83,26 @@ validate_markdown_file() {
 
 extract_markdown_paths_from_command() {
   local command="$1"
+  local remaining
+  local match
+  local candidate
 
   [[ -n "$command" ]] || return 0
-  printf '%s\n' "$command" | grep -oE '([.]{1,2}/)?[[:alnum:]_./-]+\.md' | sort -u || true
+
+  remaining="$command"
+  while [[ "$remaining" =~ (\"([^\"\\]|\\.)+\.md\"|\'([^\'\\]|\\.)+\.md\'|([.]{1,2}/)?([^[:space:]\"\'\|\&\;\<\>\\]|\\.)+\.md) ]]; do
+    match="${BASH_REMATCH[1]}"
+    candidate="$match"
+
+    if [[ "$candidate" == \"*\" || "$candidate" == \'*\' ]]; then
+      candidate="${candidate:1:${#candidate}-2}"
+    fi
+
+    candidate="${candidate//\\ / }"
+    printf '%s\n' "$candidate"
+
+    remaining="${remaining#*"$match"}"
+  done | sort -u
 }
 
 if [[ -n "$FILE" ]]; then
