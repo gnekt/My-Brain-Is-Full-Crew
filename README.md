@@ -245,7 +245,7 @@ The installer sets up the Crew for your preferred platform:
 | **Gemini CLI** | `.gemini/` | Google Gemini-optimized agent support |
 | **Codex CLI** | `.codex/` | TOML-based agent configuration support |
 
-All platforms support the same 8 agents and 13 skills. `launchme.sh` installs your chosen platform automatically.
+All platforms support the same 8 agents and 14 skills. `launchme.sh` installs your chosen platform automatically.
 
 #### Hook support matrix
 
@@ -302,7 +302,7 @@ cd My-Brain-Is-Full-Crew
 bash scripts/launchme.sh
 ```
 
-By default, the script installs for **Claude Code**. You can also target other platforms:
+`launchme.sh` prompts you to choose a supported platform interactively. You can also target a platform explicitly:
 
 ```bash
 # Install for a specific platform
@@ -311,9 +311,11 @@ bash scripts/launchme.sh --platform opencode
 # Install into a specific vault path
 bash scripts/launchme.sh --vault /path/to/vault
 
-# Non-interactive install with defaults
-bash scripts/launchme.sh --yes
+# Non-interactive install for a specific platform
+bash scripts/launchme.sh --platform claude --yes
 ```
+
+In `--yes` mode without `--platform`, the installer defaults to **Claude Code**.
 
 #### Preferred Model Selection
 During interactive installation for specific platforms, the script will prompt you for your preferred models (Fast, Powerful, and Light). These choices are persisted in `<vault>/<platform-dir>/.installer-models.env` and reused during updates.
