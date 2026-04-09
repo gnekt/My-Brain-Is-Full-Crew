@@ -445,6 +445,7 @@ The updater detects all installed platforms in your vault, preserves your custom
 
 The project uses a template-based build system to support multiple platforms.
 
+- **`templates/**/*.tmpl.md`**: Source-of-truth templates for agents, skills, references, and dispatchers.
 - **`scripts/build.sh <platform>`**: Generates platform-specific agents and configs from templates. Supports `all` to build everything.
 - **`scripts/validate.sh <dir>`**: Validates generated agents for syntax, tool consistency, and unresolved variables.
 - **`yq`**: Required for build and validation processes (processing YAML/TOML).
@@ -497,6 +498,11 @@ My-Brain-Is-Full-Crew/               ← cloned inside your vault
 │   ├── tracker-today, tracker-search  Local tracker queries
 │   ├── contact-lookup                 Person-based email search
 │   └── vault-stats, vault-inbox       Vault health helpers
+├── templates/                       Source templates used by the multi-platform build
+│   ├── agents/*.tmpl.md               Agent templates
+│   ├── skills/*/SKILL.tmpl.md         Skill templates
+│   ├── references/*.tmpl.md           Shared reference templates
+│   └── dispatchers/*.tmpl.md          Dispatcher templates
 ├── references/                      Shared agent documentation
 ├── scripts/
 │   ├── launchme.sh                    First-time installer
