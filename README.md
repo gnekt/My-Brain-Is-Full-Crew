@@ -167,7 +167,7 @@ graph TB
         Transcribe["/transcribe"]
         InboxTriage["/inbox-triage"]
         VaultAudit["/vault-audit"]
-        MoreSkills["... +8 more"]
+        MoreSkills["... +9 more"]
     end
 
     subgraph Agents["The Crew (8 agents)"]
@@ -369,13 +369,15 @@ The `/contact-sync` skill syncs contacts to Apple Contacts on macOS. It requires
 
 - **[@griches/apple-contacts-mcp](https://www.npmjs.com/package/@griches/apple-contacts-mcp)** — an MCP server that provides full CRUD access to Apple Contacts (search, create, update, delete contacts and groups).
 
-Add it to your `.mcp.json`:
+Add it to your `.mcp.json` inside the `mcpServers` object:
 
 ```json
 {
-  "apple-contacts": {
-    "command": "npx",
-    "args": ["-y", "@griches/apple-contacts-mcp"]
+  "mcpServers": {
+    "apple-contacts": {
+      "command": "npx",
+      "args": ["-y", "@griches/apple-contacts-mcp"]
+    }
   }
 }
 ```
@@ -433,7 +435,7 @@ My-Brain-Is-Full-Crew/               ← cloned inside your vault
 │   ├── deep-clean/SKILL.md            Extended vault cleanup
 │   ├── tag-garden/SKILL.md            Tag analysis and cleanup
 │   ├── inbox-triage/SKILL.md          Process and route inbox notes
-│   └── contact-sync/SKILL.md         Sync contacts to Apple Contacts
+│   └── contact-sync/SKILL.md          Sync contacts to Apple Contacts
 ├── references/                      Shared agent documentation
 ├── scripts/
 │   ├── launchme.sh                    First-time installer
