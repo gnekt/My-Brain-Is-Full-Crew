@@ -10,9 +10,9 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Claude_Code-7c3aed?style=for-the-badge&logo=anthropic&logoColor=white" alt="Claude Code" />
-  <img src="https://img.shields.io/badge/Gemini_CLI-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Gemini CLI" />
-  <img src="https://img.shields.io/badge/OpenCode-000000?style=for-the-badge&logo=github&logoColor=white" alt="OpenCode" />
+  <img src="https://img.shields.io/badge/Claude_Code-555555?style=for-the-badge" alt="Claude Code" />
+  <img src="https://img.shields.io/badge/Gemini_CLI-555555?style=for-the-badge" alt="Gemini CLI" />
+  <img src="https://img.shields.io/badge/OpenCode-555555?style=for-the-badge" alt="OpenCode" />
 </p>
 
 <p align="center">
