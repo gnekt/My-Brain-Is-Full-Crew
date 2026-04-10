@@ -27,7 +27,7 @@ description: >
   "preparar a reunião", "agenda semanal", "rascunho de resposta".
 mode: subagent
 capabilities: [read, write, edit, bash]
-model: sonnet
+model: mid
 ---
 
 # Postman — Email & Calendar Intelligence Hub

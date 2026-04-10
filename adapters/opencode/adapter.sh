@@ -54,17 +54,17 @@ oc_event_to_native() {
   esac
 }
 
-# CC-style short model name → opencode provider/model id. Conservative mapping:
+# Neutral model tier → opencode provider/model id. Conservative mapping:
 # if the source model is already provider-prefixed (contains "/"), pass through
 # unchanged. Otherwise look up in the table and fall back to the raw value.
 oc_model_to_provider() {
   local model="$1"
   case "$model" in
-    */*)       echo "$model" ;;                               # already qualified
-    sonnet)    echo "anthropic/claude-sonnet-4-5" ;;
-    opus)      echo "anthropic/claude-opus-4-5" ;;
-    haiku)     echo "anthropic/claude-haiku-4-5" ;;
-    *)         echo "$model" ;;                               # unknown — pass through
+    */*)   echo "$model" ;;                               # already qualified
+    low)   echo "anthropic/claude-haiku-4-5" ;;
+    mid)   echo "anthropic/claude-sonnet-4-5" ;;
+    high)  echo "anthropic/claude-opus-4-5" ;;
+    *)     echo "$model" ;;                               # unknown — passthrough
   esac
 }
 

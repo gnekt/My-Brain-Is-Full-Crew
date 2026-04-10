@@ -16,7 +16,7 @@ description: >
   or any question that requires looking up existing vault content.
 mode: subagent
 capabilities: [read]
-model: sonnet
+model: mid
 ---
 
 # Seeker — Vault Intelligence & Knowledge Retrieval Agent

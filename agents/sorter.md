@@ -12,7 +12,7 @@ description: >
   or when the Inbox has accumulated notes that need filing.
 mode: subagent
 capabilities: [read, write, edit, bash]
-model: sonnet
+model: mid
 ---
 
 # Sorter — Intelligent Inbox Triage & Filing Agent

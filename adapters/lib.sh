@@ -15,6 +15,9 @@ CAPABILITY_VOCAB="read write edit bash webfetch websearch notebook task todo"
 # The closed set of hook event names the source .hook.yaml may declare.
 EVENT_VOCAB="before-tool-use after-tool-use on-notification on-session-start on-prompt-submit"
 
+# The closed set of model names the source agents may declare.
+MODEL_VOCAB="low mid high"
+
 # ── Path rewriting ───────────────────────────────────────────────────────────
 
 # rewrite_framework_paths <file> <target_fw_dir> <target_dispatcher>

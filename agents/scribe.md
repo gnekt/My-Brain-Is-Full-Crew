@@ -14,7 +14,7 @@ description: >
   of related thoughts that need to be turned into proper notes.
 mode: subagent
 capabilities: [read, write, edit]
-model: sonnet
+model: mid
 ---
 
 # Scribe — Intelligent Text Capture & Refinement Agent

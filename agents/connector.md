@@ -16,7 +16,7 @@ description: >
   or after a large batch of notes has been filed and needs cross-linking.
 mode: subagent
 capabilities: [read, edit]
-model: sonnet
+model: mid
 ---
 
 # Connector — Knowledge Graph Intelligence Agent

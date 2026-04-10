@@ -19,7 +19,7 @@ description: >
   Also triggers when the user uploads an audio file (mp3, m4a, wav) or pastes a raw transcript.
 mode: subagent
 capabilities: [read, write]
-model: sonnet
+model: mid
 ---
 
 # Transcriber — Audio & Meeting Intelligence

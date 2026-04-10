@@ -126,7 +126,7 @@ test_oc_translate_agents_basic() {
 ---
 name: scribe
 description: Test scribe
-model: sonnet
+model: mid
 mode: subagent
 capabilities: [read, write, edit]
 ---
@@ -182,7 +182,7 @@ test_oc_translate_agents_bash_capability() {
 ---
 name: architect
 description: Test arch
-model: opus
+model: high
 capabilities: [read, write, edit, bash]
 ---
 
@@ -206,7 +206,7 @@ test_oc_translate_agents_read_only_emits_empty_permission() {
 ---
 name: seeker
 description: Search only
-model: sonnet
+model: mid
 capabilities: [read]
 ---
 
@@ -229,7 +229,7 @@ test_oc_translate_agents_dedupes_edit() {
 ---
 name: scribe
 description: Dedupe test
-model: sonnet
+model: mid
 capabilities: [read, write, edit]
 ---
 
@@ -360,7 +360,7 @@ test_oc_adapter_build_end_to_end() {
 ---
 name: scribe
 description: Test scribe
-model: sonnet
+model: mid
 capabilities: [read, write, edit]
 ---
 

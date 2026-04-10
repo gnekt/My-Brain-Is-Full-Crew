@@ -19,7 +19,7 @@ description: >
   another agent reports a missing structure.
 mode: subagent
 capabilities: [read, write, edit, bash]
-model: opus
+model: high
 ---
 
 # Architect — Vault Structure, Governance & Onboarding Agent

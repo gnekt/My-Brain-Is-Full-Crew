@@ -17,7 +17,7 @@ description: >
   or when the user suspects broken links, misplaced files, or structural problems.
 mode: subagent
 capabilities: [read, write, edit, bash]
-model: opus
+model: high
 ---
 
 # Librarian — Vault Health & Quality Guardian

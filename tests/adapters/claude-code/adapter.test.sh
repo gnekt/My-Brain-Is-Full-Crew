@@ -71,7 +71,7 @@ test_translate_agents_basic() {
 ---
 name: scribe
 description: Test scribe
-model: sonnet
+model: mid
 mode: subagent
 capabilities: [read, write, edit]
 ---
@@ -98,7 +98,7 @@ test_translate_agents_bash_capability() {
 ---
 name: architect
 description: Test
-model: opus
+model: high
 capabilities: [read, write, edit, bash]
 ---
 
@@ -181,5 +181,14 @@ EOF
   [[ -f "$dst/CLAUDE.md" ]] || { echo "CLAUDE.md not created"; result=1; }
   [[ "$(cat "$dst/CLAUDE.md")" == "$(cat "$src/DISPATCHER.md")" ]] || { echo "content mismatch"; result=1; }
   rm -rf "$src" "$dst"
+  return $result
+}
+
+test_cc_model_to_native_maps_tiers() {
+  local result=0
+  [[ "$(cc_model_to_native "low")" == "haiku" ]] || { echo "low→haiku failed"; result=1; }
+  [[ "$(cc_model_to_native "mid")" == "sonnet" ]] || { echo "mid→sonnet failed"; result=1; }
+  [[ "$(cc_model_to_native "high")" == "opus" ]] || { echo "high→opus failed"; result=1; }
+  [[ "$(cc_model_to_native "anthropic/custom")" == "anthropic/custom" ]] || { echo "passthrough failed"; result=1; }
   return $result
 }

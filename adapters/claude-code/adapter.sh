@@ -132,6 +132,18 @@ cc_match_tool_to_matcher() {
   echo "$matcher"
 }
 
+# Neutral model tier → Claude Code model name.
+cc_model_to_native() {
+  local model="$1"
+  case "$model" in
+    */*)   echo "$model" ;;   # already qualified — passthrough
+    low)   echo "haiku" ;;
+    mid)   echo "sonnet" ;;
+    high)  echo "opus" ;;
+    *)     echo "$model" ;;   # unknown — passthrough
+  esac
+}
+
 # adapter_translate_hooks <source_hooks_dir> <dest_root>
 adapter_translate_hooks() {
   local src="$1" dst="$2"
@@ -208,6 +220,7 @@ adapter_translate_agents() {
     should_include "$agent" "$CC_PLATFORM" || continue
     local name; name="$(parse_frontmatter "$agent" name)"
     local model; model="$(parse_frontmatter "$agent" model)"
+    model="$(cc_model_to_native "$model")"
     local caps; caps="$(parse_capabilities "$agent")"
 
     # Build tools allowlist by expanding each capability.
