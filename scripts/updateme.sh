@@ -9,7 +9,7 @@
 #   bash scripts/updateme.sh
 #
 # Options:
-#   --platform <name>    Platform to build for (default: claude-code)
+#   --platform <name>    Platform to update (auto-detected if omitted)
 #   --target <path>      Override the vault destination path
 # =============================================================================
 
@@ -22,7 +22,7 @@ source "$SCRIPT_DIR/lib.sh"
 resolve_paths "${BASH_SOURCE[0]}"
 
 # ── Parse args ─────────────────────────────────────────────────────────────
-PLATFORM="claude-code"
+PLATFORM=""
 TARGET_OVERRIDE=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -35,6 +35,38 @@ done
 
 # ── Banner ────────────────────────────────────────────────────────────────────
 print_banner "Update       "
+
+# ── Auto-detect platform if not specified ────────────────────────────────────
+if [[ -z "$PLATFORM" ]]; then
+  DETECTED=()
+  [[ -d "$VAULT_DIR/.claude/agents" ]]   && DETECTED+=("claude-code")
+  [[ -d "$VAULT_DIR/.opencode/agents" ]] && DETECTED+=("opencode")
+  [[ -d "$VAULT_DIR/.gemini/agents" ]]   && DETECTED+=("gemini-cli")
+
+  if [[ ${#DETECTED[@]} -eq 0 ]]; then
+    die "No installed platform detected in $VAULT_DIR — run launchme.sh first"
+  elif [[ ${#DETECTED[@]} -eq 1 ]]; then
+    PLATFORM="${DETECTED[0]}"
+    info "Detected platform: $PLATFORM"
+  else
+    echo -e "   ${BOLD}Multiple platforms detected:${NC}"
+    echo ""
+    for i in "${!DETECTED[@]}"; do
+      echo -e "   ${BOLD}$((i+1)))${NC} ${DETECTED[$i]}"
+    done
+    echo ""
+    if ! read -r -p "   Which platform to update? > " PLATFORM_CHOICE 2>/dev/null; then PLATFORM_CHOICE=""; fi
+    if [[ "$PLATFORM_CHOICE" =~ ^[0-9]+$ ]] && (( PLATFORM_CHOICE >= 1 && PLATFORM_CHOICE <= ${#DETECTED[@]} )); then
+      PLATFORM="${DETECTED[$((PLATFORM_CHOICE-1))]}"
+    else
+      for p in "${DETECTED[@]}"; do
+        [[ "$p" == "$PLATFORM_CHOICE" ]] && PLATFORM="$p" && break
+      done
+    fi
+    [[ -n "$PLATFORM" ]] || die "Invalid selection: $PLATFORM_CHOICE"
+    info "Selected platform: $PLATFORM"
+  fi
+fi
 
 # ── Check vault has been set up ───────────────────────────────────────────────
 case "$PLATFORM" in

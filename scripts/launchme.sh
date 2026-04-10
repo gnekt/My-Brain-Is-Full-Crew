@@ -11,7 +11,7 @@
 # .claude/ directory.
 #
 # Options:
-#   --platform <name>    Platform to build for (default: claude-code)
+#   --platform <name>    Platform to build for (interactive selection if omitted)
 #   --target <path>      Override the vault destination path
 # =============================================================================
 
@@ -24,7 +24,7 @@ source "$SCRIPT_DIR/lib.sh"
 resolve_paths "${BASH_SOURCE[0]}"
 
 # ── Parse args ─────────────────────────────────────────────────────────────
-PLATFORM="claude-code"
+PLATFORM=""
 TARGET_OVERRIDE=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -34,6 +34,42 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 [[ -n "$TARGET_OVERRIDE" ]] && VAULT_DIR="$TARGET_OVERRIDE"
+
+# ── Platform selection (interactive if not specified) ──────────────────────
+if [[ -z "$PLATFORM" ]]; then
+  # Discover available platforms from adapters/ directories
+  AVAILABLE=()
+  for d in "$REPO_DIR/adapters/"*/; do
+    [[ -f "${d}adapter.sh" ]] || continue
+    AVAILABLE+=("$(basename "$d")")
+  done
+  if [[ ${#AVAILABLE[@]} -eq 0 ]]; then
+    die "No adapters found in adapters/"
+  fi
+  echo ""
+  echo -e "   ${BOLD}Select your agent platform:${NC}"
+  echo ""
+  for i in "${!AVAILABLE[@]}"; do
+    echo -e "   ${BOLD}$((i+1)))${NC} ${AVAILABLE[$i]}"
+  done
+  echo ""
+  if ! read -r -p "   > " PLATFORM_CHOICE 2>/dev/null; then PLATFORM_CHOICE=""; fi
+  # Accept either number or name
+  if [[ "$PLATFORM_CHOICE" =~ ^[0-9]+$ ]] && (( PLATFORM_CHOICE >= 1 && PLATFORM_CHOICE <= ${#AVAILABLE[@]} )); then
+    PLATFORM="${AVAILABLE[$((PLATFORM_CHOICE-1))]}"
+  else
+    # Try matching by name
+    for p in "${AVAILABLE[@]}"; do
+      if [[ "$p" == "$PLATFORM_CHOICE" ]]; then
+        PLATFORM="$p"
+        break
+      fi
+    done
+  fi
+  [[ -n "$PLATFORM" ]] || die "Invalid selection: $PLATFORM_CHOICE"
+  echo ""
+  info "Selected platform: $PLATFORM"
+fi
 
 # ── Banner ────────────────────────────────────────────────────────────────────
 print_banner "Setup        "
