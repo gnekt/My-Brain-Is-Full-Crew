@@ -7,6 +7,9 @@
 # opencode expects in the user's vault.
 # =============================================================================
 
+# shellcheck source=adapters/opencode/config-merge.sh
+source "$(dirname "${BASH_SOURCE[0]}")/config-merge.sh"
+
 OC_PLATFORM="opencode"
 OC_FW_DIR="opencode"
 OC_DISPATCHER="AGENTS.md"

@@ -106,6 +106,12 @@ case "$PLATFORM" in
 esac
 PLATFORM_VAULT_DIR="$VAULT_COMPONENTS_DIR"
 
+# Load opencode-specific helpers when building for opencode
+if [[ "$PLATFORM" == "opencode" ]]; then
+  # shellcheck source=adapters/opencode/config-merge.sh
+  source "$REPO_DIR/adapters/opencode/config-merge.sh"
+fi
+
 # ── Migrate legacy manifests (if any) ────────────────────────────────────────
 manifest_migrate
 
@@ -142,7 +148,12 @@ CLAUDE_MD_CHANGED=$_LAST_CHANGED
 
 # ── MCP / opencode.json ───────────────────────────────────────────────────────
 if [[ -f "$MCP_SRC" ]]; then
-  copy_if_changed "$MCP_SRC" "$MCP_DST"
+  if [[ "$PLATFORM" == "opencode" && -f "$MCP_DST" ]]; then
+    oc_config_merge "$MCP_SRC" "$MCP_DST" "$MCP_DST"
+    info "Merged opencode.json (user config preserved)"
+  else
+    copy_if_changed "$MCP_SRC" "$MCP_DST"
+  fi
 fi
 
 # ── Summary ───────────────────────────────────────────────────────────────────
