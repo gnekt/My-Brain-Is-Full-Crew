@@ -5,7 +5,18 @@
 </p>
 
 <p align="center">
-  You talk. They organize, file, connect, search, transcribe, and triage your email. In any language.
+  You talk. They organize, file, connect, search, transcribe, and triage your email.<br>
+  In any language. On the platform you already use.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Claude_Code-7c3aed?style=for-the-badge&logo=anthropic&logoColor=white" alt="Claude Code" />
+  <img src="https://img.shields.io/badge/Gemini_CLI-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Gemini CLI" />
+  <img src="https://img.shields.io/badge/OpenCode-000000?style=for-the-badge&logo=github&logoColor=white" alt="OpenCode" />
+</p>
+
+<p align="center">
+  <em>One codebase. Three platforms. Same crew.</em>
 </p>
 
 <p align="center">
@@ -18,7 +29,6 @@
   <img src="https://img.shields.io/badge/Agents-8%2B-blueviolet?style=flat-square" alt="8+ Agents" />
   <img src="https://img.shields.io/badge/Skills-14-blue?style=flat-square" alt="14 Skills" />
   <img src="https://img.shields.io/badge/Language-Any-success?style=flat-square" alt="Any Language" />
-  <img src="https://img.shields.io/badge/Platform-Obsidian%20%2B%20Claude-blue?style=flat-square" alt="Obsidian + Claude" />
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=flat-square" alt="MIT License" />
 </p>
 
