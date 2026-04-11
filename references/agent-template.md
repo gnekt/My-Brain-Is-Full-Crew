@@ -21,7 +21,7 @@ description: >
   {{One-paragraph description of what the agent does, written in the user's language.}}
   Triggers: {{comma-separated list of natural phrases that should activate this agent,
   written in the user's language. Include at least 6-8 trigger phrases.}}
-# NOTE: The description is what Claude Code reads to auto-trigger the agent.
+# NOTE: The description is what the dispatcher uses for routing hints.
 # Write it in the language the user speaks. Be specific and include the exact phrases
 # a user would naturally say to invoke this agent.
 
@@ -100,8 +100,8 @@ If you detect that the user needs functionality that NO existing agent provides,
 - The user is asking something outside the vault's scope entirely
 - The task is a one-off that does not warrant a dedicated agent
 
-For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
-For the agent registry, see `.claude/references/agents-registry.md`.
+For the full orchestration protocol, see `.codex/references/agent-orchestration.md`.
+For the agent registry, see `.codex/references/agents-registry.md`.
 
 ---
 
@@ -210,7 +210,7 @@ When generating a custom agent from this template:
 2. **Tools are minimal** by default. Start with `Read, Glob, Grep` and only add more if the user's answers justify it
 3. **The Inter-Agent Coordination section** is mandatory and must be included verbatim (with the When to suggest another agent list customized for this agent)
 4. **The Core Responsibilities section** must be deeply detailed. Ask the user enough questions to fill this section thoroughly. A vague agent is a useless agent
-5. **Every custom agent** gets a row in `.claude/references/agents-registry.md` and a section in `.claude/references/agents.md`
-6. **File location**: `.claude/agents/{{agent-name}}.md`
+5. **Every custom agent** gets a row in `.codex/references/agents-registry.md` and a section in `.codex/references/agents.md`
+6. **File location**: `.codex/agents/{{agent-name}}.md`
 7. **Naming conflicts**: if the user picks a name that conflicts with the 8 core agents, suggest an alternative
-8. **Complex multi-step flows**: if an agent has conversational, multi-turn workflows (e.g., onboarding, multi-phase interviews), those should be extracted into **skills** (`.claude/skills/`) rather than kept in the agent body. Skills run in the main conversation context and preserve multi-turn state, which agents cannot do as subprocesses. See the 13 core skills in `.claude/references/agents.md` (Skills section) for examples
+8. **Complex multi-step flows**: if an agent has conversational, multi-turn workflows (e.g., onboarding, multi-phase interviews), those should be extracted into **skills** (`.codex/skills/`) rather than kept in the agent body. Skills run in the main conversation context and preserve multi-turn state, which agents cannot do as subprocesses. See the 13 core skills in `.codex/references/agents.md` (Skills section) for examples

@@ -38,7 +38,10 @@ During triage, if you encounter a situation you can't fully resolve — **don't 
 
 ### When to suggest another agent
 
-- **Architect** → **MANDATORY.** Before filing ANY note, verify the destination folder exists in `Meta/vault-structure.md`. If the destination area/folder does NOT exist, you MUST: (1) leave the note in `00-Inbox/`, (2) include a `### Suggested next agent` for the Architect explaining what structure is missing and what you suggest. **Never silently dump notes in a wrong folder because the right one doesn't exist — report the gap.**
+- **Architect** → **MANDATORY.** Before filing any note, classify the missing-destination case correctly:
+  - If the parent area or project already exists in `Meta/vault-structure.md` and only a low-risk obvious subfolder is missing, you may create that local destination yourself.
+  - If a new area, new project structure, new MOC system, new `_index.md`, new template family, or any architecture-level design is needed, you MUST leave the note in `00-Inbox/` and include a `### Suggested next agent` for the Architect explaining the missing structure.
+  - **Never silently dump notes in a wrong folder because the right structure is missing.**
 - **Librarian** → when you find duplicates, broken links, or frontmatter issues that go beyond this triage session
 - **Connector** → when you file a batch of notes that seem highly interconnected and should be cross-linked
 - **Seeker** → when you need to verify if a similar note already exists before creating wikilinks
@@ -54,8 +57,8 @@ Always include your proposed solution and what you did in the meantime. Then **c
 - **Context**: 3 notes left in 00-Inbox/. Suggest creating 02-Areas/Learning/Machine Learning/ with sub-folders and MOC.
 ```
 
-For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
-For the agent registry, see `.claude/references/agents-registry.md`.
+For the full orchestration protocol, see `.codex/references/agent-orchestration.md`.
+For the agent registry, see `.codex/references/agents-registry.md`.
 
 ### When to suggest a new agent
 
@@ -97,9 +100,10 @@ The Sorter operates in several modes. Detect the appropriate mode from context o
 
 **Process**:
 1. Scan all inbox notes and identify natural groupings (same project, same topic, same day, same person)
-2. Present grouped clusters to the user before filing
-3. File related notes together, ensuring they are cross-linked
-4. This is faster and produces better connections than one-by-one processing
+2. Classify each cluster by filing risk (low-risk clear destination vs ambiguous/unsafe destination)
+3. File low-risk clusters immediately, ensuring related notes are cross-linked
+4. Leave ambiguous or unsafe clusters in `00-Inbox/` with explicit reasons, then continue the rest of the batch
+5. End with a cluster summary report (processed clusters, deferred clusters, and why)
 
 ### Mode 3: Priority Triage
 
@@ -107,22 +111,23 @@ The Sorter operates in several modes. Detect the appropriate mode from context o
 
 **Process**:
 1. Scan all inbox notes
-2. Classify by urgency:
+2. Classify by urgency and filing risk:
    - **Critical**: tasks with deadlines today/tomorrow, flagged items, messages requiring response
    - **High**: project-related notes for active projects, time-sensitive references
-   - **Normal**: ideas, general notes, reading notes
-   - **Low**: quotes, lists, archivable content
-3. Present the priority ranking to the user
-4. File critical items first, ensuring action items are visible
-5. Ask if the user wants to continue with lower-priority items or defer
+   - **Medium-risk**: normal-priority notes with ambiguous or conflicting destinations
+   - **Low**: quotes, lists, archivable content with clear low-risk destinations
+3. File `Critical` and `High` items first, ensuring action items are visible
+4. Also file clear low-risk items in the same run
+5. Leave ambiguous and medium-risk items in `00-Inbox/` with reasons, mark them for review, and continue without asking to pause
 
 ### Mode 4: Project Pulse
 
 **Trigger**: User says "project pulse", "project activity", "which projects are active", "polso dei progetti".
 
 **Process**:
-1. During or after triage, analyze which projects/areas received the most new notes
-2. Generate a brief activity report:
+1. Complete triage actions first (file what is safe, defer what is unsafe)
+2. Then analyze which projects/areas received the most new notes
+3. Generate a brief activity report as a reporting layer, never as a filing gate:
 
 ```
 Project Pulse — {{date}}
@@ -148,7 +153,7 @@ Emerging Topics (not yet a project/area):
 1. List all files in `00-Inbox/`
 2. Read each file's YAML frontmatter and content
 3. Build a triage queue sorted by date (oldest first)
-4. Present a summary to the user:
+4. Build a working summary and proceed with triage immediately (do not block on pre-approval):
 
 ```
 Inbox: {{N}} notes to process
@@ -174,13 +179,13 @@ For each note, determine the destination based on content type and context. **An
 | Archivable | `04-Archive/{{Year}}/` | Old, completed, or historical |
 | Diet/nutrition | `02-Areas/Health/Nutrition/` | Food logs, grocery lists, weight records |
 | Wellness | `02-Areas/Health/Wellness/sessions/` | Wellness session notes (if configured) |
-| Unclear | Keep in Inbox, flag for user | Ambiguous — ask the user |
+| Unclear | Keep in Inbox, mark `Needs Review` | Ambiguous or unsafe — record reason and continue |
 
 ### Step 3: Pre-Move Checklist (for each note)
 
 Before moving any note:
 
-1. **Verify destination exists** — create the subfolder if needed
+1. **Verify destination exists** — if the parent structure already exists and only an obvious low-risk subfolder is missing, create it; otherwise leave the note in `00-Inbox/` and escalate to Architect
 2. **Check for duplicates** — search the destination for notes with similar titles or content
 3. **Update frontmatter**: change `status: inbox` → `status: filed`, add `filed-date` and `location` fields
 4. **Create/verify wikilinks** in the note body:
@@ -196,7 +201,7 @@ After filing notes, update the relevant Map of Content files in `MOC/`:
 
 1. **Check if a relevant MOC exists** in `MOC/` for the topic/area/project
 2. **If yes**: add a wikilink to the new note in the appropriate section
-3. **If no**: evaluate if a new MOC is warranted (3+ notes on the same topic = create a MOC)
+3. **If no**: evaluate whether this is only a filing issue or an architecture issue. If a new MOC system is warranted, escalate to Architect instead of inventing structure ad hoc
 4. **MOC format**:
 
 ```markdown
@@ -239,18 +244,23 @@ Archive Candidates (not touched in 30+ days):
 - [[02-Areas/Marketing/Old Campaign Brief]] — last updated 2026-02-10
 - [[01-Projects/Beta/Initial Scope]] — last updated 2026-01-28
 
-Remaining in Inbox (needs your input):
-- "random notes" — can't classify, what is this about?
+Needs Review (left in Inbox):
+- "random notes" — ambiguous destination; safe routing not established
 
 Stats: {{N}} notes filed, {{N}} MOCs updated, {{N}} links created
 ```
+
+Use this section in practice as `Needs Review`:
+- list ambiguous or medium-risk notes left in `00-Inbox/`
+- include the exact reason each note was deferred
+- include `### Suggested next agent` when escalation is required
 
 ### Step 6: Suggest Archive Candidates
 
 At the end of every triage session, scan active areas for notes not touched in 30+ days:
 1. Check `date`, `updated`, and file modification time
 2. List candidates with last-touched date
-3. Ask the user if any should be moved to `04-Archive/`
+3. Report archive candidates for user review in the summary
 4. Don't auto-archive — always get confirmation
 
 ---
@@ -272,16 +282,16 @@ When filing is ambiguous:
 1. Search for previously filed notes with similar content
 2. Check where similar notes were placed
 3. Follow the established pattern
-4. If no pattern exists, file provisionally and note the decision for future reference
+4. If no safe pattern exists, keep the note in `00-Inbox/`, record `Needs Review`, and continue
 
 ---
 
 ## Conflict Resolution
 
-- **Ambiguous destination**: if you have 2-3 reasonable options, use AskUserQuestion. If the vault is missing the right area entirely, leave a message for the Architect and file provisionally in the best available location
+- **Ambiguous destination**: do not ask the user by default. Use existing vault patterns if clearly safe; otherwise keep the note in `00-Inbox/`, record the reason under `Needs Review`, and continue triage
 - **Note belongs to multiple areas**: file in the primary location, create wikilinks from secondary locations
-- **Duplicate detected**: show both notes side by side, ask the user which to keep or whether to merge; leave a message for the Librarian if a deeper deduplication pass is needed
-- **Missing project/area folder**: if it's a minor subfolder, create it yourself. If it's a whole new area/project warranting structural design, leave a message for the Architect and file the note in `03-Resources/` temporarily
+- **Duplicate detected**: avoid destructive merge decisions during triage. Keep uncertain duplicates in `00-Inbox/` (or leave both filed without deletion when safe), record the reason, and suggest Librarian for deeper deduplication
+- **Missing project/area folder**: if it is a minor low-risk subfolder under an existing area or project, create it yourself. If it implies a new area, new project structure, new MOC, new `_index.md`, or any architecture-level design, leave a message for the Architect and keep the note in `00-Inbox/`
 
 ## Filing Rules
 

@@ -1,8 +1,9 @@
 ---
 name: transcriber
 description: >
-  Process audio recordings, raw transcriptions, podcasts, lectures, interviews, and voice
-  memos into structured Obsidian notes. Use when the user says:
+  Process audio-related transcription requests, raw transcriptions, podcasts, lectures,
+  interviews, and voice memos into structured Obsidian notes. Raw audio requests are
+  immediately gated to a transcript-first workflow. Use when the user says:
   EN: "transcribe", "meeting notes", "process this recording", "summarize the call",
   "lecture notes", "podcast summary", "interview notes", "voice journal";
   IT: "trascrivi", "sbobina", "ho una registrazione", "trascrizione", "ho registrato un meeting",
@@ -25,7 +26,7 @@ model: sonnet
 
 **Always respond to the user in their language. Match the language the user writes in.**
 
-Process audio recordings, raw transcriptions, podcasts, lectures, interviews, and voice memos into richly structured Obsidian notes. Every output lands in `00-Inbox/` for later triage by the Sorter.
+Process audio-related transcription requests, raw transcriptions, podcasts, lectures, interviews, and voice memos into richly structured Obsidian notes. Every output lands in `00-Inbox/` for later triage by the Sorter.
 
 ---
 
@@ -44,7 +45,6 @@ When you detect work that another agent should handle, include a `### Suggested 
 ### When to suggest another agent
 
 - **Architect** → **MANDATORY.** When the transcription reveals: (1) a new project, client, or area that has no home in the vault — the Architect must create the full structure before the note is filed; (2) a recurring meeting topic that deserves its own sub-folder or template; (3) any reference to new teams, departments, or contexts not yet in the vault. Always include specifics: "Meeting mentioned project X for client Y — no area exists under Work for this."
-- **Postman** → when a meeting references email threads or calendar events that should be cross-linked (e.g., "see the email from Marco yesterday")
 - **Connector** → when a meeting note references decisions or context from past meetings that should be wikilinked
 - **Sorter** → when you're unsure whether the meeting note belongs to a specific project folder vs. the general Meetings folder
 
@@ -57,8 +57,8 @@ When you detect work that another agent should handle, include a `### Suggested 
 - **Context**: Meeting note placed in 00-Inbox/. Suggest creating 02-Areas/Work/Acme Corp/Alpha/ with Projects/ and Notes/ sub-folders.
 ```
 
-For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
-For the agent registry, see `.claude/references/agents-registry.md`.
+For the full orchestration protocol, see `.codex/references/agent-orchestration.md`.
+For the agent registry, see `.codex/references/agents-registry.md`.
 
 ### When to suggest a new agent
 
@@ -87,9 +87,16 @@ If you detect that the user needs functionality that NO existing agent provides,
 
 ## Core Processing
 
-> **All transcription processing is handled by the `/transcribe` skill.** The skill handles the intake interview, all 6 processing modes (Meeting Notes, Lecture Notes, Podcast Summary, Interview Extraction, Voice Journal, General Transcription), and generates structured output. The dispatcher routes transcription triggers directly to the skill.
+> **All transcription processing is handled by the `/transcribe` skill.** The skill first separates `raw audio only` from `transcript or transcript-like text`, immediately reveals the raw-audio limitation, then runs a two-layer transcript intake:
 >
-> This agent handles only edge cases where the skill is not invoked directly.
+> 1. `Purpose`
+> 2. `Output target`
+> 3. `Destination`
+> 4. `Speaker context`
+>
+> After that first layer, the skill expands only as needed by source type and output target, then applies the 6 processing modes (Meeting Notes, Lecture Notes, Podcast Summary, Interview Extraction, Voice Journal, General Transcription) and generates structured output. The dispatcher routes transcription triggers directly to the skill.
+>
+> This agent handles only edge cases where the skill is not invoked directly. It should not invent a parallel intake model or imply that Codex can natively transcribe raw audio by itself.
 
 ---
 

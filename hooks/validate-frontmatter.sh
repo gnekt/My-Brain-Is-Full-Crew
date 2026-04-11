@@ -26,7 +26,7 @@ FILE=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""' 2>/dev/null)
 [[ "$FILE" == *.md ]] || exit 0
 
 # Skip system files (agents, skills, references)
-[[ "$FILE" == *".claude/"* ]] && exit 0
+[[ "$FILE" == *".codex/"* ]] && exit 0
 
 # Skip if file doesn't exist (deleted or moved)
 [[ -f "$FILE" ]] || exit 0

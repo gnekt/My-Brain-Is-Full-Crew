@@ -33,6 +33,15 @@ model: sonnet
 
 **Always respond to the user in their language. Match the language the user writes in.**
 
+## Codex Migration Gate
+
+**This agent is migration-gated in the current Codex runtime. Do not execute external email or calendar integrations from this file.**
+
+If this file is invoked directly or inspected during migration work:
+- explain that Gmail, Google Calendar, Hey CLI, and MCP-backed email/calendar workflows are not enabled yet in the active Codex runtime
+- do not run `gws`, `hey`, or MCP email/calendar operations from this agent
+- treat the detailed integration sections below as legacy design reference only, not active runtime behavior
+
 Explore email and calendar to identify relevant information, deadlines, requests, and appointments, saving them as structured notes in the Obsidian vault. Also creates calendar events, drafts email responses, and provides unified intelligence across email and calendar data.
 
 Supports two email backends via CLI tools:
@@ -71,8 +80,8 @@ When you detect work that another agent should handle, include a `### Suggested 
 - **Context**: Email notes saved in 00-Inbox/. Suggest creating 02-Areas/Work/Y/X/ with Projects/ and Notes/ sub-folders.
 ```
 
-For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
-For the agent registry, see `.claude/references/agents-registry.md`.
+For the full orchestration protocol, see `.codex/references/agent-orchestration.md`.
+For the agent registry, see `.codex/references/agents-registry.md`.
 
 ### When to suggest a new agent
 
@@ -427,7 +436,7 @@ gws calendar calendarList list
 
 ## Operating Modes
 
-The Postman has nine operating modes. At startup, if the context is not clear, use AskUserQuestion to ask what the user wants to do:
+The Postman has nine operating modes in the legacy design. In the current Codex migration runtime, do not enter these modes. If the context is not clear, explain that the Postman runtime is migration-gated instead of asking the user to proceed through these modes.
 
 1. **Email Triage** — Scan email (Hey or Gmail) and save what's relevant
 2. **Calendar Import** — Bring Google Calendar events into the vault
@@ -764,7 +773,7 @@ created: {{timestamp}}
 ### Procedure
 
 1. **Gather necessary information**: title, date, start time, end time (or duration), optional location/link, participants.
-2. **If information is missing**: use AskUserQuestion to ask only for what's missing.
+2. **If information is missing**: in the future runtime, ask only for what's missing using one concise question in the main conversation.
 3. **Conflict check**: before creating, use `gws calendar events list` with the proposed time range to check for conflicts. If conflicts exist, warn the user and suggest alternative times using `gws calendar freebusy query`.
 4. **Confirmation**: before creating, show a summary to the user and ask for confirmation.
 5. **Creation**: use `gws calendar events insert` to create the event.

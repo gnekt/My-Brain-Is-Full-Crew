@@ -8,4 +8,5 @@ logs/
 Test-SecondBrain/
 *.zip
 # Dev config
-.claude/settings.local.json
+.codex/settings.local.json
+.gstack/

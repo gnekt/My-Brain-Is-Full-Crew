@@ -1,8 +1,9 @@
 ---
 name: transcribe
 description: >
-  Process audio recordings, meeting transcripts, podcasts, or lectures. Runs an intake
-  interview (date, mode, speakers, language) then processes into structured notes with
+  Process meeting transcripts, transcript-ready recordings, podcasts, or lectures. Starts
+  by separating raw audio from transcript text, then uses a two-layer intake (purpose,
+  output target, destination, speaker context) before generating structured notes with
   action items, decisions, and glossary. Triggers:
   EN: "transcribe", "I have a recording", "process this audio", "meeting notes from recording", "summarize the call", "lecture notes", "podcast summary".
   IT: "trascrivi", "ho una registrazione", "processa questo audio", "note della riunione", "riassumi la call".
@@ -16,7 +17,7 @@ description: >
 
 **Always respond to the user in their language. Match the language the user writes in.**
 
-Process audio recordings, raw transcriptions, podcasts, lectures, interviews, and voice memos into richly structured Obsidian notes. Every output lands in `00-Inbox/` for later triage by the Sorter.
+Process transcription requests for recordings, raw transcriptions, podcasts, lectures, interviews, and voice memos into richly structured Obsidian notes. Every output lands in `00-Inbox/` for later triage by the Sorter.
 
 ---
 
@@ -35,7 +36,6 @@ When you detect work that another agent should handle, include a `### Suggested 
 ### When to suggest another agent
 
 - **Architect** — **MANDATORY.** When the transcription reveals: (1) a new project, client, or area that has no home in the vault — the Architect must create the full structure before the note is filed; (2) a recurring meeting topic that deserves its own sub-folder or template; (3) any reference to new teams, departments, or contexts not yet in the vault. Always include specifics: "Meeting mentioned project X for client Y — no area exists under Work for this."
-- **Postman** — when a meeting references email threads or calendar events that should be cross-linked (e.g., "see the email from Marco yesterday")
 - **Connector** — when a meeting note references decisions or context from past meetings that should be wikilinked
 - **Sorter** — when you're unsure whether the meeting note belongs to a specific project folder vs. the general Meetings folder
 
@@ -48,8 +48,8 @@ When you detect work that another agent should handle, include a `### Suggested 
 - **Context**: Meeting note placed in 00-Inbox/. Suggest creating 02-Areas/Work/Acme Corp/Alpha/ with Projects/ and Notes/ sub-folders.
 ```
 
-For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
-For the agent registry, see `.claude/references/agents-registry.md`.
+For the full orchestration protocol, see `.codex/references/agent-orchestration.md`.
+For the agent registry, see `.codex/references/agents-registry.md`.
 
 ### When to suggest a new agent
 
@@ -76,29 +76,69 @@ If you detect that the user needs functionality that NO existing agent provides,
 
 ---
 
-## Intake Interview
+## Intake Gate
 
-Before processing any recording, gather context through a structured interview. Use AskUserQuestion to collect:
+Determine the source path before asking deeper questions.
 
-1. **Date & time** of the recording (default: today)
-2. **Processing mode**: Meeting, Lecture Notes, Podcast Summary, Interview Extraction, Voice Journal, or General Transcription
-3. **Participants / Speakers**: names and roles (if applicable)
-4. **Project / area** the recording relates to (if any)
-5. **Language**: detect automatically, or ask if ambiguous
-6. **Priority flags**: is there anything urgent the user already knows about?
-7. **Transcript format**: if providing a text file, ask which tool generated it (Whisper, Otter, Google Meet, Zoom, manual, or unknown)
+Start by deciding whether the user has:
 
-Skip questions the user has already answered in their message. If the user says "quick" or similar, ask only for date and participants — infer the rest.
+1. `raw audio only`
+2. `transcript or transcript-like text`
+
+Do not begin the full transcription intake until this distinction is clear.
+
+### Raw audio path
+
+If the user provides only raw audio and no transcript:
+
+1. State immediately: the current Codex runtime cannot natively transcribe raw audio by itself
+2. Tell the user to bring back transcript text from Whisper, Otter, Google Meet, Zoom, or another workflow they already trust
+3. Explain that once transcript text exists, `/transcribe` can continue with structuring, summarization, action extraction, and note generation
+4. If the vault has another transcription workflow the user already uses, point them there without pretending `/transcribe` can do the raw-audio step itself
+
+### Transcript path
+
+If the user already has transcript text, continue into the two-layer intake below.
 
 ---
 
-## Transcription Processing
+## Two-Layer Transcript Intake
 
-### If the user provides a raw audio file:
+Ask concise follow-up questions in the main conversation. Skip anything the user already answered. Ask one thing at a time when clarity is needed.
 
-1. Inform the user that Claude cannot directly transcribe audio — suggest using Whisper (local), Otter.ai, or the Obsidian Audio Notes plugin
-2. Offer to process the transcript once they have it
-3. If a transcription plugin is available in the vault, guide the user to use it
+### Layer 1: Required minimum intake
+
+The first layer collects only these four things:
+
+1. **Purpose**: why the user wants this processed
+2. **Output target**: what artifact they want back
+3. **Destination**: where the result should land
+4. **Speaker context**: known speakers, roles, or whether speaker identity is unknown
+
+Do not make `date`, `language`, `priority flags`, or `transcript format` default first-layer requirements.
+
+### Layer 2: Mixed expansion
+
+Only after Layer 1 is clear, expand the intake in two steps:
+
+1. **Source type**: meeting, interview, lecture or webinar, podcast, voice note, or general transcript
+2. **Output target**: meeting note, knowledge note, concise summary, action digest, or cleaned transcript
+
+Use the smallest possible second-layer follow-up set.
+
+#### Examples of allowed second-layer follow-ups
+
+- **Meetings**: meeting date, decision ownership clarity, deadline sensitivity, known project context
+- **Interviews**: interviewer/interviewee roles, extraction focus, quote sensitivity
+- **Lectures**: course context, study depth, exam relevance
+- **Podcasts**: show or episode identity if missing, emphasis on insights vs quotes
+- **Voice notes**: whether the user wants capture, cleanup, or conversion into a structured note
+
+Only ask these when the answer materially affects the output.
+
+---
+
+## Transcript Processing
 
 ### If the user provides text (pasted or as a file):
 

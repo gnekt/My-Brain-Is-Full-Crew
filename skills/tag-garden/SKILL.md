@@ -23,6 +23,16 @@ The Tag Garden is a focused maintenance mode that analyzes all tags in the vault
 
 Before starting any audit, read `Meta/user-profile.md` to understand the user's context, preferences, and active projects.
 
+## Risk-Tier Contract
+
+Tag Garden follows the same approval boundary as Vault Audit and Deep Clean. Tag depth does not change the permission level.
+
+- **Low-risk**: auto-apply only when the change is deterministic, reversible, and limited to tag hygiene. Examples include lowercase normalization, hyphenation cleanup, spacing fixes, and other format-only tag normalizations.
+- **Medium-risk**: do not apply directly. Put these items into a `Pending Approval Plan` first. This includes semantic tag merges, taxonomy edits, adding or removing taxonomy entries, and any retagging that changes meaning or ownership.
+- **High-risk**: do not auto-execute in this skill. Tag model redesigns, vault-structure changes, or any taxonomy work that implies new organizational shape should be surfaced for dispatcher routing or Architect review instead of being executed here.
+
+`Pending Approval Plan` means: group the medium-risk items, list exact paths, describe the proposed change and rollback path, then wait for user approval before applying anything.
+
 ---
 
 ## Inter-Agent Coordination
@@ -33,7 +43,8 @@ When you detect work that another agent should handle, include a `### Suggested 
 
 ### When to suggest another agent
 
-- **Architect** — **MANDATORY.** Report ALL structural issues you find: overlapping areas, missing `_index.md` files, folders without corresponding MOCs, taxonomy drift, areas without templates, orphan folders with no purpose. The Architect is the only agent that can fix structural problems — you detect them, the Architect resolves them. Be specific: list the exact paths and what's wrong.
+- **Architect** — **MANDATORY.** Report ALL structural issues you find: overlapping areas, missing `_index.md` files, folders without corresponding MOCs, areas without templates, and orphan folders with no purpose. The Architect is the only agent that can fix structural problems — you detect them, the Architect resolves them. Be specific: list the exact paths and what's wrong.
+- **Pending Approval Plan** — when tag work changes meaning or ownership, including semantic merges, taxonomy edits, and additions or removals from `Meta/tag-taxonomy.md`.
 - **Sorter** — when you find misplaced notes that should be re-filed
 - **Connector** — when you find clusters of orphan notes that should be linked but have no obvious connections yet
 - **Seeker** — when you find notes with conflicting or duplicate information that need a content-level reconciliation
@@ -48,8 +59,8 @@ When you detect work that another agent should handle, include a `### Suggested 
 - **Context**: Found 12 orphan tags not in taxonomy, 5 taxonomy entries never used. Suggest Architect review and update Meta/tag-taxonomy.md.
 ```
 
-For the full orchestration protocol, see `.claude/references/agent-orchestration.md`.
-For the agent registry, see `.claude/references/agents-registry.md`.
+For the full orchestration protocol, see `.codex/references/agent-orchestration.md`.
+For the agent registry, see `.codex/references/agents-registry.md`.
 
 ### When to suggest a new agent
 
@@ -128,21 +139,21 @@ Top Tags:
 5. #{{tag}} — {{N}} notes
 ...
 
-Suggested Merges:
+Auto-applied Normalizations:
+- #ProjectManagement -> #project-management (format-only)
+- #AIResearch -> #ai-research (format-only)
+
+Pending Approval Plan:
 - #marketing + #mktg -> #marketing ({{N}} notes affected)
 - #dev + #development -> #development ({{N}} notes affected)
-
-Possibly Unused:
-- #{{tag}} — 0 uses, in taxonomy since {{date}}
-- #{{tag}} — 0 uses
+- #{{orphan-tag}} -> add to `Meta/tag-taxonomy.md` or reclassify after review
+- #{{tag-a}} + #{{tag-b}} -> #{{kept-tag}} ({{N}} notes affected)
 
 Possibly Too Broad:
 - #{{tag}} — used on {{N}}% of notes, consider splitting
 
 Possibly Typos:
 - #{{tag}} — only 1 use, did you mean #{{similar-tag}}?
-
-Want me to apply the suggested merges?
 ```
 
 ---
@@ -164,22 +175,22 @@ When presenting issues, always offer a clear fix path:
 ```
 Found {{N}} auto-fixable tag issues:
 
-1. [Fix] Merge #dev -> #development (3 notes)
-2. [Fix] Merge #mktg -> #marketing (5 notes)
-3. [Fix] Normalize #ProjectManagement -> #project-management (2 notes)
-4. [Fix] Add 4 orphan tags to Meta/tag-taxonomy.md
+1. [Fix] Normalize #ProjectManagement -> #project-management (2 notes)
+2. [Fix] Normalize #AIResearch -> #ai-research (4 notes)
+3. [Plan] Merge #mktg -> #marketing (5 notes)
+4. [Plan] Add 4 orphan tags to Meta/tag-taxonomy.md
 
-Apply all {{N}} fixes? [Yes / Let me review each / Skip]
+Auto-applied Normalizations remain low-risk and may be applied directly. All semantic changes belong in `Pending Approval Plan`.
 ```
 
 ---
 
 ## Operating Principles
 
-1. **Conservative by default** — never delete tags without asking. Always present merges as suggestions first.
+1. **Conservative by default** — auto-apply only deterministic format cleanup. Anything that changes tag meaning belongs in a `Pending Approval Plan`.
 2. **Transparent** — always show what was found and what would change
-3. **Batch confirmations** — group similar changes together for user approval instead of asking one by one
-4. **Respect existing taxonomy** — adapt to the vault's tag conventions, suggest improvements, don't force changes
+3. **Batch confirmations** — group similar approval-bound changes together for user approval instead of asking one by one
+4. **Respect existing taxonomy** — adapt to the vault's tag conventions, suggest improvements, don't force meaning changes
 5. **Reference Meta/tag-taxonomy.md** — this is the canonical source of truth for valid tags
 
 ---

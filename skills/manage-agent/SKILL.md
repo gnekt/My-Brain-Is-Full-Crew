@@ -46,7 +46,7 @@ last-run: "{{ISO timestamp}}"
 
 When the user says "edit my agent", "update agent X", "modify agent X", or equivalents:
 
-1. **Identify the agent.** If the user specifies a name, read `.claude/agents/{name}.md`. If the name is ambiguous or not provided, read `.claude/references/agents-registry.md` and ask the user which agent they mean using `AskUserQuestion`.
+1. **Identify the agent.** If the user specifies a name, read `.codex/agents/{name}.md`. If the name is ambiguous or not provided, read `.codex/references/agents-registry.md` and ask the user directly in one concise message which agent they mean.
 
 2. **Show current configuration.** Present the agent's current setup to the user in a readable format:
    - Name and description
@@ -57,7 +57,7 @@ When the user says "edit my agent", "update agent X", "modify agent X", or equiv
    - Agent coordination rules
    - First-run setup
 
-3. **Ask what to change.** Use `AskUserQuestion` to ask the user what they want to modify. Common changes:
+3. **Ask what to change.** Ask the user directly in one concise message what they want to modify. Common changes:
    - Update trigger phrases
    - Change permissions (add/remove tools)
    - Modify output format or templates
@@ -65,11 +65,11 @@ When the user says "edit my agent", "update agent X", "modify agent X", or equiv
    - Change description
    - Add new capabilities
 
-4. **Apply changes.** Modify the agent file at `.claude/agents/{name}.md` with the requested changes.
+4. **Apply changes.** Modify the agent file at `.codex/agents/{name}.md` with the requested changes.
 
-5. **Update the registry.** If the change affects the agent's description, triggers, or capabilities, update the corresponding row in `.claude/references/agents-registry.md`.
+5. **Update the registry.** If the change affects the agent's description, triggers, or capabilities, update the corresponding row in `.codex/references/agents-registry.md`.
 
-6. **Update agents.md.** If the change affects the agent's role description, update `.claude/references/agents.md`.
+6. **Update agents.md.** If the change affects the agent's role description, update `.codex/references/agents.md`.
 
 7. **Log the change** in `Meta/agent-log.md`.
 
@@ -81,15 +81,15 @@ When the user says "edit my agent", "update agent X", "modify agent X", or equiv
 
 When the user says "remove agent", "delete agent X", "rimuovi agente", or equivalents:
 
-1. **Identify the agent.** If the user specifies a name, locate `.claude/agents/{name}.md`. If not provided, read `.claude/references/agents-registry.md` and ask the user which agent to remove using `AskUserQuestion`.
+1. **Identify the agent.** If the user specifies a name, locate `.codex/agents/{name}.md`. If not provided, read `.codex/references/agents-registry.md` and ask the user directly in one concise message which agent to remove.
 
-2. **Ask for confirmation.** Use `AskUserQuestion` to confirm:
+2. **Ask for confirmation.** Ask the user directly in one concise message to confirm:
    > "Are you sure you want to remove the agent `{name}`? This will delete its file and deactivate it. This action cannot be undone."
 
 3. **If confirmed:**
-   - Delete the agent file from `.claude/agents/{name}.md`
-   - Update `.claude/references/agents-registry.md`: set the agent's status to `disabled` (do NOT delete the row — keep it for historical reference)
-   - Update `.claude/references/agents.md`: remove or mark the agent's section as disabled under "Custom Agents"
+   - Delete the agent file from `.codex/agents/{name}.md`
+   - Update `.codex/references/agents-registry.md`: set the agent's status to `disabled` (do NOT delete the row — keep it for historical reference)
+   - Update `.codex/references/agents.md`: remove or mark the agent's section as disabled under "Custom Agents"
    - Log the removal in `Meta/agent-log.md`
 
 4. **If not confirmed:** acknowledge and do nothing.
@@ -102,12 +102,12 @@ When the user says "remove agent", "delete agent X", "rimuovi agente", or equiva
 
 When the user says "list agents", "show my agents", "lista agenti", "see my agents", or equivalents:
 
-1. **Read `.claude/references/agents-registry.md`** to get the full list of agents (core + custom).
+1. **Read `.codex/references/agents-registry.md`** to get the full list of agents (core + custom).
 
 2. **Present the list** to the user in a clear format, organized by type:
 
-   **Core Agents (8):**
-   - For each: name, brief role description, status (always active)
+   **Active Core Crew + Migration-Gated Postman Role:**
+   - For each: name, brief role description, and current runtime status
 
    **Custom Agents:**
    - For each: name, brief description, status (active/disabled), creation date if available
@@ -118,7 +118,7 @@ When the user says "list agents", "show my agents", "lista agenti", "see my agen
 
 ## Validation Rules
 
-- **Never allow editing core agents' names.** The 8 core agent names (architect, scribe, sorter, seeker, connector, librarian, transcriber, postman) are immutable. You can edit their content if the user insists, but warn them that updates via `updateme.sh` will overwrite their changes.
+- **Never allow editing core agents' names.** The reserved core names (architect, scribe, sorter, seeker, connector, librarian, transcriber, postman) are immutable. You can edit their content if the user insists, but warn them that updates via `updateme.sh` will overwrite their changes.
 - **Never allow removing core agents.** Core agents can only be deactivated through the user profile (active-agents list), not deleted.
 - **Never grant Bash access unless the agent genuinely needs filesystem operations.**
 - **Always preserve the Inter-Agent Coordination section** when editing — it is mandatory for every agent.

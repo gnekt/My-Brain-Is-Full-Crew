@@ -1,0 +1,150 @@
+# Status 2026-04-09 Codex Migration
+
+## Goal
+
+Track the in-progress rewrite from Claude-first runtime assumptions to Codex-first runtime assumptions.
+
+## Completed
+
+- Established Codex migration design baseline in `docs/design-rules/2026-04-09-codex-first-migration-design-rule.md`
+- Added `func.md` as the reusable function and entrypoint registry
+- Added workspace dispatcher entrypoint `AGENTS.md`
+- Migrated installer runtime target from `.claude/` to `.codex/`
+- Migrated updater runtime target from `.claude/` to `.codex/`
+- Migrated runtime hook/settings paths to `.codex/hooks/...`
+- Added installer smoke test: `tests/install_runtime_smoke.sh`
+- Added source-reference smoke test: `tests/codex_source_reference_smoke.sh`
+- Rewrote README architecture and runtime wording to Codex-first language
+- Rewrote contribution, onboarding, and orchestration docs away from Claude-specific runtime terms
+- Removed fake Codex MCP endpoint examples from onboarding and replaced them with provider-supplied placeholders
+- Updated the legacy plugin manifest copy so it no longer describes the old Claude-era product shape
+- Replaced `AskUserQuestion`-specific runtime assumptions with Codex-compatible one-question-at-a-time conversation rules
+- Added explicit migration gating for Postman and Postman-derived skills so dispatcher behavior no longer promises unsupported external integrations
+- Added round-3 runtime behavior smoke test: `tests/codex_runtime_behavior_smoke.sh`
+- Cleaned active runtime onboarding/transcription docs to stop depending on stale installer and Postman assumptions
+- Added round-4 active-runtime consistency smoke test: `tests/codex_active_runtime_consistency_smoke.sh`
+- Rewrote active runtime inventory wording so docs consistently distinguish 7 active agents + 1 migration-gated role and 9 active skills + 4 migration-gated skills
+- Removed stale active-product examples that still implied live Postman calendar/email behavior in day-to-day usage guidance
+- Added round-5 runtime inventory smoke test: `tests/codex_runtime_inventory_smoke.sh`
+- Upgraded Seeker and Connector runtime permissions so their documented edit and graph-write behaviors now match their actual tools
+- Unified Sorter and `/inbox-triage` around one shared structural-boundary rule: low-risk local subfolders are allowed, architecture-level structure still escalates to Architect
+- Updated custom-agent creation/management docs to use active-core-crew plus migration-gated Postman inventory language
+- Added round-6 runtime capability parity smoke test: `tests/codex_runtime_capability_parity_smoke.sh`
+- Added round-7A maintenance risk contract guard rail across Librarian, Vault Audit, Deep Clean, Defrag, and Tag Garden: `tests/codex_maintenance_risk_contract_smoke.sh`
+- Registered the round-7A smoke-test entrypoint in `func.md`
+- Updated the maintenance-chain wording so Librarian, Vault Audit, Deep Clean, Defrag, and Tag Garden keep the low-risk vs approval-required boundary explicit
+- Aligned Librarian, Vault Audit, Deep Clean, Tag Garden, and Defrag to one shared maintenance risk contract with `Pending Approval Plan` as the medium-risk approval boundary
+- Narrowed Defrag from autonomous structure evolution into structural repair plus approval/escalation flow so vault-shape changes no longer happen implicitly
+- Reworked `/transcribe` into a two-layer intake contract with an immediate raw-audio gate and a fixed first-layer intake of purpose, output target, destination, and speaker context
+- Aligned `agents/transcriber.md` to the new `/transcribe` contract so the agent no longer implies a parallel intake model or native raw-audio transcription support
+- Added round-7B transcribe-intake guard rail: `tests/codex_transcribe_intake_smoke.sh`
+- Registered the round-7B smoke-test entrypoint in `func.md`
+- Added round-8 objective: align the shared Scribe references with the fast text-capture contract and guard against heavyweight default capture drift
+- Updated `references/agents.md` and `references/agents-registry.md` so Scribe is described as a fast capture agent with direct low-risk notes and lightweight richer modes
+- Added round-8 Scribe capture-contract smoke test: `tests/codex_scribe_capture_contract_smoke.sh`
+- Registered the round-8 smoke-test entrypoint in `func.md`
+- Added round-9 Seeker objective: align shared references and guard rails with the retrieval-first, narrow incidental-edit, and analyze-don't-edit conflict contract
+- Reworked `agents/seeker.md` into a retrieval-first contract with narrow incidental edits, explicit conflict analysis rules, optional background state reads, and a clearer Sorter-vs-Architect escalation boundary
+- Updated `references/agents.md` and `references/agents-registry.md` so Seeker is described as retrieval-first with only narrow incidental fixes on explicit request
+- Added round-9 Seeker search-update contract smoke test: `tests/codex_seeker_search_update_contract_smoke.sh`
+- Registered the round-9 smoke-test entrypoint in `func.md`
+- Updated the round-6 capability parity smoke test so Seeker's edit-capable contract is validated against the newer narrow incidental-edit boundary instead of stale broad-update wording
+- Added round-10 Connector objective: align graph-first behavior, explicit bridge-note creation, and narrow structural escalation across the agent and shared references
+- Reworked `agents/connector.md` into an existing-structure-first graph contract and updated shared references so Connector no longer reads like a structural-governance agent
+- Added round-10 Connector graph-contract smoke test: `tests/codex_connector_graph_contract_smoke.sh`
+- Registered the round-10 smoke-test entrypoint in `func.md`
+- Added round-11 Sorter objective: align Sorter and `/inbox-triage` to autonomy-first, non-blocking triage with explicit `Needs Review` deferral
+- Reworked `agents/sorter.md` and `skills/inbox-triage/SKILL.md` so safe work proceeds immediately, ambiguous items stay in `00-Inbox/`, and Project Pulse remains reporting-only
+- Added round-11 Sorter autonomy-contract smoke test: `tests/codex_sorter_autonomy_contract_smoke.sh`
+- Registered the round-11 smoke-test entrypoint in `func.md`
+- Deployed the current Codex runtime into `/Users/pigo/Documents/Pigo_Obsidian/.codex/` and refreshed the vault-root `AGENTS.md`
+- Backed up the pre-deployment vault-root `AGENTS.md` to `AGENTS.pre-codex-migration-2026-04-09.bak.md`
+- Added a concrete vault deployment test plan at `docs/testing/2026-04-09-vault-deployment-test-plan.md`
+- Added a real-vault acceptance script: `tests/vault_deployment_acceptance.sh`
+- Registered the deployment acceptance entrypoint in `func.md`
+- Added a deployed-runtime journey acceptance script: `tests/vault_runtime_journey_acceptance.sh`
+- Repaired the local `gstack` installation and ran gstack-based deployment QA against a local probe page that verified the deployed dispatcher, registry, and pre-migration backup artifacts
+- Registered the runtime journey acceptance entrypoint in `func.md`
+
+## In Progress
+
+- Round 8: continue deeper parity work inside the remaining active agents and skills now that the round-7A maintenance-risk contract, round-7B transcribe-intake contract, and round-8 Scribe capture contract guard rail are in place
+- Round 9: continue deeper parity work inside the remaining active agents and skills now that the round-9 Seeker retrieval-first contract guard rail is in place
+- Round 10: continue deeper parity work inside the remaining active agents and skills now that the round-10 Connector graph-contract guard rail is in place
+- Round 11: continue deeper parity work inside the remaining active agents and skills now that the round-11 Sorter autonomy contract guard rail is in place
+- Deployment validation, gstack QA, and final goal-achievement acceptance
+
+## Next
+
+- Audit the remaining docs outside the round-2 smoke-test scope (for example disclaimers and setup side-docs) for stale Claude-era wording
+- Start deeper parity work inside the remaining active agent and skill bodies now that the Codex runtime contract, interaction model, and gating rules are aligned
+- Decide whether the legacy plugin manifest should remain indefinitely or be removed in a later cleanup phase
+- Plan the future ungating path for Postman once Codex-native external integration support is defined
+- Reduce remaining future-facing references in top-level docs that still discuss Postman design in detail
+
+## Verification
+
+- `bash tests/install_runtime_smoke.sh` passed after foundation changes
+- `bash tests/codex_source_reference_smoke.sh` passed
+- `bash tests/install_runtime_smoke.sh` passed
+- `bash -n tests/codex_source_reference_smoke.sh tests/install_runtime_smoke.sh scripts/launchme.sh scripts/updateme.sh hooks/protect-system-files.sh hooks/validate-frontmatter.sh hooks/notify.sh` passed
+- `bash tests/codex_runtime_behavior_smoke.sh` passed
+- `bash -n tests/codex_runtime_behavior_smoke.sh tests/codex_source_reference_smoke.sh tests/install_runtime_smoke.sh` passed
+- `bash tests/codex_active_runtime_consistency_smoke.sh` passed
+- `bash tests/codex_runtime_inventory_smoke.sh` passed
+- `bash -n tests/codex_runtime_inventory_smoke.sh tests/codex_active_runtime_consistency_smoke.sh tests/codex_runtime_behavior_smoke.sh tests/codex_source_reference_smoke.sh tests/install_runtime_smoke.sh` passed
+- `bash tests/codex_runtime_capability_parity_smoke.sh` passed
+- `bash -n tests/codex_runtime_capability_parity_smoke.sh tests/codex_runtime_inventory_smoke.sh tests/codex_active_runtime_consistency_smoke.sh tests/codex_runtime_behavior_smoke.sh tests/codex_source_reference_smoke.sh tests/install_runtime_smoke.sh` passed
+- `bash tests/codex_maintenance_risk_contract_smoke.sh` passed
+- `bash tests/codex_transcribe_intake_smoke.sh` passed
+- `bash tests/codex_runtime_capability_parity_smoke.sh` passed
+- `bash tests/codex_runtime_inventory_smoke.sh` passed
+- `bash tests/codex_active_runtime_consistency_smoke.sh` passed
+- `bash tests/codex_runtime_behavior_smoke.sh` passed
+- `bash tests/codex_source_reference_smoke.sh` passed
+- `bash tests/install_runtime_smoke.sh` passed
+- `bash -n tests/codex_transcribe_intake_smoke.sh tests/codex_maintenance_risk_contract_smoke.sh tests/codex_runtime_capability_parity_smoke.sh tests/codex_runtime_inventory_smoke.sh tests/codex_active_runtime_consistency_smoke.sh tests/codex_runtime_behavior_smoke.sh tests/codex_source_reference_smoke.sh tests/install_runtime_smoke.sh` passed
+- `bash tests/codex_scribe_capture_contract_smoke.sh` passed
+- `bash -n tests/codex_scribe_capture_contract_smoke.sh tests/codex_transcribe_intake_smoke.sh tests/codex_maintenance_risk_contract_smoke.sh tests/codex_runtime_capability_parity_smoke.sh tests/codex_runtime_inventory_smoke.sh tests/codex_active_runtime_consistency_smoke.sh tests/codex_runtime_behavior_smoke.sh tests/codex_source_reference_smoke.sh tests/install_runtime_smoke.sh` passed
+- `bash tests/codex_seeker_search_update_contract_smoke.sh` passed
+- `bash tests/codex_runtime_capability_parity_smoke.sh` passed after aligning the Seeker expectation to the round-9 narrow incidental-edit contract
+- `bash tests/codex_scribe_capture_contract_smoke.sh` passed
+- `bash tests/codex_transcribe_intake_smoke.sh` passed
+- `bash tests/codex_maintenance_risk_contract_smoke.sh` passed
+- `bash tests/codex_runtime_inventory_smoke.sh` passed
+- `bash tests/codex_active_runtime_consistency_smoke.sh` passed
+- `bash tests/codex_runtime_behavior_smoke.sh` passed
+- `bash tests/codex_source_reference_smoke.sh` passed
+- `bash tests/install_runtime_smoke.sh` passed
+- `bash -n tests/codex_seeker_search_update_contract_smoke.sh tests/codex_scribe_capture_contract_smoke.sh tests/codex_transcribe_intake_smoke.sh tests/codex_maintenance_risk_contract_smoke.sh tests/codex_runtime_capability_parity_smoke.sh tests/codex_runtime_inventory_smoke.sh tests/codex_active_runtime_consistency_smoke.sh tests/codex_runtime_behavior_smoke.sh tests/codex_source_reference_smoke.sh tests/install_runtime_smoke.sh` passed
+- `bash tests/codex_connector_graph_contract_smoke.sh` passed
+- `bash tests/codex_runtime_capability_parity_smoke.sh` passed after aligning the Connector expectation to the round-10 explicit bridge-note contract
+- `bash tests/codex_seeker_search_update_contract_smoke.sh` passed
+- `bash tests/codex_scribe_capture_contract_smoke.sh` passed
+- `bash tests/codex_transcribe_intake_smoke.sh` passed
+- `bash tests/codex_maintenance_risk_contract_smoke.sh` passed
+- `bash tests/codex_runtime_inventory_smoke.sh` passed
+- `bash tests/codex_active_runtime_consistency_smoke.sh` passed
+- `bash tests/codex_runtime_behavior_smoke.sh` passed
+- `bash tests/codex_source_reference_smoke.sh` passed
+- `bash tests/install_runtime_smoke.sh` passed
+- `bash -n tests/codex_connector_graph_contract_smoke.sh tests/codex_seeker_search_update_contract_smoke.sh tests/codex_scribe_capture_contract_smoke.sh tests/codex_transcribe_intake_smoke.sh tests/codex_maintenance_risk_contract_smoke.sh tests/codex_runtime_capability_parity_smoke.sh tests/codex_runtime_inventory_smoke.sh tests/codex_active_runtime_consistency_smoke.sh tests/codex_runtime_behavior_smoke.sh tests/codex_source_reference_smoke.sh tests/install_runtime_smoke.sh` passed
+- `bash tests/codex_sorter_autonomy_contract_smoke.sh` passed
+- `bash tests/codex_connector_graph_contract_smoke.sh` passed
+- `bash tests/codex_seeker_search_update_contract_smoke.sh` passed
+- `bash tests/codex_scribe_capture_contract_smoke.sh` passed
+- `bash tests/codex_transcribe_intake_smoke.sh` passed
+- `bash tests/codex_maintenance_risk_contract_smoke.sh` passed
+- `bash tests/codex_runtime_capability_parity_smoke.sh` passed
+- `bash tests/codex_runtime_inventory_smoke.sh` passed
+- `bash tests/codex_active_runtime_consistency_smoke.sh` passed
+- `bash tests/codex_runtime_behavior_smoke.sh` passed
+- `bash tests/codex_source_reference_smoke.sh` passed
+- `bash tests/install_runtime_smoke.sh` passed
+- `bash -n tests/codex_sorter_autonomy_contract_smoke.sh tests/codex_connector_graph_contract_smoke.sh tests/codex_seeker_search_update_contract_smoke.sh tests/codex_scribe_capture_contract_smoke.sh tests/codex_transcribe_intake_smoke.sh tests/codex_maintenance_risk_contract_smoke.sh tests/codex_runtime_capability_parity_smoke.sh tests/codex_runtime_inventory_smoke.sh tests/codex_active_runtime_consistency_smoke.sh tests/codex_runtime_behavior_smoke.sh tests/codex_source_reference_smoke.sh tests/install_runtime_smoke.sh` passed
+- `bash tests/vault_deployment_acceptance.sh /Users/pigo/Documents/Pigo_Obsidian` passed
+- `bash tests/vault_runtime_journey_acceptance.sh /Users/pigo/Documents/Pigo_Obsidian` passed
+- gstack QA probe passed with:
+  - `PASS — Vault AGENTS is Codex dispatcher`
+  - `PASS — Vault registry includes Seeker + Connector contract`
+  - `PASS — Backup AGENTS preserves pre-migration file`
