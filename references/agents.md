@@ -157,6 +157,7 @@ For the definitive list of all agents (core + custom) with capabilities, inputs,
 
 Current installed custom agent example:
 - `note-update` — compounded inbox formalization + Learning orphan audit + git sync workflow
+- `llm-wiki` — Obsidian-first source ingest, Learning/Lumentum routing, cross-link/index maintenance, optional Notion + git sync
 
 ### How Custom Agents Coordinate
 

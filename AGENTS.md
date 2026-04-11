@@ -91,6 +91,7 @@ If no skill matches, route to the best-fit agent:
 Route to these when no core agent is a better fit:
 
 - `note-update`
+- `llm-wiki`
 
 ## Migration-Gated Units
 
