@@ -33,3 +33,16 @@
 - 後續建議：
   - 提交本次修正，避免其他 Windows 使用者再次遇到 CRLF 安裝失敗。
   - 若要提升易用性，可在 README 額外補充：WSL 輸入 vault 路徑請使用 `/mnt/<drive>/...` 格式。
+
+## 2026-04-09 實際安裝（PigoVault）
+- 目標 Vault：`E:\obsidian\PigoVault`
+- 執行指令：`bash scripts/launchme.sh`
+- 互動選項：
+  - 指定 Vault 路徑：`/mnt/e/obsidian/PigoVault`
+  - 既有安裝偵測：選擇 `c`（覆蓋核心檔案，保留自訂 agents）
+  - MCP 設定：選擇 `n`（先跳過）
+- 結果：成功，輸出包含 `Setup complete!`
+- 安裝後快速驗證：
+  - `.codex/agents`、`.codex/skills`、`.codex/hooks`、`.codex/references`、`AGENTS.md` 均存在
+  - `agents` 數量：8
+  - `skills` 目錄數量：13
