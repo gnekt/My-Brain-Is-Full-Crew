@@ -86,6 +86,12 @@ If no skill matches, route to the best-fit agent:
 - `librarian`
 - `transcriber`
 
+## Active Custom Agents
+
+Route to these when no core agent is a better fit:
+
+- `note-update`
+
 ## Migration-Gated Units
 
 These units are intentionally excluded from active dispatch during the current Codex migration because they depend on external email/calendar integrations that are not yet supported end-to-end:

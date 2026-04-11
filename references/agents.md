@@ -155,6 +155,9 @@ Custom agents are created by the Architect and live in `.codex/agents/` alongsid
 
 For the definitive list of all agents (core + custom) with capabilities, inputs, outputs, and status, see `.codex/references/agents-registry.md`.
 
+Current installed custom agent example:
+- `note-update` — compounded inbox formalization + Learning orphan audit + git sync workflow
+
 ### How Custom Agents Coordinate
 
 Custom agents participate in the same orchestration protocol as core agents:
