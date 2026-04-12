@@ -155,6 +155,57 @@ Practical scenarios showing how the Crew works in daily life. Each example shows
 
 ---
 
+## Codex CLI session examples
+
+These examples show how to start and use the Crew with Codex CLI specifically.
+
+### Install and launch
+
+```bash
+# Install Codex CLI
+npm i -g @openai/codex@latest
+
+# Install the Crew for Codex CLI
+bash scripts/launchme.sh --platform codex-cli
+
+# Launch Codex in your vault
+codex -C /path/to/your-vault
+```
+
+### Verify the layout before your first session
+
+```bash
+# Non-interactive discovery smoke — confirms agents, skills, and dispatcher are visible
+codex exec -C /path/to/your-vault "List the project custom agents under .codex/agents, the repo skills under .agents/skills, and the dispatcher file used in this workspace."
+
+# Check MCP server visibility
+codex -C /path/to/your-vault mcp list
+```
+
+### Using agents and skills inside Codex
+
+Once inside the interactive `codex` session, the Crew works the same way as on other platforms — just talk naturally:
+
+```
+"Initialize my vault"          → /onboarding skill starts
+"Save this note: quick idea"   → Scribe agent captures it
+"Triage my inbox"              → /inbox-triage skill runs
+"Check my email"               → /email-triage skill scans Gmail
+"Weekly review"                → /vault-audit skill audits vault
+```
+
+### Update after a git pull
+
+```bash
+cd /path/to/your-vault/My-Brain-Is-Full-Crew
+git pull
+bash scripts/updateme.sh --platform codex-cli
+```
+
+For the full runtime smoke matrix covering all 8 agents, all 14 skills, bounded child-agent chaining, and MCP visibility, see [docs/codex-cli.md](codex-cli.md).
+
+---
+
 ## Daily Workflow Cheat Sheet
 
 | Time | What to say | Skill/Agent |

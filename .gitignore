@@ -9,3 +9,5 @@ Test-SecondBrain/
 # Dev config
 .claude/settings.local.json
 .mcp.json
+# GSD planning artifacts (internal workflow — not for upstream)
+.planning/

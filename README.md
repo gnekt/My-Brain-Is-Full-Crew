@@ -13,10 +13,11 @@
   <img src="https://img.shields.io/badge/Claude_Code-555555?style=for-the-badge" alt="Claude Code" />
   <img src="https://img.shields.io/badge/Gemini_CLI-555555?style=for-the-badge" alt="Gemini CLI" />
   <img src="https://img.shields.io/badge/OpenCode-555555?style=for-the-badge" alt="OpenCode" />
+  <img src="https://img.shields.io/badge/Codex_CLI-555555?style=for-the-badge" alt="Codex CLI" />
 </p>
 
 <p align="center">
-  <em>One codebase. Three platforms. Same crew.</em>
+  <em>One codebase. Four platforms. Same crew.</em>
 </p>
 
 <p align="center">
@@ -253,8 +254,11 @@ The Crew works on multiple agent platforms. The installer builds from a single s
 | **Claude Code** (CLI & Desktop) | `bash scripts/launchme.sh --platform claude-code` | `.claude/` | `CLAUDE.md` |
 | **Gemini CLI** | `bash scripts/launchme.sh --platform gemini-cli` | `.gemini/` | `GEMINI.md` |
 | **OpenCode** | `bash scripts/launchme.sh --platform opencode` | `.opencode/` | `AGENTS.md` |
+| **Codex CLI** | `bash scripts/launchme.sh --platform codex-cli` | `.codex/ + .agents/` | `AGENTS.md` |
 
 If you omit `--platform`, the installer asks you to choose. Each platform gets agents, skills, references, hooks, and MCP servers translated to its native format. `launchme.sh` installs everything automatically.
+
+> **Codex CLI on Windows:** Codex CLI's Windows support is experimental. Running inside WSL (Windows Subsystem for Linux) is strongly recommended. See [docs/codex-cli.md](docs/codex-cli.md) for details.
 
 Your vault follows a hybrid **PARA + Zettelkasten** structure:
 
@@ -380,7 +384,7 @@ The `/contact-sync` skill syncs contacts to Apple Contacts on macOS. It requires
 
 - **[@griches/apple-contacts-mcp](https://www.npmjs.com/package/@griches/apple-contacts-mcp)** — an MCP server that provides full CRUD access to Apple Contacts (search, create, update, delete contacts and groups).
 
-Add it to your `.mcp.json` inside the `mcpServers` object:
+**Claude Code / Gemini CLI / OpenCode** — add it to your `.mcp.json` inside the `mcpServers` object:
 
 ```json
 {
@@ -392,6 +396,8 @@ Add it to your `.mcp.json` inside the `mcpServers` object:
   }
 }
 ```
+
+**Codex CLI** — add it to `.codex/config.toml` instead (Codex uses TOML, not `.mcp.json`). Follow the instructions in [docs/codex-cli.md](docs/codex-cli.md) for the correct `[mcp_servers.apple-contacts]` table format.
 
 Once connected, the `/contact-sync` skill auto-syncs contacts when you reply to emails or on demand ("sync contact", "add to contacts").
 
@@ -493,6 +499,23 @@ your-vault/
 └── ... your Obsidian notes
 ```
 
+Codex CLI uses a split layout instead of a single platform directory:
+
+```
+your-vault/
+├── .codex/
+│   ├── agents/               ← 8 core agents (.toml format)
+│   ├── references/           ← shared docs
+│   └── config.toml           ← MCP servers + profiles + sandbox policy
+├── .agents/
+│   └── skills/               ← 14 specialized skills
+├── Meta/
+│   └── scripts/              ← orchestra scripts
+├── AGENTS.md                 ← dispatcher (Codex reads this)
+├── My-Brain-Is-Full-Crew/    ← the repo (for updates)
+└── ... your Obsidian notes
+```
+
 ---
 
 ## Contributing (seriously, please help)
@@ -548,5 +571,5 @@ MIT: use it, modify it, share it. Just keep the attribution.
 <p align="center">
   <i>Built by someone who got tired of forgetting things.</i>
   <br><br>
-  <a href="docs/getting-started.md"><strong>Get Started</strong></a> · <a href="docs/examples.md"><strong>Examples</strong></a> · <a href="docs/agents/architect.md"><strong>Meet the Agents</strong></a> · <a href="CONTRIBUTING.md"><strong>Contribute</strong></a>
+  <a href="docs/getting-started.md"><strong>Get Started</strong></a> · <a href="docs/examples.md"><strong>Examples</strong></a> · <a href="docs/codex-cli.md"><strong>Codex CLI Guide</strong></a> · <a href="docs/codex-migration.md"><strong>Migrate to Codex</strong></a> · <a href="docs/agents/architect.md"><strong>Meet the Agents</strong></a> · <a href="CONTRIBUTING.md"><strong>Contribute</strong></a>
 </p>

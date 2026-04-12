@@ -51,6 +51,20 @@ copy_if_changed() {
   fi
 }
 
+# ── copy_tree_if_changed <src_dir> <dst_dir> ────────────────────────────────
+# Overlays a source directory tree onto the destination when files differ or
+# the destination does not exist. This preserves nested skill assets/scripts
+# needed by platforms such as Codex CLI.
+copy_tree_if_changed() {
+  local src="$1" dst="$2"
+  _LAST_CHANGED=0
+  if [[ ! -d "$dst" ]] || ! diff -qr "$src" "$dst" >/dev/null 2>&1; then
+    mkdir -p "$dst"
+    cp -R "$src/." "$dst/"
+    _LAST_CHANGED=1
+  fi
+}
+
 # ── _insert_after_start_marker <dst> <content> ───────────────────────────────
 # Inserts <content> immediately after the MBIFC:CUSTOM_AGENTS_START line in dst.
 # dst must already exist and contain the marker.
@@ -304,7 +318,32 @@ install_agents() {
   local src_dir="$1" dst_dir="$2"
   local count=0 manifest=()
   mkdir -p "$dst_dir"
-  for src in "$src_dir/"*.md; do
+  for src in "$src_dir/"*; do
+    [[ -f "$src" ]] || continue
+    case "$src" in
+      *.md|*.toml) ;;
+      *) continue ;;
+    esac
+    local name; name="$(basename "$src")"
+    manifest+=("$name")
+    copy_if_changed "$src" "$dst_dir/$name"
+    if [[ $_LAST_CHANGED -eq 1 ]]; then
+      [[ $VERBOSE_COPY -eq 1 ]] && info "Updated agent: $name" || true
+      count=$((count + 1))
+    fi
+  done
+  manifest_write "agents" "${manifest[@]}"
+  printf '%d' "$count"
+}
+
+# install_toml_agents <src_dir> <dst_dir>
+# Copies *.toml agent files from src to dst. Used by Codex CLI platform installs
+# where agents are .toml rather than .md. Tracked in the manifest under "agents".
+install_toml_agents() {
+  local src_dir="$1" dst_dir="$2"
+  local count=0 manifest=()
+  mkdir -p "$dst_dir"
+  for src in "$src_dir/"*.toml; do
     [[ -f "$src" ]] || continue
     local name; name="$(basename "$src")"
     manifest+=("$name")
@@ -349,8 +388,7 @@ install_skills() {
     [[ -f "${skill_src}SKILL.md" ]] || continue
     local name; name="$(basename "$skill_src")"
     manifest+=("$name")
-    mkdir -p "$dst_dir/$name"
-    copy_if_changed "${skill_src}SKILL.md" "$dst_dir/$name/SKILL.md"
+    copy_tree_if_changed "$skill_src" "$dst_dir/$name"
     if [[ $_LAST_CHANGED -eq 1 ]]; then
       [[ $VERBOSE_COPY -eq 1 ]] && info "Updated skill: $name" || true
       count=$((count + 1))

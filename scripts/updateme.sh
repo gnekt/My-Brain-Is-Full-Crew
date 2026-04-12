@@ -42,6 +42,7 @@ if [[ -z "$PLATFORM" ]]; then
   [[ -d "$VAULT_DIR/.claude/agents" ]]   && DETECTED+=("claude-code")
   [[ -d "$VAULT_DIR/.opencode/agents" ]] && DETECTED+=("opencode")
   [[ -d "$VAULT_DIR/.gemini/agents" ]]   && DETECTED+=("gemini-cli")
+  [[ -d "$VAULT_DIR/.codex/agents" ]]    && DETECTED+=("codex-cli")
 
   if [[ ${#DETECTED[@]} -eq 0 ]]; then
     die "No installed platform detected in $VAULT_DIR — run launchme.sh first"
@@ -73,6 +74,7 @@ case "$PLATFORM" in
   claude-code) _SETUP_CHECK="$VAULT_DIR/.claude/agents" ;;
   opencode)    _SETUP_CHECK="$VAULT_DIR/.opencode/agents" ;;
   gemini-cli)  _SETUP_CHECK="$VAULT_DIR/.gemini/agents" ;;
+  codex-cli)   _SETUP_CHECK="$VAULT_DIR/.codex/agents" ;;
   *)           die "Unknown platform: $PLATFORM" ;;
 esac
 [[ -d "$_SETUP_CHECK" ]] \
@@ -83,6 +85,7 @@ case "$PLATFORM" in
   opencode)    _DISP_NAME="AGENTS.md"; _FW_DIR_NAME="opencode" ;;
   gemini-cli)  _DISP_NAME="GEMINI.md"; _FW_DIR_NAME="gemini" ;;
   claude-code) _DISP_NAME="CLAUDE.md"; _FW_DIR_NAME="claude" ;;
+  codex-cli)   _DISP_NAME="AGENTS.md"; _FW_DIR_NAME="codex" ;;
   *)           die "Unknown platform: $PLATFORM" ;;
 esac
 echo -e "${BOLD}This will update core agents, skills, references, hooks, and ${_DISP_NAME}.${NC}"
@@ -132,11 +135,26 @@ case "$PLATFORM" in
     MCP_SRC=""
     MCP_DST=""
     HAS_PLUGINS=0
+    DIST_SKILLS_DIR="$DIST_COMPONENTS_DIR/skills"
+    VAULT_SKILLS_DIR="$VAULT_COMPONENTS_DIR/skills"
+    ;;
+  codex-cli)
+    DIST_COMPONENTS_DIR="$DIST_DIR/.codex"
+    VAULT_COMPONENTS_DIR="$VAULT_DIR/.codex"
+    DISPATCHER_SRC="$DIST_DIR/AGENTS.md"
+    DISPATCHER_DST="$VAULT_DIR/AGENTS.md"
+    MCP_SRC="$DIST_DIR/.codex/config.toml"
+    MCP_DST="$VAULT_DIR/.codex/config.toml"
+    HAS_PLUGINS=0
+    DIST_SKILLS_DIR="$DIST_DIR/.agents/skills"
+    VAULT_SKILLS_DIR="$VAULT_DIR/.agents/skills"
     ;;
   *)
     die "Unknown platform: $PLATFORM (install layout not defined)"
     ;;
 esac
+[[ -n "${DIST_SKILLS_DIR:-}" ]] || DIST_SKILLS_DIR="$DIST_COMPONENTS_DIR/skills"
+[[ -n "${VAULT_SKILLS_DIR:-}" ]] || VAULT_SKILLS_DIR="$VAULT_COMPONENTS_DIR/skills"
 PLATFORM_VAULT_DIR="$VAULT_COMPONENTS_DIR"
 
 # Load opencode-specific helpers when building for opencode
@@ -158,9 +176,13 @@ mkdir -p "$VAULT_DIR/Meta/states"
 # ── Update components (per-file logging enabled) ─────────────────────────────
 VERBOSE_COPY=1
 
-AGENT_COUNT=$(install_agents "$DIST_COMPONENTS_DIR/agents" "$VAULT_COMPONENTS_DIR/agents")
+if [[ "$PLATFORM" == "codex-cli" ]]; then
+  AGENT_COUNT=$(install_toml_agents "$DIST_COMPONENTS_DIR/agents" "$VAULT_COMPONENTS_DIR/agents")
+else
+  AGENT_COUNT=$(install_agents "$DIST_COMPONENTS_DIR/agents" "$VAULT_COMPONENTS_DIR/agents")
+fi
 REF_COUNT=$(install_refs     "$DIST_COMPONENTS_DIR/references" "$VAULT_COMPONENTS_DIR/references")
-SKILL_COUNT=$(install_skills "$DIST_COMPONENTS_DIR/skills" "$VAULT_COMPONENTS_DIR/skills")
+SKILL_COUNT=$(install_skills "$DIST_SKILLS_DIR" "$VAULT_SKILLS_DIR")
 HOOK_COUNT=$(install_hooks   "$DIST_COMPONENTS_DIR/hooks"  "$VAULT_COMPONENTS_DIR/hooks")
 
 PLUGIN_COUNT=0

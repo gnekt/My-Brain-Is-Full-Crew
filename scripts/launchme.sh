@@ -102,6 +102,7 @@ EXISTING=0
 [[ -d "$VAULT_DIR/.claude" ]]    && EXISTING=1
 [[ -d "$VAULT_DIR/.opencode" ]]  && EXISTING=1
 [[ -d "$VAULT_DIR/.gemini" ]]    && EXISTING=1
+[[ -d "$VAULT_DIR/.codex" ]]     && EXISTING=1
 [[ -f "$VAULT_DIR/CLAUDE.md" ]]  && EXISTING=1
 [[ -f "$VAULT_DIR/AGENTS.md" ]]  && EXISTING=1
 [[ -f "$VAULT_DIR/GEMINI.md" ]]  && EXISTING=1
@@ -111,6 +112,7 @@ if [[ $EXISTING -eq 1 ]]; then
   [[ -d "$VAULT_DIR/.claude" ]]   && warn "  .claude/ directory exists"
   [[ -d "$VAULT_DIR/.opencode" ]] && warn "  .opencode/ directory exists"
   [[ -d "$VAULT_DIR/.gemini" ]]   && warn "  .gemini/ directory exists"
+  [[ -d "$VAULT_DIR/.codex" ]]    && warn "  .codex/ directory exists"
   [[ -f "$VAULT_DIR/CLAUDE.md" ]] && warn "  CLAUDE.md exists"
   [[ -f "$VAULT_DIR/AGENTS.md" ]] && warn "  AGENTS.md exists"
   [[ -f "$VAULT_DIR/GEMINI.md" ]] && warn "  GEMINI.md exists"
@@ -162,11 +164,26 @@ case "$PLATFORM" in
     MCP_SRC=""
     MCP_DST=""
     HAS_PLUGINS=0
+    DIST_SKILLS_DIR="$DIST_COMPONENTS_DIR/skills"
+    VAULT_SKILLS_DIR="$VAULT_COMPONENTS_DIR/skills"
+    ;;
+  codex-cli)
+    DIST_COMPONENTS_DIR="$DIST_DIR/.codex"
+    VAULT_COMPONENTS_DIR="$VAULT_DIR/.codex"
+    DISPATCHER_SRC="$DIST_DIR/AGENTS.md"
+    DISPATCHER_DST="$VAULT_DIR/AGENTS.md"
+    MCP_SRC="$DIST_DIR/.codex/config.toml"
+    MCP_DST="$VAULT_DIR/.codex/config.toml"
+    HAS_PLUGINS=0
+    DIST_SKILLS_DIR="$DIST_DIR/.agents/skills"
+    VAULT_SKILLS_DIR="$VAULT_DIR/.agents/skills"
     ;;
   *)
     die "Unknown platform: $PLATFORM (install layout not defined)"
     ;;
 esac
+[[ -n "${DIST_SKILLS_DIR:-}" ]] || DIST_SKILLS_DIR="$DIST_COMPONENTS_DIR/skills"
+[[ -n "${VAULT_SKILLS_DIR:-}" ]] || VAULT_SKILLS_DIR="$VAULT_COMPONENTS_DIR/skills"
 PLATFORM_VAULT_DIR="$VAULT_COMPONENTS_DIR"
 
 # Load opencode-specific helpers when building for opencode
@@ -190,7 +207,11 @@ mkdir -p "$VAULT_DIR/Meta/states"
 
 # ── Install components ────────────────────────────────────────────────────────
 info "Installing agents..."
-AGENT_COUNT=$(install_agents "$DIST_COMPONENTS_DIR/agents" "$VAULT_COMPONENTS_DIR/agents")
+if [[ "$PLATFORM" == "codex-cli" ]]; then
+  AGENT_COUNT=$(install_toml_agents "$DIST_COMPONENTS_DIR/agents" "$VAULT_COMPONENTS_DIR/agents")
+else
+  AGENT_COUNT=$(install_agents "$DIST_COMPONENTS_DIR/agents" "$VAULT_COMPONENTS_DIR/agents")
+fi
 success "Agents: $AGENT_COUNT installed/updated"
 
 info "Installing references..."
@@ -198,7 +219,7 @@ REF_COUNT=$(install_refs "$DIST_COMPONENTS_DIR/references" "$VAULT_COMPONENTS_DI
 success "References: $REF_COUNT installed/updated"
 
 info "Installing skills..."
-SKILL_COUNT=$(install_skills "$DIST_COMPONENTS_DIR/skills" "$VAULT_COMPONENTS_DIR/skills")
+SKILL_COUNT=$(install_skills "$DIST_SKILLS_DIR" "$VAULT_SKILLS_DIR")
 success "Skills: $SKILL_COUNT installed/updated"
 
 info "Installing hooks..."
@@ -266,19 +287,30 @@ echo ""
 echo -e "   ${VAULT_DIR}/"
 FW_DIR_NAME="$(basename "$VAULT_COMPONENTS_DIR")"
 DISPATCHER_NAME="$(basename "$DISPATCHER_DST")"
-echo -e "   ├── ${FW_DIR_NAME}/"
-echo -e "   │   ├── agents/          ${DIM}← agents${NC}"
-echo -e "   │   ├── skills/          ${DIM}← skills${NC}"
-echo -e "   │   ├── hooks/           ${DIM}← hooks${NC}"
-if [[ $HAS_PLUGINS -eq 1 ]]; then
-  echo -e "   │   ├── plugins/         ${DIM}← hook plugins${NC}"
+if [[ "$PLATFORM" == "codex-cli" ]]; then
+  echo -e "   ├── .codex/"
+  echo -e "   │   ├── agents/          ${DIM}← custom agents${NC}"
+  echo -e "   │   ├── references/      ${DIM}← shared docs${NC}"
+  echo -e "   │   └── config.toml      ${DIM}← MCP + profiles${NC}"
+  echo -e "   ├── .agents/"
+  echo -e "   │   └── skills/          ${DIM}← repo skills${NC}"
 else
-  echo -e "   │   ├── settings.json    ${DIM}← hooks configuration${NC}"
+  echo -e "   ├── ${FW_DIR_NAME}/"
+  echo -e "   │   ├── agents/          ${DIM}← agents${NC}"
+  echo -e "   │   ├── skills/          ${DIM}← skills${NC}"
+  echo -e "   │   ├── hooks/           ${DIM}← hooks${NC}"
+  if [[ $HAS_PLUGINS -eq 1 ]]; then
+    echo -e "   │   ├── plugins/         ${DIM}← hook plugins${NC}"
+  else
+    echo -e "   │   ├── settings.json    ${DIM}← hooks configuration${NC}"
+  fi
+  echo -e "   │   └── references/      ${DIM}← shared docs${NC}"
 fi
-echo -e "   │   └── references/      ${DIM}← shared docs${NC}"
 echo -e "   ├── Meta/"
 echo -e "   │   └── scripts/         ${DIM}← ${ORCH_COUNT:-0} orchestra scripts${NC}"
-if [[ -n "$MCP_SRC" && -f "$MCP_DST" ]]; then
+if [[ "$PLATFORM" == "codex-cli" && -f "$MCP_DST" ]]; then
+  echo -e "   └── ${DISPATCHER_NAME}            ${DIM}← project instructions${NC}"
+elif [[ -n "$MCP_SRC" && -f "$MCP_DST" ]]; then
   echo -e "   ├── ${DISPATCHER_NAME}            ${DIM}← project instructions${NC}"
   echo -e "   └── $(basename "$MCP_DST")        ${DIM}← MCP servers${NC}"
 else
@@ -295,6 +327,7 @@ case "$PLATFORM" in
   claude-code) echo -e "   1. Open Claude Code in your vault folder" ;;
   opencode)    echo -e "   1. Open OpenCode in your vault folder" ;;
   gemini-cli)  echo -e "   1. Open Gemini CLI in your vault folder" ;;
+  codex-cli)   echo -e "   1. Open Codex CLI in your vault folder (run: codex)" ;;
   *)           echo -e "   1. Open your agent platform in your vault folder" ;;
 esac
 echo -e "   2. Say: ${BOLD}\"Initialize my vault\"${NC}"

@@ -8,7 +8,9 @@ A step-by-step guide for setting up your AI-powered vault. No technical backgrou
 
 ### Required
 - **Obsidian**: A free note-taking app. Download it at [obsidian.md](https://obsidian.md)
-- **An agent platform**: one of [Claude Code](https://claude.ai/code) (Pro/Max/Team), [Gemini CLI](https://github.com/google-gemini/gemini-cli), or [OpenCode](https://opencode.ai).
+- **An agent platform**: one of [Claude Code](https://claude.ai/code) (Pro/Max/Team), [Gemini CLI](https://github.com/google-gemini/gemini-cli), [OpenCode](https://opencode.ai), or [Codex CLI](https://openai.com/codex) (`npm i -g @openai/codex`).
+
+  > **Windows + Codex CLI:** Codex CLI's Windows support is experimental. If you plan to use Codex CLI on Windows, run it inside WSL (Windows Subsystem for Linux) for the best experience.
 - **An Obsidian vault**: This is just a folder on your computer where Obsidian stores your notes. If you don't have one yet, Obsidian will create one for you when you first open it.
 - **Git**: A tool to download the project. On Mac, the terminal will prompt you to install it automatically the first time you use it. On Windows, download it from [git-scm.com](https://git-scm.com).
 
@@ -66,8 +68,9 @@ Install one of the following:
 | **Claude Code** | [claude.ai/code](https://claude.ai/code) | Claude Pro, Max, or Team |
 | **Gemini CLI** | [github.com/google-gemini/gemini-cli](https://github.com/google-gemini/gemini-cli) | Google account |
 | **OpenCode** | [opencode.ai](https://opencode.ai) | Varies by provider |
+| **Codex CLI** | `npm i -g @openai/codex` | OpenAI account |
 
-Claude Code works as both CLI and Desktop app (Cowork). The Crew works on all supported platforms.
+Claude Code works as both CLI and Desktop app (Cowork). The Crew works on all four supported platforms.
 
 ---
 
@@ -95,19 +98,34 @@ bash scripts/launchme.sh
 ```
 
 The script will ask a couple of questions:
-1. **Which platform?** Select your agent platform (Claude Code, Gemini CLI, or OpenCode)
+1. **Which platform?** Select your agent platform (Claude Code, Gemini CLI, OpenCode, or Codex CLI)
 2. **Is this your vault folder?** Confirm or enter the correct path
 
 When it's done, your vault will look like this (paths vary by platform):
 
 ```
 your-vault/
-├── .<platform>/         ← .claude/, .gemini/, .opencode/, or any platform dir that will be supported in the future
+├── .<platform>/         ← .claude/, .gemini/, .opencode/
 │   ├── agents/          ← 8 lightweight crew agents
 │   ├── skills/          ← 14 specialized skills for complex flows
 │   ├── hooks/           ← file protection and validation
 │   └── references/      ← shared docs the agents read
-├── CLAUDE.md / GEMINI.md / AGENTS.md / ...  ← dispatcher (varies by platform)
+├── CLAUDE.md / GEMINI.md / AGENTS.md  ← dispatcher (varies by platform)
+├── My-Brain-Is-Full-Crew/  ← the repo (for future updates)
+└── ... your Obsidian notes
+```
+
+**Codex CLI** uses a split layout instead of a single platform directory:
+
+```
+your-vault/
+├── .codex/
+│   ├── agents/          ← 8 core agents (.toml format)
+│   ├── references/      ← shared docs
+│   └── config.toml      ← MCP servers + profiles + sandbox policy
+├── .agents/
+│   └── skills/          ← 14 specialized skills
+├── AGENTS.md            ← dispatcher
 ├── My-Brain-Is-Full-Crew/  ← the repo (for future updates)
 └── ... your Obsidian notes
 ```
@@ -118,13 +136,18 @@ your-vault/
 
 ## Step 4: Connect your vault
 
-1. Open your agent platform (Claude Code, Gemini CLI, or OpenCode)
+1. Open your agent platform (Claude Code, Gemini CLI, OpenCode, or Codex CLI)
 2. Open it **inside your Obsidian vault folder**. This is important: the platform needs to be in your vault to read and write your notes.
 
 If you're using a CLI tool:
 ```bash
 cd /path/to/your-vault
-claude          # or: gemini, opencode
+claude          # or: gemini, opencode, codex
+```
+
+For Codex CLI, you can also use the `-C` flag to point directly at your vault:
+```bash
+codex -C /path/to/your-vault
 ```
 
 If you're using Claude Code Desktop (Cowork), open the vault folder as your working directory.
@@ -220,7 +243,11 @@ The Crew works best with simple daily routines:
 Make sure your agent platform is open inside your vault folder (not a different directory). Verify agent files exist in the platform's agents directory (e.g., `.claude/agents/`). Try saying the trigger phrase differently. Agents and skills understand natural language in multiple languages.
 
 ### "Email/Calendar isn't working"
-The Postman needs at least one email backend: GWS CLI (`gws`), Hey CLI (`hey`), or MCP connectors. For GWS, see `docs/gws-setup-guide.md`. For Hey, install from [github.com/basecamp/hey-cli](https://github.com/basecamp/hey-cli) and run `hey auth login`. For MCP, run the installer again (`bash scripts/launchme.sh`) and answer **yes** to the Gmail/Calendar question, or manually copy `.mcp.json` from the repo to your vault root.
+The Postman needs at least one email backend: GWS CLI (`gws`), Hey CLI (`hey`), or MCP connectors. For GWS, see `docs/gws-setup-guide.md`. For Hey, install from [github.com/basecamp/hey-cli](https://github.com/basecamp/hey-cli) and run `hey auth login`.
+
+For MCP connectors:
+- **Claude Code / OpenCode**: run the installer again (`bash scripts/launchme.sh`) and answer **yes** to the Gmail/Calendar question, or manually add the servers to your `.mcp.json` at the vault root.
+- **Codex CLI**: MCP servers are configured in `.codex/config.toml` (not `.mcp.json`). Run `bash scripts/launchme.sh --platform codex-cli` and the installer writes them automatically. See [docs/codex-cli.md](codex-cli.md) for the full MCP setup details.
 
 ### "My vault structure looks different from the docs"
 The Architect customizes the structure based on your onboarding answers.
@@ -231,6 +258,11 @@ The Architect customizes the structure based on your onboarding answers.
 cd /path/to/your-vault/My-Brain-Is-Full-Crew
 git pull
 bash scripts/updateme.sh
+```
+
+For Codex CLI specifically:
+```bash
+bash scripts/updateme.sh --platform codex-cli
 ```
 
 Only changed files are updated. Your vault notes are never touched.
@@ -249,6 +281,8 @@ Open an issue on GitHub with:
 ## Next steps
 
 - **[Examples](examples.md)**: See real-world usage scenarios
+- **[Codex CLI Guide](codex-cli.md)**: Install/update guide, architecture differences, runtime smoke matrix, and troubleshooting for Codex CLI
+- **[Migrate to Codex CLI](codex-migration.md)**: Step-by-step migration from Claude Code, Gemini CLI, or OpenCode
 - **[Mobile Access](mobile-access.md)**: Use the Crew from your phone
 - **[Meet the Agents](agents/)**: Deep-dive into each agent's capabilities
 - **[Contributing](../CONTRIBUTING.md)**: Help make the Crew better
