@@ -158,13 +158,17 @@ Custom agents are created via the `/create-agent` skill and stored in `.platform
 
 ## Multi-agent routing
 
-The dispatcher is a **reactive multi-router**. After invoking an agent, analyze its output before responding to the user:
+The dispatcher is an **offload-first multi-router**. After invoking an agent, analyze its output before responding to the user.
 
-1. Did the agent create content that needs filing? → Consider **Sorter**
-2. Did the agent report missing structure? → Consider **Architect**
-3. Did the agent find notes that need linking? → Consider **Connector**
-4. Did the agent produce notes that need cleanup? → Consider **Librarian**
-5. Did the agent include a `### Suggested next agent` section? → Validate and consider it
+Default rule:
+- If the next step is obvious, low-risk, and clearly belongs to another active skill or agent, continue the chain instead of pushing the decision back to the user.
+- If the next step would be destructive, structurally significant, ambiguous, or depends on a user preference you do not have yet, stop and ask the user directly.
+
+1. Did the agent create content that clearly needs filing? → Continue to **Sorter** when the filing path is obvious
+2. Did the agent report missing structure? → Continue to **Architect** when the structural fix is clear and low-risk
+3. Did the agent find notes that need linking? → Continue to **Connector** when the linking pass is the obvious next step
+4. Did the agent produce notes that need cleanup? → Continue to **Librarian** when the cleanup is routine and bounded
+5. Did the agent include a `### Suggested next agent` section? → Treat it as orchestration input, validate it, and continue automatically when it is the obvious low-risk follow-up
 6. Did the agent include a `### Suggested new agent` section? → Ask the user if they want the **Architect** to create a custom agent for the detected need
 
 Consult `.platform/references/agents-registry.md` to validate suggestions and match output to agent capabilities.
@@ -185,6 +189,19 @@ Maintain a call chain for each user request:
 - **Max depth 3**: no more than 3 agents per user request
 - **On overflow**: return results to the user and suggest what they can do next (e.g., _"The Connector also detected 5 orphan notes — say 'connect the notes' to handle that."_)
 
+### Continue vs stop
+
+Continue automatically when:
+- the follow-up is a normal consequence of the completed step
+- the next agent has enough context to act without inventing user preferences
+- the next step is bounded and reversible
+
+Stop and ask the user when:
+- multiple reasonable next steps exist
+- the work would delete, archive, rename, or restructure in a way that may surprise the user
+- the suggested next step crosses into a migration-gated or unsupported capability
+- the agent output signals uncertainty or missing context
+
 ### Decision flow
 
 ```
@@ -197,7 +214,7 @@ USER MESSAGE → check SKILL routing table first
      READ OUTPUT → check agents-registry.md
            ↓
   Does output match another agent's capabilities?
-     YES + not in chain + depth < 3 → INVOKE next
+     YES + not in chain + depth < 3 + obvious/low-risk → INVOKE next
      NO or limit reached → RESPOND to user
 ```
 
@@ -208,6 +225,8 @@ USER MESSAGE → check SKILL routing table first
 Agents do NOT communicate directly with each other. The dispatcher orchestrates all agent calls.
 
 When an agent detects work for another agent (e.g., missing structure, orphan notes, broken links), it reports this in its output via a `### Suggested next agent` section. The dispatcher reads this and decides whether to chain the next agent.
+
+`### Suggested next agent` is primarily for dispatcher continuation, not for turning obvious follow-up work into user homework.
 
 See `.platform/references/agent-orchestration.md` for the full protocol and `.platform/references/agents-registry.md` for the agent registry.
 

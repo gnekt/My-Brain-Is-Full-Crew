@@ -6,16 +6,16 @@ This document defines how agents coordinate through the **dispatcher** (`DISPATC
 
 ## Overview
 
-The dispatcher is a **reactive multi-router** with skill-first routing:
+The dispatcher is an **offload-first multi-router** with skill-first routing:
 
 1. **User sends a message** → dispatcher checks the **skill routing table** first
 2. **Skill match found?** → invoke the skill via the **Skill tool** and respond to user
 3. **No skill match?** → dispatcher picks the best **agent** by priority
 4. **Agent executes** → returns output to the dispatcher
-5. **Dispatcher reads the output** → decides if another agent should be chained
+5. **Dispatcher reads the output** → continues through obvious low-risk follow-up work when appropriate
 6. **Repeat** until done or max depth reached
 
-Agents help the dispatcher by including **suggestions** in their output when they detect work for other agents.
+Agents help the dispatcher by including **suggestions** in their output when they detect work for other agents. These suggestions are primarily dispatcher inputs, not default user-facing to-do items.
 
 ---
 
@@ -34,7 +34,8 @@ Skills are checked **before** agents. They handle complex, multi-step workflows 
 
 Skills can still produce output that triggers agent chaining:
 - A skill may include `### Suggested next agent` in its output (e.g., `/onboarding` may suggest Connector to link newly created notes).
-- The dispatcher reads this output and applies the same chaining rules as for agents (check registry, check call chain, max depth 3).
+- The dispatcher reads this output and applies the same chaining rules as for agents.
+- If the suggested follow-up is obvious, low-risk, and well-scoped, the dispatcher should continue automatically instead of bouncing the choice back to the user.
 - Skills count as step 1 in the call chain when they produce agent suggestions.
 
 ### List of skills
@@ -55,6 +56,8 @@ When an agent detects work that another agent should handle, it includes a secti
 ```
 
 Multiple suggestions are allowed — list them all. The dispatcher prioritizes and decides which (if any) to invoke.
+
+For obvious low-risk follow-up work, the default expectation is that the dispatcher continues the chain and returns completed results to the user. The dispatcher should stop and ask only when the next step is ambiguous, risky, unsupported, or preference-sensitive.
 
 ### Examples
 
@@ -101,10 +104,12 @@ After each agent returns, the dispatcher:
 1. **Reads the output** — looks for `### Suggested next agent` sections
 2. **Consults `agents-registry.md`** — validates the suggested agent exists and is `active`
 3. **Checks the call chain** — is this agent already in the chain? Is max depth reached?
-4. **Checks for `### Suggested new agent`** -- if present, asks the user if they want the Architect to create a custom agent
-5. **Decides**: invoke next agent OR return results to user
+4. **Applies the offload-first gate** — continue automatically only if the next step is obvious, low-risk, and has enough context
+5. **Checks for stop conditions** — ambiguity, destructive edits, structural surprises, unsupported capability, or missing user preference
+6. **Checks for `### Suggested new agent`** -- if present, asks the user if they want the Architect to create a custom agent
+7. **Decides**: invoke next agent OR return results to user
 
-The dispatcher can also chain agents **without an explicit suggestion** if the output clearly matches another agent's capabilities (e.g., notes created → Sorter might be needed).
+The dispatcher can also chain agents **without an explicit suggestion** if the output clearly matches another agent's capabilities (e.g., notes created → Sorter might be needed) and the same offload-first gate is satisfied.
 
 ---
 
@@ -121,6 +126,20 @@ Every user request has a **call chain** — the ordered list of agents invoked s
 5. **No circular patterns**: if Agent A suggests Agent B and B is already in the chain, skip
 6. **Max depth: 3**: no more than 3 agents per user request
 7. **On overflow**: return results to user with a note about what was deferred
+
+### Continue Criteria
+
+Continue automatically when all of these are true:
+- The next step is the normal consequence of the completed step
+- The next agent has enough concrete context to act
+- The follow-up is bounded and unlikely to surprise the user
+- No unsupported or migration-gated capability is involved
+
+Stop and ask the user when any of these are true:
+- More than one reasonable next move exists
+- The work would delete, archive, rename, or restructure in a surprising way
+- The next step depends on a user preference or policy choice not yet stated
+- The agent output indicates uncertainty or incomplete context
 
 ### What Happens at Max Depth
 
@@ -149,6 +168,7 @@ Custom agents are created by the Architect and stored in `.platform/agents/`. Th
 - ❌ **Do NOT edit other agents' prompt/config files** (e.g., `.platform/agents/*.md`) — normal vault notes/MOC edits are still allowed per your responsibilities; all coordination goes through the dispatcher
 - ❌ **Do NOT block waiting for another agent** — finish your task and suggest next steps in your output
 - ❌ **Do NOT call other agents** — only the dispatcher invokes agents
+- ❌ **Do NOT frame every suggestion as user homework** — provide context rich enough for the dispatcher to continue when the next step is obvious
 
 ---
 

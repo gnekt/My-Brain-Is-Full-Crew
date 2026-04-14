@@ -120,11 +120,11 @@ your-vault/
 ```
 your-vault/
 ├── .codex/
-│   ├── agents/          ← 8 core agents (.toml format)
+│   ├── agents/          ← 8 core agent files (7 active + 1 migration-gated Postman role)
 │   ├── references/      ← shared docs
 │   └── config.toml      ← MCP servers + profiles + sandbox policy
 ├── .agents/
-│   └── skills/          ← 14 specialized skills
+│   └── skills/          ← 14 skill definitions (10 active + 4 migration-gated Postman skills)
 ├── AGENTS.md            ← dispatcher
 ├── My-Brain-Is-Full-Crew/  ← the repo (for future updates)
 └── ... your Obsidian notes
@@ -170,12 +170,12 @@ The `/onboarding` skill will kick in and the **Architect** will start a friendly
 
 ### About your vault
 - Are you new to Obsidian, or migrating from an existing vault?
-- Do you want all 8 agents, or just some?
+- Do you want all active agents, or just some?
 - What areas of your life do you want to manage?
 
 ### About integrations (optional)
-- Do you want email triage? (requires Gmail via GWS/MCP, or Hey.com via Hey CLI)
-- Do you want calendar integration? (requires Google Calendar via GWS/MCP)
+- Do you want email preferences recorded for a future Postman migration phase?
+- Do you want calendar preferences recorded for a future Postman migration phase?
 
 After the conversation, the Architect creates your entire vault structure, saves your profile, and leaves you a personalized welcome note.
 
@@ -201,10 +201,10 @@ The **Scribe** will turn this into a clean note in your inbox.
 
 The **Scribe** detects multiple items and creates separate notes for each.
 
-### Check your email
-> "Check my email for anything important"
+### Ask about future integrations
+> "Do we already support email triage in Codex?"
 
-The `/email-triage` skill scans your inbox (Gmail or Hey.com), saves actionable emails, and gives you a summary.
+The dispatcher explains that Postman workflows are migration-gated for now. On Claude Code, Gemini CLI, and OpenCode, `/email-triage` remains the active email workflow.
 
 ### File everything
 > "Triage my inbox"
@@ -223,7 +223,7 @@ The **Seeker** searches your vault and synthesizes an answer with source citatio
 The Crew works best with simple daily routines:
 
 ### Morning (2 minutes)
-> "Check my calendar for today" to see what's ahead
+> "What needs my attention today?" to see what the active vault agents already know
 > "Any messages from the crew?" to check if agents flagged anything
 
 ### Throughout the day
@@ -243,11 +243,13 @@ The Crew works best with simple daily routines:
 Make sure your agent platform is open inside your vault folder (not a different directory). Verify agent files exist in the platform's agents directory (e.g., `.claude/agents/`). Try saying the trigger phrase differently. Agents and skills understand natural language in multiple languages.
 
 ### "Email/Calendar isn't working"
-The Postman needs at least one email backend: GWS CLI (`gws`), Hey CLI (`hey`), or MCP connectors. For GWS, see `docs/gws-setup-guide.md`. For Hey, install from [github.com/basecamp/hey-cli](https://github.com/basecamp/hey-cli) and run `hey auth login`.
+On **Codex CLI**, that is expected in the current migration runtime: Postman workflows are intentionally migration-gated. You can still record future email/calendar preferences during onboarding, but live email/calendar automation is not active yet.
+
+On **Claude Code, Gemini CLI, and OpenCode**, the Postman needs at least one email backend: GWS CLI (`gws`), Hey CLI (`hey`), or MCP connectors. For GWS, see `docs/gws-setup-guide.md`. For Hey, install from [github.com/basecamp/hey-cli](https://github.com/basecamp/hey-cli) and run `hey auth login`.
 
 For MCP connectors:
 - **Claude Code / OpenCode**: run the installer again (`bash scripts/launchme.sh`) and answer **yes** to the Gmail/Calendar question, or manually add the servers to your `.mcp.json` at the vault root.
-- **Codex CLI**: MCP servers are configured in `.codex/config.toml` (not `.mcp.json`). Run `bash scripts/launchme.sh --platform codex-cli` and the installer writes them automatically. See [docs/codex-cli.md](codex-cli.md) for the full MCP setup details.
+- **Codex CLI**: MCP servers are configured in `.codex/config.toml` (not `.mcp.json`) for future parity and for active servers such as Apple Contacts. See [docs/codex-cli.md](codex-cli.md) for the current Codex scope.
 
 ### "My vault structure looks different from the docs"
 The Architect customizes the structure based on your onboarding answers.
