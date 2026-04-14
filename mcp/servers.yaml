@@ -4,7 +4,7 @@ servers:
     url: "https://gmail.mcp.claude.com/mcp"
     env: {}
     exclude: []
-  - name: Google-Calendar
+  - name: Google Calendar
     type: http
     url: "https://gcal.mcp.claude.com/mcp"
     env: {}

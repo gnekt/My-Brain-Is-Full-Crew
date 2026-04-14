@@ -120,6 +120,8 @@ Key points:
 | 8 | **Postman** | Email & Calendar | Bridges email (Gmail or Hey.com) and Google Calendar with your vault: deadline radar, meeting prep |
 
 > **Agents + Skills = the full system.** Each agent handles quick, reactive tasks. For complex multi-step workflows (like onboarding, email triage, or vault audits), the dispatcher routes to one of **14 specialized skills** that run as guided conversations. See the [Skills](#skills) section below.
+>
+> **Codex CLI status:** the Codex runtime currently activates **7 agents** and **10 skills**. `Postman`, `/email-triage`, `/meeting-prep`, `/weekly-agenda`, and `/deadline-radar` remain migration-gated until external email/calendar parity lands.
 
 ---
 
@@ -314,7 +316,7 @@ The `/onboarding` skill starts a friendly guided conversation:
 
 1. **Who are you?** Name, language, role, what brought you here
 2. **What do you need?** Which agents to activate, which areas of life to manage
-3. **Integrations** Gmail and Google Calendar connections
+3. **Integrations** Gmail and Google Calendar connections on platforms where Postman is active; in Codex CLI these preferences are recorded for a future migration phase
 
 After onboarding, the Architect creates your entire vault folder structure, saves your profile, leaves you a welcome note, and you're ready to go.
 
@@ -325,7 +327,7 @@ After onboarding, the Architect creates your entire vault folder structure, save
 | *"Save this: meeting with Marco about the Q3 budget, he wants the report by Friday"* | **Scribe** agent captures it as a clean note with tasks, wikilinks, and deadline |
 | *"Triage my inbox"* | `/inbox-triage` skill files everything, updates MOCs, gives you a summary |
 | *"What did we decide about the pricing strategy?"* | **Seeker** agent searches your vault, synthesizes the answer with source citations |
-| *"Check my email"* | `/email-triage` skill scans Gmail, saves important emails, flags deadlines |
+| *"Check my email"* | On Claude Code, Gemini CLI, and OpenCode, `/email-triage` scans Gmail or Hey. In Codex CLI, the dispatcher explains that Postman workflows are migration-gated. |
 | *"Weekly review"* | `/vault-audit` skill runs a full vault audit: broken links, duplicates, health score |
 | *"Find connections for my latest note"* | **Connector** agent discovers hidden links to other notes in your vault |
 
@@ -337,7 +339,7 @@ The Crew is built in English but **responds in whatever language you write in**.
 
 ```
 "Salva questa nota veloce..."          → Scribe responds in Italian
-"Vérifie mon email..."                 → Postman responds in French
+"Vérifie mon email..."                 → Codex explains the current Postman migration gate in French
 "Was habe ich diese Woche geplant?"    → Seeker responds in German
 "Check my inbox"                       → Sorter responds in English
 ```
@@ -358,6 +360,8 @@ Capture a quick thought on a walk. Check your email from the couch. Search your 
 
 ## Agent coordination
 
+> **Codex note:** Postman-driven chains stay migration-gated in the current Codex runtime. The examples below describe the intended orchestration model once external integrations reach parity.
+
 Agents coordinate through a dispatcher-driven orchestration system. When an agent or skill finishes its task and detects work for another agent, it signals the dispatcher via a `### Suggested next agent` section in its output. The dispatcher reads this and automatically chains the next agent:
 
 - The `/transcribe` skill processes a meeting that introduces a new project -- the dispatcher chains the **Architect** to create the folder structure
@@ -371,7 +375,7 @@ No agent works in isolation. The crew is greater than the sum of its parts.
 
 ## Required integrations
 
-The **Postman** agent (and its related skills: `/email-triage`, `/meeting-prep`, `/weekly-agenda`, `/deadline-radar`) requires one of:
+The **Postman** agent (and its related skills: `/email-triage`, `/meeting-prep`, `/weekly-agenda`, `/deadline-radar`) requires one of the following on platforms where Postman is active today. In the current Codex CLI runtime, these workflows are intentionally migration-gated and the dispatcher should explain the gate instead of running them:
 - **Google Workspace CLI** (`gws`) — full read/write access to Gmail and Google Calendar: search, read, archive, delete, label, send emails; create/update/delete calendar events. See [`docs/gws-setup-guide.md`](docs/gws-setup-guide.md) for setup.
 - **Hey CLI** (`hey`) — for Hey.com accounts. Read/reply/compose emails, leverages Hey's pre-sorted mailboxes (Imbox, Feed, Paper Trail, Reply Later, Set Aside, Bubble Up). Calendar operations still use `gws`. See [Hey CLI](https://github.com/basecamp/hey-cli) for installation.
 - **MCP connectors** (read-only fallback) — `launchme.sh` sets up MCP servers automatically (format varies by platform). Limited to reading emails and calendar events, plus draft creation.
@@ -443,16 +447,16 @@ My-Brain-Is-Full-Crew/               ← cloned inside your vault
 │   ├── connector.md                   Knowledge graph & link analysis
 │   ├── librarian.md                   Vault health & maintenance
 │   ├── transcriber.md                 Audio & meeting transcription
-│   └── postman.md                     Email & calendar integration
+│   └── postman.md                     Email & calendar integration (migration-gated in current Codex runtime)
 ├── skills/                          The 14 specialized skills
 │   ├── onboarding/SKILL.md            Full vault setup conversation
 │   ├── create-agent/SKILL.md          Design a custom agent step by step
 │   ├── manage-agent/SKILL.md          Edit, remove, or list custom agents
 │   ├── defrag/SKILL.md                Weekly vault defragmentation
-│   ├── email-triage/SKILL.md          Scan and prioritize unread emails
-│   ├── meeting-prep/SKILL.md          Comprehensive meeting brief
-│   ├── weekly-agenda/SKILL.md         Day-by-day week overview
-│   ├── deadline-radar/SKILL.md        Unified deadline timeline
+│   ├── email-triage/SKILL.md          Scan and prioritize unread emails (migration-gated in current Codex runtime)
+│   ├── meeting-prep/SKILL.md          Comprehensive meeting brief (migration-gated in current Codex runtime)
+│   ├── weekly-agenda/SKILL.md         Day-by-day week overview (migration-gated in current Codex runtime)
+│   ├── deadline-radar/SKILL.md        Unified deadline timeline (migration-gated in current Codex runtime)
 │   ├── transcribe/SKILL.md            Process recordings into structured notes
 │   ├── vault-audit/SKILL.md           Full 7-phase vault audit
 │   ├── deep-clean/SKILL.md            Extended vault cleanup
@@ -504,11 +508,11 @@ Codex CLI uses a split layout instead of a single platform directory:
 ```
 your-vault/
 ├── .codex/
-│   ├── agents/               ← 8 core agents (.toml format)
+│   ├── agents/               ← 8 core agent files (7 active + 1 migration-gated Postman role)
 │   ├── references/           ← shared docs
 │   └── config.toml           ← MCP servers + profiles + sandbox policy
 ├── .agents/
-│   └── skills/               ← 14 specialized skills
+│   └── skills/               ← 14 skill definitions (10 active + 4 migration-gated Postman skills)
 ├── Meta/
 │   └── scripts/              ← orchestra scripts
 ├── AGENTS.md                 ← dispatcher (Codex reads this)

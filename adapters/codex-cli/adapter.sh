@@ -29,6 +29,7 @@ rewrite_codex_paths() {
     s|\.platform/references/|.codex/references/|g;
     s|\.platform/skills/|.agents/skills/|g;
     s|\.platform/|.codex/|g;
+    s|\.mcp\.json|.codex/config.toml|g;
     s|DISPATCHER\.md|AGENTS.md|g;
   ' "$file"
 }
@@ -101,6 +102,11 @@ normalize_codex_routing_contract() {
     s/\binvoke the skill\b/follow the skill instructions directly in the root context/g;
     s/\binvoke the agent\b/spawn a bounded child agent from the root context/g;
     s/\bask the user\b/ask the user directly in chat and wait for the reply/g;
+    s/follow the skill instructions directly in the root context via the `Skill` tool/follow the skill instructions directly in the root context/g;
+    s/\(Skill tool\)/(root-context skill flow)/g;
+    s/\(Agent tool\)/(bounded child agent)/g;
+    s/YES \+ not in chain \+ depth < 3 → INVOKE next/YES + not already handled → the root context decides whether another bounded child task is still necessary/g;
+    s/- \*\*Max depth 3\*\*: no more than 3 agents per user request/- **Child depth: `agents.max_depth = 1`**: the root context may spawn one bounded child task, then decides the next step itself/g;
   ' "$file"
 }
 
@@ -151,6 +157,249 @@ HEADER
 # Copies the source DISPATCHER.md to dest_dir/AGENTS.md (Codex CLI's vault-root
 # dispatcher filename). Rewrites .platform/ and DISPATCHER.md to codex paths,
 # normalizes Codex routing semantics, and prepends the Codex routing header.
+# _cc_prune_dispatcher_appendix <file>
+# Removes the source-repo installation appendix from generated Codex AGENTS.md.
+# That appendix is platform-general source documentation and leaks stale runtime
+# details (.mcp.json, .md agents, .codex/skills) into the Codex dispatcher.
+_cc_prune_dispatcher_appendix() {
+  local file="$1"
+  [[ -f "$file" ]] || return 0
+  perl -0pi -e 's/\n# Project Info\n.*\z/\n/s' "$file"
+}
+
+_cc_insert_after_frontmatter() {
+  local file="$1" marker="$2" section="$3"
+  [[ -f "$file" ]] || return 0
+  grep -qF "$marker" "$file" && return 0
+
+  local boundary
+  boundary="$(awk 'BEGIN { count = 0 } /^---$/ { count++; if (count == 2) { print NR; exit } }' "$file")"
+  local tmp; tmp="$(mktemp)"
+
+  if [[ -n "$boundary" ]]; then
+    sed -n "1,${boundary}p" "$file" > "$tmp"
+    printf '\n%s\n' "$section" >> "$tmp"
+    sed -n "$((boundary + 1)),\$p" "$file" >> "$tmp"
+  else
+    printf '%s\n\n' "$section" > "$tmp"
+    cat "$file" >> "$tmp"
+  fi
+
+  mv "$tmp" "$file"
+}
+
+_cc_replace_literal_line() {
+  local file="$1" old="$2" new="$3"
+  [[ -f "$file" ]] || return 0
+  grep -qF "$old" "$file" || return 0
+
+  local tmp; tmp="$(mktemp)"
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    if [[ "$line" == "$old" ]]; then
+      printf '%s
+' "$new"
+    else
+      printf '%s
+' "$line"
+    fi
+  done < "$file" > "$tmp"
+  mv "$tmp" "$file"
+}
+
+_cc_override_agent_description_for_codex() {
+  local name="$1" description="$2"
+  case "$name" in
+    postman)
+      printf '%s' 'Migration-gated placeholder for future email and calendar parity in Codex. Do not route active Codex email or calendar requests here; explain the current migration gate instead.'
+      ;;
+    *)
+      printf '%s' "$description"
+      ;;
+  esac
+}
+
+_cc_apply_codex_postman_gate_dispatcher() {
+  local file="$1"
+  [[ -f "$file" ]] || return 0
+
+  FILE="$file" python - <<'PY'
+from pathlib import Path
+import os
+import re
+
+path = Path(os.environ["FILE"])
+text = path.read_text()
+newline = "\n" if text.endswith("\n") else ""
+
+text = text.replace(
+    "Your crew consists of **14 skills** (in `.agents/skills/`) and **8 core agents** (in `.codex/agents/`). Your agent platform auto-loads both at session start.\n\nThe 8 core agents are:\n\n`architect`, `scribe`, `sorter`, `seeker`, `connector`, `librarian`, `transcriber`, `postman`\n\nCustom agents created by the Architect are also valid. Check `.codex/references/agents-registry.md` for the full list of active agents (core + custom).",
+    "Your crew consists of **14 skills** (in `.agents/skills/`) and **8 core agents** (in `.codex/agents/`). Your agent platform auto-loads both at session start.\n\nIn the current Codex runtime, **10 skills** and **7 core agents** are active. `postman`, `/email-triage`, `/meeting-prep`, `/weekly-agenda`, and `/deadline-radar` are migration-gated until external email/calendar parity lands.\n\nThe 8 core agents are:\n\n`architect`, `scribe`, `sorter`, `seeker`, `connector`, `librarian`, `transcriber`, `postman`\n\nCustom agents created by the Architect are also valid. Check `.codex/references/agents-registry.md` for the full list of active and migration-gated units.",
+)
+
+gate_block = """## Migration-Gated Units
+
+Before normal skill or agent routing, check whether the request targets one of these Codex migration-gated units:
+
+- `postman`
+- `/email-triage`
+- `/meeting-prep`
+- `/weekly-agenda`
+- `/deadline-radar`
+
+If yes, explain that external Gmail, Hey, and Google Calendar workflows are not enabled in the current Codex runtime yet. Do not dispatch into those runtime files.
+"""
+if "## Migration-Gated Units" not in text:
+    text = text.replace("## How to delegate", gate_block + "\n## How to delegate", 1)
+
+line_map = {
+    "| 5 | `/email-triage` |": '| 5 | `/email-triage` | Migration-gated in Codex. Reserved for future email triage parity. | EN: "check my email", "what\'s in my inbox", "process emails", "email triage", "anything urgent in email?", "save important emails" · IT: "controlla le email", "cosa c\'è nella mia inbox", "triage email", "processa le email", "email urgenti" · FR: "vérifier mes emails", "trier mes emails" · ES: "revisar mi correo", "triaje de emails" · DE: "E-Mails prüfen", "Posteingang sichten" · PT: "verificar meus emails", "triagem de emails" |',
+    "| 6 | `/meeting-prep` |": '| 6 | `/meeting-prep` | Migration-gated in Codex. Reserved for future meeting brief parity once email/calendar integrations land. | EN: "prepare for meeting", "meeting prep", "brief me for the meeting", "get ready for the call" · IT: "prepara la riunione", "brief per il meeting", "preparami per la call" · FR: "préparer la réunion", "brief pour le meeting" · ES: "preparar la reunión", "brief para la reunión" · DE: "Meeting vorbereiten", "Besprechung vorbereiten" · PT: "preparar a reunião", "brief para o meeting" |',
+    "| 7 | `/weekly-agenda` |": '| 7 | `/weekly-agenda` | Migration-gated in Codex. Reserved for future week aggregation from external integrations. | EN: "weekly agenda", "what\'s this week", "week overview", "plan my week" · IT: "agenda settimanale", "cosa c\'è questa settimana", "panoramica della settimana" · FR: "agenda de la semaine", "programme de la semaine" · ES: "agenda semanal", "qué hay esta semana" · DE: "Wochenagenda", "Wochenübersicht" · PT: "agenda semanal", "o que tem esta semana" |',
+    "| 8 | `/deadline-radar` |": '| 8 | `/deadline-radar` | Migration-gated in Codex. Reserved for future deadline aggregation from external integrations. | EN: "deadline radar", "what are my deadlines", "this week\'s deadlines", "upcoming deadlines" · IT: "scadenze", "radar scadenze", "le mie scadenze", "scadenze della settimana" · FR: "échéances", "radar des échéances" · ES: "fechas límite", "radar de plazos" · DE: "Fristen-Radar", "meine Fristen" · PT: "radar de prazos", "meus prazos" |',
+    "| 1 | **postman** |": "| 1 | **postman** | Migration-gated in Codex. Explain that external email/calendar integrations are not enabled yet. |",
+}
+
+lines = text.splitlines()
+for idx, line in enumerate(lines):
+    for prefix, replacement in line_map.items():
+        if line.startswith(prefix):
+            lines[idx] = replacement
+            break
+text = "\n".join(lines)
+
+text = re.sub(
+    r"\n## 1\. POSTMAN \(agent\)\n.*?\n---\n\n## 2\. TRANSCRIBER \(agent\)",
+    "\n## 1. POSTMAN (agent)\n\nThis agent is migration-gated in the current Codex runtime.\n\nIf the user asks for email or calendar work that would normally route here, explain that external Gmail, Hey, and Google Calendar workflows are not enabled yet in Codex. Do not dispatch into the Postman runtime files.\n\n---\n\n## 2. TRANSCRIBER (agent)",
+    text,
+    count=1,
+    flags=re.S,
+)
+
+path.write_text(text + newline)
+PY
+}
+
+_cc_apply_codex_postman_gate_registry() {
+  local file="$1"
+  [[ -f "$file" ]] || return 0
+
+  FILE="$file" python - <<'PY'
+from pathlib import Path
+import os
+
+path = Path(os.environ["FILE"])
+text = path.read_text()
+newline = "\n" if text.endswith("\n") else ""
+
+lines = text.splitlines()
+for idx, line in enumerate(lines):
+    if line.startswith("| postman |"):
+        lines[idx] = "| postman | Email & Calendar Intelligence | Reserved for future Codex parity. External email/calendar integrations are currently migration-gated and must not be dispatched from the active runtime. | Email triage, calendar queries, deadline tracking, meeting prep, VIP filtering | For now, explain that external integrations are not yet enabled in the Codex runtime | migration-gated |"
+    elif line == "- **disabled**: Agent is temporarily disabled — the dispatcher will skip it":
+        if idx + 1 >= len(lines) or "migration-gated" not in lines[idx + 1]:
+            lines.insert(idx + 1, "- **migration-gated**: Agent or skill is intentionally excluded from active Codex dispatch until its external/runtime dependencies reach parity")
+    elif line.startswith('| `/email-triage` | postman |'):
+        lines[idx] = '| `/email-triage` | postman | "check my email", "what\'s in my inbox", "process emails", "email triage", "anything urgent in email?" | Reserved for future Codex parity; current runtime must explain that email integrations are migration-gated | migration-gated |'
+    elif line.startswith('| `/meeting-prep` | postman |'):
+        lines[idx] = '| `/meeting-prep` | postman | "prepare for meeting", "meeting prep", "brief me for the meeting", "get ready for the call" | Reserved for future Codex parity; current runtime must explain that meeting email/calendar enrichment is migration-gated | migration-gated |'
+    elif line.startswith('| `/weekly-agenda` | postman |'):
+        lines[idx] = '| `/weekly-agenda` | postman | "weekly agenda", "what\'s this week", "week overview", "plan my week" | Reserved for future Codex parity; current runtime must explain that external week aggregation is migration-gated | migration-gated |'
+    elif line.startswith('| `/deadline-radar` | postman |'):
+        lines[idx] = '| `/deadline-radar` | postman | "deadline radar", "what are my deadlines", "this week\'s deadlines", "upcoming deadlines" | Reserved for future Codex parity; current runtime must explain that external deadline aggregation is migration-gated | migration-gated |'
+
+path.write_text("\n".join(lines) + newline)
+PY
+}
+
+_cc_apply_codex_postman_gate_agents_reference() {
+  local file="$1"
+  [[ -f "$file" ]] || return 0
+
+  FILE="$file" python - <<'PY'
+from pathlib import Path
+import os
+import re
+
+path = Path(os.environ["FILE"])
+text = path.read_text()
+newline = "\n" if text.endswith("\n") else ""
+
+text = text.replace("## The Eight Agents", "## Core Agents")
+text = re.sub(
+    r"### 8\. Postman\n\n\*\*Role\*\*: Email & Calendar Intelligence\n\*\*Agent file\*\*: `postman\.md`\n\*\*Requires\*\*:.*?\n\*\*Contact when\*\*: Important information may have arrived by email\. Meeting notes should be cross-referenced with calendar events\. An event needs to be created from a note\.\n",
+    "### 8. Postman\n\n**Role**: Email & Calendar Intelligence\n**Agent file**: `postman.md`\n**Codex runtime status**: migration-gated\n**Responsibilities**: Reserved for future Codex parity. External Gmail, Hey, and Google Calendar workflows are intentionally excluded from active Codex dispatch until the migration reaches end-to-end parity.\n**Skills**: `/email-triage`, `/meeting-prep`, `/weekly-agenda`, and `/deadline-radar` are likewise migration-gated in the current Codex runtime. `/contact-sync` remains separately active when `apple-contacts` MCP is configured.\n**Contact when**: In the current Codex runtime, do not dispatch external email/calendar work here. Explain the migration gate or capture future integration preferences instead.\n",
+    text,
+    count=1,
+    flags=re.S,
+)
+
+lines = text.splitlines()
+for idx, line in enumerate(lines):
+    if line.startswith("| `/email-triage` | Postman |"):
+        lines[idx] = "| `/email-triage` | Postman | Migration-gated in Codex; reserved for future email scanning parity |"
+    elif line.startswith("| `/meeting-prep` | Postman |"):
+        lines[idx] = "| `/meeting-prep` | Postman | Migration-gated in Codex; reserved for future meeting brief parity |"
+    elif line.startswith("| `/weekly-agenda` | Postman |"):
+        lines[idx] = "| `/weekly-agenda` | Postman | Migration-gated in Codex; reserved for future external week aggregation |"
+    elif line.startswith("| `/deadline-radar` | Postman |"):
+        lines[idx] = "| `/deadline-radar` | Postman | Migration-gated in Codex; reserved for future external deadline aggregation |"
+    elif line.startswith('| "Cross-reference this with email" | Postman |'):
+        lines[idx] = '| "Cross-reference this with email" | Postman (migration-gated in Codex) |'
+
+path.write_text("\n".join(lines) + newline)
+PY
+}
+
+_cc_apply_codex_postman_gate_skill() {
+  local skill_name="$1" file="$2"
+  [[ -f "$file" ]] || return 0
+
+  local summary=''
+  case "$skill_name" in
+    email-triage)
+      summary='**This skill is migration-gated in the current Codex runtime. Do not execute email integration steps from this file.**'
+      ;;
+    meeting-prep)
+      summary='**This skill is migration-gated in the current Codex runtime. Do not execute external email/calendar enrichment from this file.**'
+      ;;
+    weekly-agenda)
+      summary='**This skill is migration-gated in the current Codex runtime. Do not execute external email/calendar aggregation from this file.**'
+      ;;
+    deadline-radar)
+      summary='**This skill is migration-gated in the current Codex runtime. Do not execute external deadline aggregation from this file.**'
+      ;;
+    *)
+      return 0
+      ;;
+  esac
+
+  local section
+  section=$(cat <<EOF
+## Codex Migration Gate
+
+${summary}
+
+When a user asks for this workflow in Codex:
+1. Explain that the workflow is not enabled yet in the current Codex runtime.
+2. Offer to capture the user's intent or future integration preference in the vault if helpful.
+3. Do not run Gmail, Hey, Google Calendar, or email/calendar MCP commands from this file.
+EOF
+)
+
+  _cc_insert_after_frontmatter "$file" '## Codex Migration Gate' "$section"
+}
+
+_cc_apply_codex_postman_gate_agent() {
+  local file="$1"
+  [[ -f "$file" ]] || return 0
+
+  if ! grep -q '## Codex Migration Gate' "$file"; then
+    perl -0pi -e 's|# Postman — Email & Calendar Intelligence Hub\n|# Postman — Email & Calendar Intelligence Hub\n\n## Codex Migration Gate\n\n**This agent is migration-gated in the current Codex runtime. Do not execute external email or calendar integrations from this file.**\n\nWhen a user asks for Postman behavior in Codex, explain that Gmail, Hey, and Google Calendar workflows are not enabled yet, offer to capture future preferences if useful, and stop before running email or calendar commands.\n\n|s' "$file"
+  fi
+
+  perl -0pi -e 's|The Postman has nine operating modes\..*?what the user wants to do:|The Postman has nine operating modes in the legacy design. In the current Codex migration runtime, do not enter these modes. If the context is not clear, explain that the Postman runtime is migration-gated instead of asking the user to proceed through these modes.|s' "$file"
+}
+
 adapter_translate_dispatcher() {
   local src="$1" dst="$2"
   [[ -f "$src" ]] || return 0
@@ -158,12 +407,99 @@ adapter_translate_dispatcher() {
   cp "$src" "$dst/AGENTS.md"
   rewrite_codex_paths "$dst/AGENTS.md"
   normalize_codex_routing_contract "$dst/AGENTS.md"
+  _cc_apply_codex_postman_gate_dispatcher "$dst/AGENTS.md"
+  _cc_prune_dispatcher_appendix "$dst/AGENTS.md"
   _cc_prepend_codex_header "$dst/AGENTS.md"
 }
 
 # adapter_translate_references <source_refs_dir> <dest_root>
 # Copies *.md into dest_root/.codex/references/, rewriting framework paths
 # and normalizing Codex routing semantics.
+# _cc_rewrite_agent_template_reference <file>
+# Replaces the source markdown/YAML custom-agent template with a Codex-native
+# TOML template so the create-agent skill does not learn the wrong runtime.
+_cc_rewrite_agent_template_reference() {
+  local file="$1"
+  [[ -f "$file" ]] || return 0
+
+  cat > "$file" <<'EOF'
+# Custom Agent Template
+
+This file is the Codex-native reference template for the **Architect** when generating new custom agents.
+
+**Codex custom agents are TOML files** in `.codex/agents/`, not Markdown prompt files.
+
+---
+
+## Template
+
+```toml
+name = "{{agent-name}}"
+description = "{{One-paragraph description in the user's language, including trigger phrases they would naturally say.}}"
+model = "{{gpt-5.4|gpt-5.4-mini|gpt-5.3-codex-spark}}"
+model_reasoning_effort = "{{high|medium}}"
+sandbox_mode = "{{read-only|workspace-write}}"
+developer_instructions = '''
+# {{Agent Name}} — {{Short Subtitle}}
+
+Always respond to the user in their language.
+
+## User Profile
+
+Before doing anything, read `Meta/user-profile.md`.
+
+## Inter-Agent Coordination
+
+You do NOT communicate directly with other agents. The dispatcher handles all orchestration.
+
+### Suggested next agent
+- **Agent**: {{agent name from .codex/references/agents-registry.md}}
+- **Reason**: {{what needs to be done and why}}
+- **Context**: {{relevant details}}
+
+### Suggested new agent
+- **Need**: {{missing capability}}
+- **Reason**: {{why no existing agent can handle it}}
+- **Suggested role**: {{what the new agent would do}}
+
+For the full orchestration protocol, see `.codex/references/agent-orchestration.md`.
+For the agent registry, see `.codex/references/agents-registry.md`.
+
+## Core Responsibilities
+
+{{Detailed operating instructions, edge cases, output format, note templates, and examples.}}
+
+## First Run Setup
+
+{{How the agent detects first run, what it asks, and what it creates.}}
+
+## Agent State (Post-it)
+
+Read and write `Meta/states/{{agent-name}}.md` every run.
+
+## Operational Rules
+
+1. Always respond in the user's language.
+2. Read the user profile first.
+3. Be conservative by default.
+4. Follow vault naming conventions.
+5. Use Obsidian-compatible markdown and wikilinks.
+'''
+```
+
+---
+
+## Conventions for the Architect
+
+1. The `description` field is written only in the user's language.
+2. Start from minimal permissions and only grant `workspace-write` when the agent truly needs writes or shell operations.
+3. Every custom agent gets a row in `.codex/references/agents-registry.md` and a section in `.codex/references/agents.md`.
+4. File location: `.codex/agents/{{agent-name}}.toml`
+5. Complex multi-step flows should become skills in `.agents/skills/`, not nested child-agent logic.
+6. When in doubt, mirror the structure of the existing core `.codex/agents/*.toml` files.
+EOF
+}
+
 adapter_translate_references() {
   local src="$1" dst="$2"
   [[ -d "$src" ]] || return 0
@@ -179,6 +515,14 @@ adapter_translate_references() {
       continue
     fi
     normalize_codex_routing_contract "$out_file"
+    if [[ "$(basename "$f")" == "agents-registry.md" ]]; then
+      _cc_apply_codex_postman_gate_registry "$out_file"
+    elif [[ "$(basename "$f")" == "agents.md" ]]; then
+      _cc_apply_codex_postman_gate_agents_reference "$out_file"
+    fi
+    if [[ "$(basename "$f")" == "agent-template.md" ]]; then
+      _cc_rewrite_agent_template_reference "$out_file"
+    fi
   done
 }
 
@@ -191,6 +535,7 @@ _cc_rewrite_skill_markdown() {
 
   rewrite_codex_paths "$file"
   rewrite_tool_compat "$file"
+  _cc_apply_codex_postman_gate_skill "$skill_name" "$file"
 
   case "$skill_name" in
     onboarding)
@@ -201,9 +546,14 @@ _cc_rewrite_skill_markdown() {
         s/4\. Ask the NEXT question using ask the user/4. Ask the next direct plain-text question/g;
         s/\*\*ONE question per ask the user call\.\*\* Never bundle 2\+ questions in one message\./**One direct plain-text question at a time.** Never bundle 2+ questions in one message./g;
         s/\.codex\/agents\/\{name\}\.md/.codex\/agents\/{name}.toml/g;
+        s/\.codex\/agents\/([a-z-]+)\.md/.codex\/agents\/$1.toml/g;
+        s/"\$AGENT_SOURCE"\/([a-z-]+)\.md/"\$AGENT_SOURCE"\/$1.toml/g;
         s/\.mcp\.json/.codex\/config.toml/g;
         s/\$HOME\/\.platform\/agents/\$HOME\/.codex\/agents/g;
+        s/copy the `\.md` files from the `agents\/` folder of the plugin into `\.codex\/agents\/` inside your vault/copy the generated `.toml` files from `dist\/codex-cli\/.codex\/agents\/` inside the repo into `\.codex\/agents\/` inside your vault/g;
       ' "$file"
+      perl -0pi -e "s|cat > \.codex/config\.toml << 'EOF'\n\{\n  \"mcpServers\": \\{\n    \"Gmail\": \\{\n      \"type\": \"http\",\n      \"url\": \"https://gmail\.mcp\.claude\.com/mcp\"\n    \\},\n    \"Google Calendar\": \\{\n      \"type\": \"http\",\n      \"url\": \"https://gcal\.mcp\.claude\.com/mcp\"\n    \\}\n  \\}\n\}\nEOF|cat > .codex/config.toml << 'EOF'\n[mcp_servers.Gmail]\nurl = \"https://gmail.mcp.claude.com/mcp\"\n\n[mcp_servers.\"Google Calendar\"]\nurl = \"https://gcal.mcp.claude.com/mcp\"\nEOF|sg" "$file"
+      perl -0pi -e 's/\x60\x60\x60json\n\{\n  "mcpServers": \{\n    "Gmail": \{\n      "type": "http",\n      "url": "https:\/\/gmail\.mcp\.claude\.com\/mcp"\n    \},\n    "Google Calendar": \{\n      "type": "http",\n      "url": "https:\/\/gcal\.mcp\.claude\.com\/mcp"\n    \}\n  \}\n\}\n\x60\x60\x60/```toml\n[mcp_servers.Gmail]\nurl = "https:\/\/gmail.mcp.claude.com\/mcp"\n\n[mcp_servers."Google Calendar"]\nurl = "https:\/\/gcal.mcp.claude.com\/mcp"\n```/sg' "$file"
       ;;
     create-agent)
       perl -0pi -e '
@@ -295,14 +645,16 @@ adapter_translate_skills() {
 }
 
 # _cc_toml_quote_key <name>
-# Emits the TOML table key for [mcp_servers.<name>].
-# Codex CLI requires MCP server names to match ^[a-zA-Z0-9_-]+$, so any
-# character outside that set is replaced with a hyphen before writing.
+# Emits a TOML table key for [mcp_servers.<name>], preserving the original
+# server name. Bare keys are used for simple names; quoted keys are emitted for
+# names with spaces or punctuation.
 _cc_toml_quote_key() {
   local name="$1"
-  # Sanitize: replace any character not in [a-zA-Z0-9_-] with a hyphen
-  local safe_name="${name//[^a-zA-Z0-9_-]/-}"
-  printf '[mcp_servers.%s]' "$safe_name"
+  if [[ "$name" =~ ^[A-Za-z0-9_-]+$ ]]; then
+    printf '[mcp_servers.%s]' "$name"
+  else
+    printf '[mcp_servers."%s"]' "$(_cc_toml_escape_string "$name")"
+  fi
 }
 
 # _cc_toml_escape_string <value>
@@ -595,6 +947,7 @@ adapter_translate_agent_toml() {
   [[ -z "$name" ]] && name="$(basename "$agent_file" .md)"
 
   local description; description="$(_cc_extract_description "$agent_file")"
+  description="$(_cc_override_agent_description_for_codex "$name" "$description")"
   local desc_escaped; desc_escaped="$(_cc_toml_escape_dquote_string "$description")"
   local model_raw; model_raw="$(parse_frontmatter "$agent_file" model)"
   local model; model="$(_cc_model_to_codex "$model_raw")"
@@ -630,6 +983,9 @@ adapter_translate_agent_toml() {
       printf '%s\n' "$escaped_body"
       printf '"""\n'
     } > "$out_file"
+    if [[ "$name" == "postman" ]]; then
+      _cc_apply_codex_postman_gate_agent "$out_file"
+    fi
   else
     # Preferred: multiline literal string — no escaping needed
     {
@@ -642,6 +998,9 @@ adapter_translate_agent_toml() {
       printf '%s\n' "$body"
       printf "'''\n"
     } > "$out_file"
+    if [[ "$name" == "postman" ]]; then
+      _cc_apply_codex_postman_gate_agent "$out_file"
+    fi
   fi
 }
 

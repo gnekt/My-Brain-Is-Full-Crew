@@ -256,6 +256,78 @@ test_cc_translate_skills_rewrites_high_risk_real_skills_for_codex() {
   return $result
 }
 
+
+test_cc_real_dispatcher_marks_postman_migration_gated() {
+  local dst; dst="$(mktemp -d)"
+  adapter_translate_dispatcher "$ROOT/DISPATCHER.md" "$dst"
+
+  local content; content="$(cat "$dst/AGENTS.md")"
+  local result=0
+  [[ "$content" == *'## Migration-Gated Units'* ]] \
+    || { echo 'dispatcher should declare migration-gated units'; result=1; }
+  [[ "$content" == *'`postman`'* && "$content" == *'`/email-triage`'* ]] \
+    || { echo 'dispatcher should list postman and email-triage as gated'; result=1; }
+  [[ "$content" == *'Migration-gated in Codex. Explain that external email/calendar integrations are not enabled yet.'* ]] \
+    || { echo 'dispatcher should gate the postman fallback row'; result=1; }
+  [[ "$content" != *'Calendar import, create event, targeted email/calendar search, VIP filter, email draft'* ]] \
+    || { echo 'dispatcher should not keep the active postman routing copy'; result=1; }
+
+  rm -rf "$dst"
+  return $result
+}
+
+test_cc_real_registry_marks_postman_runtime_units_gated() {
+  local dst; dst="$(mktemp -d)"
+  adapter_translate_references "$ROOT/references" "$dst"
+
+  local content; content="$(cat "$dst/.codex/references/agents-registry.md")"
+  local result=0
+  [[ "$content" == *'| postman | Email & Calendar Intelligence | Reserved for future Codex parity.'* ]] \
+    || { echo 'registry should rewrite postman to migration-gated text'; result=1; }
+  [[ "$content" == *'| `/email-triage` | postman '* && "$content" == *'| migration-gated |'* ]] \
+    || { echo 'registry should mark email-triage as migration-gated'; result=1; }
+  [[ "$content" == *'| `/meeting-prep` | postman '* && "$content" == *'meeting email/calendar enrichment is migration-gated'* ]] \
+    || { echo 'registry should mark meeting-prep as migration-gated'; result=1; }
+  [[ "$content" == *'**migration-gated**: Agent or skill is intentionally excluded from active Codex dispatch'* ]] \
+    || { echo 'registry should document the migration-gated status value'; result=1; }
+
+  rm -rf "$dst"
+  return $result
+}
+
+test_cc_real_postman_runtime_files_have_codex_migration_gates() {
+  local dst; dst="$(mktemp -d)"
+  adapter_translate_agents_toml "$ROOT/agents" "$dst"
+  adapter_translate_skills "$ROOT/skills" "$dst"
+
+  local result=0
+  local postman="$dst/.codex/agents/postman.toml"
+  [[ -f "$postman" ]] || { echo 'missing generated postman.toml'; rm -rf "$dst"; return 1; }
+  local content; content="$(cat "$postman")"
+  [[ "$content" == *'Migration-gated placeholder for future email and calendar parity in Codex.'* ]] \
+    || { echo 'postman description should be overridden for Codex'; result=1; }
+  [[ "$content" == *'## Codex Migration Gate'* ]] \
+    || { echo 'postman.toml should include a migration gate section'; result=1; }
+  [[ "$content" != *'.mcp.json'* ]] \
+    || { echo 'postman.toml should not mention .mcp.json'; result=1; }
+
+  local skill
+  for skill in email-triage meeting-prep weekly-agenda deadline-radar; do
+    local skill_file="$dst/.agents/skills/$skill/SKILL.md"
+    [[ -f "$skill_file" ]] || { echo "missing generated $skill skill"; result=1; continue; }
+    content="$(cat "$skill_file")"
+    [[ "$content" == *'## Codex Migration Gate'* ]] \
+      || { echo "$skill should include a migration gate section"; result=1; }
+    [[ "$content" != *'.mcp.json'* ]] \
+      || { echo "$skill should not mention .mcp.json"; result=1; }
+    [[ "$content" != *'AskUserQuestion'* ]] \
+      || { echo "$skill should not leak AskUserQuestion into Codex runtime"; result=1; }
+  done
+
+  rm -rf "$dst"
+  return $result
+}
+
 test_cc_translate_skills_preserves_optional_directories_and_rewrites_text_files() {
   local src; src="$(mktemp -d)"
   local dst; dst="$(mktemp -d)"
@@ -1454,5 +1526,57 @@ EOF
     || { echo 'normalized output should mention the root-only Codex contract'; result=1; }
 
   rm -f "$tmp"
+  return $result
+}
+
+
+test_cc_real_dispatcher_prunes_source_appendix_and_stale_runtime_strings() {
+  local dst; dst="$(mktemp -d)"
+  adapter_build "$ROOT" "$dst"
+
+  local content; content="$(cat "$dst/AGENTS.md")"
+  local result=0
+  [[ "$content" != *'# Project Info'* ]] || { echo 'source appendix should not leak into Codex AGENTS.md'; result=1; }
+  [[ "$content" != *'.mcp.json'* ]] || { echo '.mcp.json should not appear in Codex AGENTS.md'; result=1; }
+  [[ "$content" != *'.codex/skills/'* ]] || { echo '.codex/skills/ should not appear in Codex AGENTS.md'; result=1; }
+  [[ "$content" != *'.codex/agents/{name}.md'* ]] || { echo '.codex/agents/{name}.md should not appear in Codex AGENTS.md'; result=1; }
+
+  rm -rf "$dst"
+  return $result
+}
+
+test_cc_real_onboarding_skill_uses_codex_runtime_examples() {
+  local dst; dst="$(mktemp -d)"
+  adapter_build "$ROOT" "$dst"
+
+  local skill="$dst/.agents/skills/onboarding/SKILL.md"
+  local content; content="$(cat "$skill")"
+  local result=0
+  [[ "$content" == *'.codex/config.toml'* ]] || { echo 'onboarding should mention .codex/config.toml'; result=1; }
+  [[ "$content" == *'[mcp_servers.Gmail]'* ]] || { echo 'onboarding should show TOML MCP example'; result=1; }
+  [[ "$content" != *'mcpServers'* ]] || { echo 'onboarding should not show JSON mcpServers example'; result=1; }
+  [[ "$content" != *'.mcp.json'* ]] || { echo 'onboarding should not mention .mcp.json'; result=1; }
+  [[ "$content" != *'"$AGENT_SOURCE"/architect.md'* ]] || { echo 'onboarding should not copy .md agent files in Codex mode'; result=1; }
+  [[ "$content" != *'.codex/agents/architect.md'* ]] || { echo 'onboarding should not reference .md agent runtime paths'; result=1; }
+  [[ "$content" == *'architect.toml'* ]] || { echo 'onboarding should reference .toml agent files'; result=1; }
+
+  rm -rf "$dst"
+  return $result
+}
+
+test_cc_real_agent_template_is_toml_native() {
+  local dst; dst="$(mktemp -d)"
+  adapter_build "$ROOT" "$dst"
+
+  local template="$dst/.codex/references/agent-template.md"
+  local content; content="$(cat "$template")"
+  local result=0
+  [[ "$content" == *'```toml'* ]] || { echo 'agent-template should use a TOML example'; result=1; }
+  [[ "$content" == *"developer_instructions = '''"* ]] || { echo 'agent-template should document developer_instructions'; result=1; }
+  [[ "$content" == *'.codex/agents/{{agent-name}}.toml'* ]] || { echo 'agent-template should point to .toml output'; result=1; }
+  [[ "$content" != *'```yaml'* ]] || { echo 'agent-template should not use YAML in Codex output'; result=1; }
+  [[ "$content" != *'.platform/'* ]] || { echo 'agent-template should not leak .platform paths'; result=1; }
+
+  rm -rf "$dst"
   return $result
 }
