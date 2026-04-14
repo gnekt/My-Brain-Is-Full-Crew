@@ -276,6 +276,33 @@ test_cc_real_dispatcher_marks_postman_migration_gated() {
   return $result
 }
 
+test_cc_real_dispatcher_uses_offload_first_codex_contract() {
+  local dst; dst="$(mktemp -d)"
+  adapter_translate_dispatcher "$ROOT/DISPATCHER.md" "$dst"
+  adapter_translate_references "$ROOT/references" "$dst"
+
+  local dispatcher; dispatcher="$(cat "$dst/AGENTS.md")"
+  local compat; compat="$(cat "$dst/.codex/references/codex-cli-compat.md")"
+  local result=0
+
+  [[ "$dispatcher" == *'The dispatcher is an **offload-first multi-router**.'* ]] \
+    || { echo 'dispatcher should describe Codex as offload-first'; result=1; }
+  [[ "$dispatcher" == *'continue through obvious, low-risk follow-up work before returning to the user'* ]] \
+    || { echo 'dispatcher header should prefer obvious low-risk continuation'; result=1; }
+  [[ "$dispatcher" == *'### Continue vs stop'* ]] \
+    || { echo 'dispatcher should define continue-vs-stop rules'; result=1; }
+  [[ "$dispatcher" == *'primarily for dispatcher continuation'* ]] \
+    || { echo 'dispatcher should frame Suggested next agent as continuation input'; result=1; }
+
+  [[ "$compat" == *'This blocks deep child recursion, not root-side serial orchestration.'* ]] \
+    || { echo 'compat guide should clarify root-side serial orchestration'; result=1; }
+  [[ "$compat" == *'Offload-first does not mean forceful.'* ]] \
+    || { echo 'compat guide should preserve the non-forceful guardrail'; result=1; }
+
+  rm -rf "$dst"
+  return $result
+}
+
 test_cc_real_registry_marks_postman_runtime_units_gated() {
   local dst; dst="$(mktemp -d)"
   adapter_translate_references "$ROOT/references" "$dst"

@@ -105,7 +105,7 @@ normalize_codex_routing_contract() {
     s/follow the skill instructions directly in the root context via the `Skill` tool/follow the skill instructions directly in the root context/g;
     s/\(Skill tool\)/(root-context skill flow)/g;
     s/\(Agent tool\)/(bounded child agent)/g;
-    s/YES \+ not in chain \+ depth < 3 → INVOKE next/YES + not already handled → the root context decides whether another bounded child task is still necessary/g;
+    s/YES \+ not in chain \+ depth < 3 → INVOKE next/YES + not already handled + obvious\/low-risk → the root context continues with another bounded child task/g;
     s/- \*\*Max depth 3\*\*: no more than 3 agents per user request/- **Child depth: `agents.max_depth = 1`**: the root context may spawn one bounded child task, then decides the next step itself/g;
   ' "$file"
 }
@@ -130,8 +130,8 @@ _cc_prepend_codex_header() {
 > **Context:** Codex CLI loads this file as the root dispatcher. Due to
 > multi-agent depth limits (`agents.max_depth = 1` by default), all
 > orchestration decisions stay in this root context. Spawned agents emit
-> a `### Suggested next agent` signal; the root context then decides whether
-> to continue with another agent.
+> `### Suggested next agent` signals, and the root context should usually
+> continue through obvious, low-risk follow-up work before returning to the user.
 
 **Custom agents** live in `.codex/agents/*.toml` and are discovered automatically.
 **Skills** live in `.agents/skills/` inside the project (or `$HOME/.agents/skills/`).
