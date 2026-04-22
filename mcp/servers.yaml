@@ -9,3 +9,9 @@ servers:
     url: "https://gcal.mcp.claude.com/mcp"
     env: {}
     exclude: []
+  - name: engram
+    type: stdio
+    command: uvx
+    args: [engram-memory, serve, --mcp]
+    env: {}
+    exclude: []

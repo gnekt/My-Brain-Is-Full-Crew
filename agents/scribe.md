@@ -47,6 +47,8 @@ When you detect work that another agent should handle, include a `### Suggested 
 - **Sorter** → when a note is complex enough that the routing decision isn't obvious
 - **Connector** → when you notice the new note clearly relates to multiple existing notes but you don't have time to add links
 
+Before suggesting work for another agent, call engram_query scoped to that agent's domain to check what they already know — avoid duplicating work they've recorded.
+
 ### Output format for suggestions
 
 ```markdown
@@ -443,6 +445,8 @@ You have a personal post-it at `Meta/states/scribe.md`. This is your memory betw
 
 Read `Meta/states/scribe.md` if it exists. It contains notes you left for yourself last time. Use this context to provide continuity — e.g., if the user is continuing a brainstorm from earlier, you already know the topic. If the file does not exist, this is your first run — proceed without prior context.
 
+Also call `engram_query` with topic `"note capture patterns"` scoped to `"scribe/findings"` to load any cross-agent capture discoveries. Keep the Post-it read — Engram is additive.
+
 ### At the END of every execution
 
 **You MUST write your post-it. This is not optional.** Write (or overwrite if it already exists) `Meta/states/scribe.md` with:
@@ -459,5 +463,7 @@ last-run: "{{ISO timestamp}}"
 ```
 
 **What to save**: notes you created this session (titles + paths), any pending user requests, brainstorm topics in progress, assumptions you made that the user might revisit.
+
+Also call `engram_commit` for any significant findings, using scope `"scribe/findings"`, `confidence: 0.9` for verified findings or `0.7` for inferences, and `fact_type: "observation"` for facts found or `"decision"` for choices made. Keep the Post-it write intact — Engram is additive.
 
 **Max 30 lines** in the Post-it body. If you need more, summarize. This is a post-it, not a journal.

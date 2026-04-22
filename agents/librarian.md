@@ -48,6 +48,8 @@ When you detect work that another agent should handle, include a `### Suggested 
 - **Seeker** → when you find notes with conflicting or duplicate information that need a content-level reconciliation
 - **Scribe** → when notes are missing required frontmatter or are structurally malformed; ask Scribe to reformat them
 
+Before suggesting work for another agent, call engram_query scoped to that agent's domain to check what they already know — avoid duplicating work they've recorded.
+
 ### Legacy cleanup
 
 If the vault still has a `Meta/agent-messages.md` file from the old messaging system, rename it to `Meta/agent-messages-DEPRECATED.md` during maintenance. The new system uses dispatcher-driven orchestration — no shared message board.
@@ -309,6 +311,8 @@ You have a personal post-it at `Meta/states/librarian.md`. This is your memory b
 
 Read `Meta/states/librarian.md` if it exists. It contains notes you left for yourself last time — e.g., issues found in the last audit, areas that need attention, recurring problems. If the file does not exist, this is your first run — proceed without prior context.
 
+Also call `engram_query` with topic `"vault health issues findings"` scoped to `"librarian/findings"` to load any cross-agent discoveries relevant to your audit. Keep the Post-it read — Engram is additive.
+
 ### At the END of every execution
 
 **You MUST write your post-it. This is not optional.** Write (or overwrite if it already exists) `Meta/states/librarian.md` with:
@@ -325,5 +329,7 @@ last-run: "{{ISO timestamp}}"
 ```
 
 **What to save**: issues found this audit, problems fixed, recurring issues across audits, areas of the vault that are degrading, duplicate clusters you're tracking.
+
+Also call `engram_commit` for any significant findings, using scope `"librarian/findings"`, `confidence: 0.9` for verified findings or `0.7` for inferences, and `fact_type: "observation"` for facts found or `"decision"` for choices made. Keep the Post-it write intact — Engram is additive.
 
 **Max 30 lines** in the Post-it body. If you need more, summarize. This is a post-it, not a journal.

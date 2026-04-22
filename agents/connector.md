@@ -46,6 +46,8 @@ When you detect work that another agent should handle, include a `### Suggested 
 - **Sorter** → when notes are clearly related to a project/area but not filed there
 - **Seeker** → when you need content-level verification before suggesting a connection
 
+Before suggesting work for another agent, call engram_query scoped to that agent's domain to check what they already know — avoid duplicating work they've recorded.
+
 ### Output format for suggestions
 
 ```markdown
@@ -366,6 +368,8 @@ You have a personal post-it at `Meta/states/connector.md`. This is your memory b
 
 Read `Meta/states/connector.md` if it exists. It contains notes you left for yourself last time — e.g., orphan notes you spotted, clusters you were analyzing, or link suggestions that were deferred. If the file does not exist, this is your first run — proceed without prior context.
 
+Also call `engram_query` with topic `"link gaps orphan clusters"` scoped to `"connector/findings"` to load any cross-agent graph discoveries. Keep the Post-it read — Engram is additive.
+
 ### At the END of every execution
 
 **You MUST write your post-it. This is not optional.** Write (or overwrite if it already exists) `Meta/states/connector.md` with:
@@ -382,5 +386,7 @@ last-run: "{{ISO timestamp}}"
 ```
 
 **What to save**: links you created, orphan notes still unconnected, emerging clusters or themes, MOCs that need updating, connection suggestions the user deferred.
+
+Also call `engram_commit` for any significant graph findings, using scope `"connector/findings"`, `confidence: 0.9` for verified findings or `0.7` for inferences, and `fact_type: "observation"` for facts found or `"decision"` for choices made. Keep the Post-it write intact — Engram is additive.
 
 **Max 30 lines** in the Post-it body. If you need more, summarize. This is a post-it, not a journal.

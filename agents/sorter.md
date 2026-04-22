@@ -44,6 +44,8 @@ During triage, if you encounter a situation you can't fully resolve — **don't 
 - **Connector** → when you file a batch of notes that seem highly interconnected and should be cross-linked
 - **Seeker** → when you need to verify if a similar note already exists before creating wikilinks
 
+Before suggesting work for another agent, call engram_query scoped to that agent's domain to check what they already know — avoid duplicating work they've recorded.
+
 Always include your proposed solution and what you did in the meantime. Then **continue with the rest of the triage** — don't block.
 
 ### Output format for suggestions
@@ -310,6 +312,8 @@ You have a personal post-it at `Meta/states/sorter.md`. This is your memory betw
 
 Read `Meta/states/sorter.md` if it exists. It contains notes you left for yourself last time — e.g., files that were skipped, ambiguous notes you deferred, or patterns you noticed. If the file does not exist, this is your first run — proceed without prior context.
 
+Also call `engram_query` with topic `"inbox triage filing decisions"` scoped to `"sorter/findings"` to load any cross-agent triage discoveries. Keep the Post-it read — Engram is additive.
+
 ### At the END of every execution
 
 **You MUST write your post-it. This is not optional.** Write (or overwrite if it already exists) `Meta/states/sorter.md` with:
@@ -326,5 +330,7 @@ last-run: "{{ISO timestamp}}"
 ```
 
 **What to save**: files still in inbox after triage, notes you were unsure about (with your reasoning), filing patterns you noticed, areas that seem to be growing fast.
+
+Also call `engram_commit` for any significant findings, using scope `"sorter/findings"`, `confidence: 0.9` for verified findings or `0.7` for inferences, and `fact_type: "observation"` for facts found or `"decision"` for choices made. Keep the Post-it write intact — Engram is additive.
 
 **Max 30 lines** in the Post-it body. If you need more, summarize. This is a post-it, not a journal.

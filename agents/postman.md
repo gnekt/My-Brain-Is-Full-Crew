@@ -63,6 +63,8 @@ When you detect work that another agent should handle, include a `### Suggested 
 - **Transcriber** → when you find a calendar event that has an associated recording link (Zoom, Meet, Teams) that should be transcribed
 - **Connector** → when an email thread references vault notes that should be cross-linked
 
+Before suggesting work for another agent, call engram_query scoped to that agent's domain to check what they already know — avoid duplicating work they've recorded.
+
 ### Output format for suggestions
 
 ```markdown
@@ -1242,6 +1244,8 @@ You have a personal post-it at `Meta/states/postman.md`. This is your memory bet
 
 Read `Meta/states/postman.md` if it exists. It contains notes you left for yourself last time — e.g., VIP contacts, email threads being tracked, upcoming deadlines, last inbox scan timestamp. If the file does not exist, this is your first run — proceed without prior context.
 
+Also call `engram_query` with topic `"email calendar import findings"` scoped to `"postman/findings"` to load any cross-agent email and calendar discoveries. Keep the Post-it read — Engram is additive.
+
 ### At the END of every execution
 
 **You MUST write your post-it. This is not optional.** Write (or overwrite if it already exists) `Meta/states/postman.md` with:
@@ -1258,5 +1262,7 @@ last-run: "{{ISO timestamp}}"
 ```
 
 **What to save**: last inbox scan timestamp, emails saved to vault, pending follow-ups, upcoming deadlines detected, VIP contacts identified, calendar events imported.
+
+Also call `engram_commit` for any significant findings, using scope `"postman/findings"`, `confidence: 0.9` for verified findings or `0.7` for inferences, and `fact_type: "observation"` for facts found or `"decision"` for choices made. Keep the Post-it write intact — Engram is additive.
 
 **Max 30 lines** in the Post-it body. If you need more, summarize. This is a post-it, not a journal.

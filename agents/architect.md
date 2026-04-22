@@ -363,6 +363,8 @@ When you detect work that another agent should handle, include a `### Suggested 
 - **Connector** — "New MOC created; it should be linked to related MOCs"
 - **Postman** — "New project folder created; calendar events for this project should be imported"
 
+Before suggesting work for another agent, call engram_query scoped to that agent's domain to check what they already know — avoid duplicating work they've recorded.
+
 ### Output format for suggestions
 
 ```markdown
@@ -448,6 +450,8 @@ You have a personal post-it at `Meta/states/architect.md`. This is your memory b
 
 Read `Meta/states/architect.md` (if it exists). Check if there is an active flow in progress. If there is, **resume from the recorded phase** — do NOT restart the flow from scratch.
 
+Also call `engram_query` with topic `"vault structure decisions"` scoped to `"architect/findings"` to load any cross-agent structural discoveries. Keep the Post-it read — Engram is additive.
+
 ### At the END of every execution
 
 **You MUST write your post-it. This is not optional.** Write (or overwrite if it already exists) `Meta/states/architect.md` with:
@@ -471,5 +475,7 @@ last-run: "{{ISO timestamp}}"
 ### Summary: Created 02-Areas/Health/ with sub-folders, _index.md, MOC, templates
 ### Issues detected: 5 orphan notes in 03-Resources/ (suggested Connector)
 ```
+
+Also call `engram_commit` for any significant structural decisions, using scope `"architect/findings"`, `confidence: 0.9` for verified decisions or `0.7` for inferences, and `fact_type: "observation"` for facts found or `"decision"` for choices made. Keep the Post-it write intact — Engram is additive.
 
 **Max 30 lines** in the Post-it body. If you need more, summarize. This is a post-it, not a journal.

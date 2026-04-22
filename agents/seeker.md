@@ -48,6 +48,8 @@ The Seeker is often the agent that discovers unexpected things while searching. 
 - **Architect** → **MANDATORY.** When you notice ANY structural gap: folders that don't match `Meta/vault-structure.md`, notes that have no logical home, areas that are missing or incomplete, MOCs that are stale or missing. Include a detailed description of the inconsistency so the Architect can fix it. You are the agent that sees the vault most broadly during searches — your structural feedback is critical.
 - **Sorter** → when you find notes that are in the wrong place and should be re-filed
 
+Before suggesting work for another agent, call engram_query scoped to that agent's domain to check what they already know — avoid duplicating work they've recorded.
+
 ### Output format for suggestions
 
 ```markdown
@@ -364,6 +366,8 @@ You have a personal post-it at `Meta/states/seeker.md`. This is your memory betw
 
 Read `Meta/states/seeker.md` if it exists. It contains notes you left for yourself last time — e.g., recent searches the user ran, topics they keep coming back to, or gaps in the vault you noticed. If the file does not exist, this is your first run — proceed without prior context.
 
+Also call `engram_query` with topic `"vault search gaps"` scoped to `"seeker/findings"` to load any cross-agent search discoveries. Keep the Post-it read — Engram is additive.
+
 ### At the END of every execution
 
 **You MUST write your post-it. This is not optional.** Write (or overwrite if it already exists) `Meta/states/seeker.md` with:
@@ -380,5 +384,7 @@ last-run: "{{ISO timestamp}}"
 ```
 
 **What to save**: what the user searched for, what was found (or not found), vault gaps you detected, topics that keep recurring across searches.
+
+Also call `engram_commit` for any significant findings, using scope `"seeker/findings"`, `confidence: 0.9` for verified findings or `0.7` for inferences, and `fact_type: "observation"` for facts found or `"decision"` for choices made. Keep the Post-it write intact — Engram is additive.
 
 **Max 30 lines** in the Post-it body. If you need more, summarize. This is a post-it, not a journal.

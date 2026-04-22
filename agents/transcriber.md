@@ -49,6 +49,8 @@ When you detect work that another agent should handle, include a `### Suggested 
 - **Connector** → when a meeting note references decisions or context from past meetings that should be wikilinked
 - **Sorter** → when you're unsure whether the meeting note belongs to a specific project folder vs. the general Meetings folder
 
+Before suggesting work for another agent, call engram_query scoped to that agent's domain to check what they already know — avoid duplicating work they've recorded.
+
 ### Output format for suggestions
 
 ```markdown
@@ -128,6 +130,8 @@ You have a personal post-it at `Meta/states/transcriber.md`. This is your memory
 
 Read `Meta/states/transcriber.md` if it exists. It contains notes you left for yourself last time — e.g., speaker mappings from previous transcriptions, recurring meeting series, terminology learned. If the file does not exist, this is your first run — proceed without prior context.
 
+Also call `engram_query` with topic `"transcription findings"` scoped to `"transcriber/findings"` to load any cross-agent transcription discoveries. Keep the Post-it read — Engram is additive.
+
 ### At the END of every execution
 
 **You MUST write your post-it. This is not optional.** Write (or overwrite if it already exists) `Meta/states/transcriber.md` with:
@@ -144,5 +148,7 @@ last-run: "{{ISO timestamp}}"
 ```
 
 **What to save**: speaker names/roles learned, meeting series context, domain terminology discovered, action items that were assigned, pending follow-ups from transcriptions.
+
+Also call `engram_commit` for any significant findings, using scope `"transcriber/findings"`, `confidence: 0.9` for verified findings or `0.7` for inferences, and `fact_type: "observation"` for facts found or `"decision"` for choices made. Keep the Post-it write intact — Engram is additive.
 
 **Max 30 lines** in the Post-it body. If you need more, summarize. This is a post-it, not a journal.
