@@ -22,6 +22,29 @@ EOF
   [[ "$result" == "scribe" ]] || { echo "expected 'scribe', got '$result'"; return 1; }
 }
 
+test_parse_frontmatter_and_body_support_crlf() {
+  local fixture; fixture="$(mktemp)"
+  printf '%s\r\n' \
+    '---' \
+    'name: architect' \
+    'model: high' \
+    'capabilities: [read, write]' \
+    '---' \
+    'You are the Architect.' > "$fixture"
+  local name model capabilities body
+  name="$(parse_frontmatter "$fixture" name)"
+  model="$(parse_frontmatter "$fixture" model)"
+  capabilities="$(parse_capabilities "$fixture")"
+  body="$(agent_body "$fixture")"
+  rm "$fixture"
+  local result=0
+  [[ "$name" == "architect" ]] || { echo "expected name architect, got '$name'"; result=1; }
+  [[ "$model" == "high" ]] || { echo "expected model high, got '$model'"; result=1; }
+  [[ "$capabilities" == "read write" ]] || { echo "expected capabilities 'read write', got '$capabilities'"; result=1; }
+  [[ "$body" == "You are the Architect." ]] || { echo "expected CRLF body, got '$body'"; result=1; }
+  return $result
+}
+
 test_parse_frontmatter_list() {
   local fixture; fixture="$(mktemp)"
   cat > "$fixture" <<'EOF'
