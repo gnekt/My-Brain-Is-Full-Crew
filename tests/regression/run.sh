@@ -53,9 +53,9 @@ echo "File lists match."
 echo "── Per-file comparison ──"
 FAILED=0
 while IFS= read -r f; do
-  if ! diff -q "$SNAPSHOT_DIR/$f" "$DIST_DIR/$f" >/dev/null 2>&1; then
+  if ! diff --strip-trailing-cr -q "$SNAPSHOT_DIR/$f" "$DIST_DIR/$f" >/dev/null 2>&1; then
     echo "DIFF: $f"
-    diff "$SNAPSHOT_DIR/$f" "$DIST_DIR/$f" | head -20
+    diff --strip-trailing-cr "$SNAPSHOT_DIR/$f" "$DIST_DIR/$f" | head -20
     FAILED=$((FAILED + 1))
   fi
 done < "$SNAP_LIST"

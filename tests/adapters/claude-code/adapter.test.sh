@@ -90,6 +90,35 @@ EOF
   return $result
 }
 
+test_translate_agents_supports_crlf_frontmatter() {
+  local src; src="$(mktemp -d)"
+  local dst; dst="$(mktemp -d)"
+  mkdir -p "$src/agents"
+  printf '%s\r\n' \
+    '---' \
+    'name: scribe' \
+    'description: >' \
+    '  Test scribe' \
+    '  across line endings' \
+    'model: mid' \
+    'mode: subagent' \
+    'capabilities: [read, write, edit]' \
+    '---' \
+    '' \
+    'You are the Scribe.' > "$src/agents/scribe.md"
+  adapter_translate_agents "$src/agents" "$dst"
+  local out="$dst/.claude/agents/scribe.md"
+  local result=0
+  grep -q '^name: scribe' "$out" || { echo "name missing"; result=1; }
+  grep -q '^description: >' "$out" || { echo "description header missing"; result=1; }
+  grep -q '^  Test scribe' "$out" || { echo "description continuation missing"; result=1; }
+  grep -q '^model: sonnet' "$out" || { echo "model not mapped from CRLF frontmatter"; result=1; }
+  grep -q '^tools: Read, Glob, Grep, Write, Edit' "$out" || { echo "tools not mapped from CRLF capabilities"; result=1; }
+  grep -q '^You are the Scribe' "$out" || { echo "body missing"; result=1; }
+  rm -rf "$src" "$dst"
+  return $result
+}
+
 test_translate_agents_bash_capability() {
   local src; src="$(mktemp -d)"
   local dst; dst="$(mktemp -d)"

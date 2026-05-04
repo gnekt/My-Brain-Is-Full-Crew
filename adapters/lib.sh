@@ -41,6 +41,7 @@ rewrite_platform_paths() {
 parse_frontmatter() {
   local file="$1" key="$2"
   awk -v key="$key" '
+    { sub(/\r$/, "") }
     /^---$/ { fm++; next }
     fm == 1 {
       # Match "key: value" — strip leading whitespace, capture value after first ":"
@@ -123,6 +124,7 @@ parse_hook_yaml() {
 agent_body() {
   local file="$1"
   awk '
+    { sub(/\r$/, "") }
     fm < 2 && /^---$/ { fm++; next }
     fm >= 2 { print }
   ' "$file"

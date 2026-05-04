@@ -152,7 +152,7 @@ adapter_translate_agents() {
     {
       echo "---"
       # Copy description block verbatim (may be folded YAML with continuation lines)
-      awk '/^---$/{n++; next} n==1 && /^description:/{print; in_desc=1; next} n==1 && in_desc && /^[[:space:]]/{print; next} n==1 && in_desc && !/^[[:space:]]/{in_desc=0} n>=2{exit}' "$agent"
+      awk '{ sub(/\r$/, "") } /^---$/{n++; next} n==1 && /^description:/{print; in_desc=1; next} n==1 && in_desc && /^[[:space:]]/{print; next} n==1 && in_desc && !/^[[:space:]]/{in_desc=0} n>=2{exit}' "$agent"
       echo "mode: $mode_out"
       echo "model: $model_out"
       if [[ -z "$perms" ]]; then

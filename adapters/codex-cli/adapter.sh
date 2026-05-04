@@ -296,13 +296,16 @@ adapter_translate_skills() {
 
 # _cc_toml_quote_key <name>
 # Emits the TOML table key for [mcp_servers.<name>].
-# Codex CLI requires MCP server names to match ^[a-zA-Z0-9_-]+$, so any
-# character outside that set is replaced with a hyphen before writing.
+# Safe identifiers can be emitted bare; names with spaces or punctuation must
+# be quoted and escaped so the original MCP server name is preserved.
 _cc_toml_quote_key() {
   local name="$1"
-  # Sanitize: replace any character not in [a-zA-Z0-9_-] with a hyphen
-  local safe_name="${name//[^a-zA-Z0-9_-]/-}"
-  printf '[mcp_servers.%s]' "$safe_name"
+  if [[ "$name" =~ ^[A-Za-z0-9_-]+$ ]]; then
+    printf '[mcp_servers.%s]' "$name"
+  else
+    local escaped; escaped="$(_cc_toml_escape_string "$name")"
+    printf '[mcp_servers."%s"]' "$escaped"
+  fi
 }
 
 # _cc_toml_escape_string <value>
@@ -345,16 +348,16 @@ adapter_translate_config() {
     echo ''
     echo '# Inherit uses the top-level defaults; named profiles override them explicitly.'
     echo '[profiles.quality]'
-    echo 'model = "gpt-5.4"'
+    echo 'model = "gpt-5.5"'
     echo 'model_reasoning_effort = "high"'
     echo ''
     echo '[profiles.balanced]'
-    echo 'model = "gpt-5.4-mini"'
-    echo 'model_reasoning_effort = "medium"'
+    echo 'model = "gpt-5.5"'
+    echo 'model_reasoning_effort = "low"'
     echo ''
     echo '[profiles.budget]'
-    echo 'model = "gpt-5.3-codex-spark"'
-    echo 'model_reasoning_effort = "medium"'
+    echo 'model = "gpt-5.5"'
+    echo 'model_reasoning_effort = "low"'
     echo ''
     echo '[agents]'
     echo 'max_depth = 1'
@@ -491,6 +494,7 @@ adapter_translate_config() {
 _cc_extract_description() {
   local file="$1"
   awk '
+    { sub(/\r$/, "") }
     /^---$/ { fm++; next }
     fm == 1 && /^description:[[:space:]]*>/ {
       # Folded-block style: value starts on next indented lines
@@ -539,10 +543,9 @@ _cc_toml_escape_dquote_string() {
 _cc_model_to_codex() {
   local model="$1"
   case "$model" in
+    gpt-5.4|gpt-5.4-mini|gpt-5.3-codex-spark) echo "gpt-5.5" ;;
     */*|gpt-*) echo "$model" ;;
-    low)       echo "gpt-5.3-codex-spark" ;;
-    mid)       echo "gpt-5.4-mini" ;;
-    high)      echo "gpt-5.4" ;;
+    low|mid|high) echo "gpt-5.5" ;;
     *)         echo "$model" ;;
   esac
 }
@@ -552,8 +555,9 @@ _cc_model_to_codex() {
 _cc_model_reasoning_effort() {
   local model="$1"
   case "$model" in
-    high) echo "high" ;;
-    *)    echo "medium" ;;
+    high|gpt-5.4) echo "high" ;;
+    low|mid|gpt-5.4-mini|gpt-5.3-codex-spark) echo "low" ;;
+    *) echo "medium" ;;
   esac
 }
 

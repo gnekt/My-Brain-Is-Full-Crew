@@ -22,6 +22,28 @@ _python_cmd() {
 }
 
 # ---------------------------------------------------------------------------
+# Model mapping tests
+# ---------------------------------------------------------------------------
+
+test_cc_model_mapping_uses_gpt55_with_requested_reasoning() {
+  local result=0
+  [[ "$(_cc_model_to_codex "high")" == "gpt-5.5" ]] || { echo "high tier model mapping failed"; result=1; }
+  [[ "$(_cc_model_reasoning_effort "high")" == "high" ]] || { echo "high tier reasoning mapping failed"; result=1; }
+  [[ "$(_cc_model_to_codex "mid")" == "gpt-5.5" ]] || { echo "mid tier model mapping failed"; result=1; }
+  [[ "$(_cc_model_reasoning_effort "mid")" == "low" ]] || { echo "mid tier reasoning mapping failed"; result=1; }
+  [[ "$(_cc_model_to_codex "low")" == "gpt-5.5" ]] || { echo "low tier model mapping failed"; result=1; }
+  [[ "$(_cc_model_reasoning_effort "low")" == "low" ]] || { echo "low tier reasoning mapping failed"; result=1; }
+  [[ "$(_cc_model_to_codex "gpt-5.4")" == "gpt-5.5" ]] || { echo "legacy gpt-5.4 model mapping failed"; result=1; }
+  [[ "$(_cc_model_reasoning_effort "gpt-5.4")" == "high" ]] || { echo "legacy gpt-5.4 reasoning mapping failed"; result=1; }
+  [[ "$(_cc_model_to_codex "gpt-5.4-mini")" == "gpt-5.5" ]] || { echo "legacy gpt-5.4-mini model mapping failed"; result=1; }
+  [[ "$(_cc_model_reasoning_effort "gpt-5.4-mini")" == "low" ]] || { echo "legacy gpt-5.4-mini reasoning mapping failed"; result=1; }
+  [[ "$(_cc_model_to_codex "gpt-5.3-codex-spark")" == "gpt-5.5" ]] || { echo "legacy gpt-5.3-codex-spark model mapping failed"; result=1; }
+  [[ "$(_cc_model_reasoning_effort "gpt-5.3-codex-spark")" == "low" ]] || { echo "legacy gpt-5.3-codex-spark reasoning mapping failed"; result=1; }
+  [[ "$(_cc_model_to_codex "openai/custom")" == "openai/custom" ]] || { echo "qualified passthrough failed"; result=1; }
+  return $result
+}
+
+# ---------------------------------------------------------------------------
 # Dispatcher tests
 # ---------------------------------------------------------------------------
 
@@ -470,12 +492,14 @@ EOF
   local result=0
   [[ "$content" == *'sandbox_workspace_write.network_access = false'* ]] || { echo "network_access default missing"; result=1; }
   [[ "$content" == *'[profiles.quality]'* ]] || { echo "profiles.quality missing"; result=1; }
-  [[ "$content" == *'model = "gpt-5.4"'* ]] || { echo "quality model missing"; result=1; }
+  [[ "$content" == *'model = "gpt-5.5"'* ]] || { echo "quality model missing"; result=1; }
   [[ "$content" == *'model_reasoning_effort = "high"'* ]] || { echo "quality reasoning effort missing"; result=1; }
   [[ "$content" == *'[profiles.balanced]'* ]] || { echo "profiles.balanced missing"; result=1; }
-  [[ "$content" == *'model = "gpt-5.4-mini"'* ]] || { echo "balanced model missing"; result=1; }
+  [[ "$content" == *'model = "gpt-5.5"'* ]] || { echo "balanced model missing"; result=1; }
+  [[ "$content" == *'model_reasoning_effort = "low"'* ]] || { echo "balanced reasoning effort missing"; result=1; }
   [[ "$content" == *'[profiles.budget]'* ]] || { echo "profiles.budget missing"; result=1; }
-  [[ "$content" == *'model = "gpt-5.3-codex-spark"'* ]] || { echo "budget model missing"; result=1; }
+  [[ "$content" == *'model = "gpt-5.5"'* ]] || { echo "budget model missing"; result=1; }
+  [[ "$content" == *'model_reasoning_effort = "low"'* ]] || { echo "budget reasoning effort missing"; result=1; }
   rm -rf "$src" "$dst"
   return $result
 }
@@ -818,6 +842,39 @@ AGENTEOF
   return $result
 }
 
+test_cc_translate_agent_toml_supports_crlf_frontmatter() {
+  local src; src="$(mktemp -d)"
+  local dst; dst="$(mktemp -d)"
+  mkdir -p "$src/agents"
+  printf '%s\r\n' \
+    '---' \
+    'name: myagent' \
+    'description: >' \
+    '  First line of description' \
+    '  across line endings.' \
+    'mode: subagent' \
+    'capabilities: [read]' \
+    'model: low' \
+    '---' \
+    '' \
+    'Body text here.' > "$src/agents/myagent.md"
+
+  adapter_translate_agent_toml "$src/agents/myagent.md" "$dst"
+
+  local result=0
+  local toml_file="$dst/.codex/agents/myagent.toml"
+  [[ -f "$toml_file" ]] || { echo "myagent.toml not created"; result=1; return $result; }
+  grep -q '^name = "myagent"$' "$toml_file" || { echo "name not parsed from CRLF frontmatter"; result=1; }
+  grep -q '^model = "gpt-5.5"$' "$toml_file" || { echo "model not mapped from CRLF frontmatter"; result=1; }
+  grep -q '^model_reasoning_effort = "low"$' "$toml_file" || { echo "reasoning not mapped from CRLF frontmatter"; result=1; }
+  grep -q 'First line of description' "$toml_file" || { echo "description missing first CRLF line"; result=1; }
+  grep -q 'across line endings' "$toml_file" || { echo "description missing continuation CRLF line"; result=1; }
+  grep -q 'Body text here.' "$toml_file" || { echo "body missing"; result=1; }
+
+  rm -rf "$src" "$dst"
+  return $result
+}
+
 test_cc_translate_agent_toml_no_platform_paths_in_output() {
   # .platform/ and DISPATCHER.md must not appear in the generated TOML
   local src; src="$(mktemp -d)"
@@ -1076,14 +1133,14 @@ test_cc_adapter_build_real_agent_corpus_has_required_fields_and_metadata() {
     || { echo 'postman.toml should be workspace-write'; result=1; }
   grep -q '^sandbox_mode = "workspace-write"$' "$dst/.codex/agents/architect.toml" \
     || { echo 'architect.toml should be workspace-write'; result=1; }
-  grep -q '^model = "gpt-5.4"$' "$dst/.codex/agents/architect.toml" \
-    || { echo 'architect.toml should map to gpt-5.4'; result=1; }
+  grep -q '^model = "gpt-5.5"$' "$dst/.codex/agents/architect.toml" \
+    || { echo 'architect.toml should map to gpt-5.5'; result=1; }
   grep -q '^model_reasoning_effort = "high"$' "$dst/.codex/agents/architect.toml" \
     || { echo 'architect.toml should map to high reasoning effort'; result=1; }
-  grep -q '^model = "gpt-5.4-mini"$' "$dst/.codex/agents/scribe.toml" \
-    || { echo 'scribe.toml should map to gpt-5.4-mini'; result=1; }
-  grep -q '^model_reasoning_effort = "medium"$' "$dst/.codex/agents/scribe.toml" \
-    || { echo 'scribe.toml should map to medium reasoning effort'; result=1; }
+  grep -q '^model = "gpt-5.5"$' "$dst/.codex/agents/scribe.toml" \
+    || { echo 'scribe.toml should map to gpt-5.5'; result=1; }
+  grep -q '^model_reasoning_effort = "low"$' "$dst/.codex/agents/scribe.toml" \
+    || { echo 'scribe.toml should map to low reasoning effort'; result=1; }
 
   rm -rf "$dst"
   return $result

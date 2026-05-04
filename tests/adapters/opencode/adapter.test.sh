@@ -149,6 +149,35 @@ EOF
   return $result
 }
 
+test_oc_translate_agents_supports_crlf_frontmatter() {
+  local src; src="$(mktemp -d)"
+  local dst; dst="$(mktemp -d)"
+  mkdir -p "$src/agents"
+  printf '%s\r\n' \
+    '---' \
+    'name: scribe' \
+    'description: >' \
+    '  Test scribe' \
+    '  across line endings' \
+    'model: mid' \
+    'mode: subagent' \
+    'capabilities: [read, write, edit]' \
+    '---' \
+    '' \
+    'You are the Scribe.' > "$src/agents/scribe.md"
+  adapter_translate_agents "$src/agents" "$dst"
+  local out="$dst/.opencode/agents/scribe.md"
+  local result=0
+  grep -q '^description: >' "$out" || { echo "description header missing"; result=1; }
+  grep -q '^  Test scribe' "$out" || { echo "description continuation missing"; result=1; }
+  grep -q '^mode: subagent' "$out" || { echo "mode not parsed from CRLF frontmatter"; result=1; }
+  grep -q '^model: anthropic/claude-sonnet-4-5' "$out" || { echo "model not mapped from CRLF frontmatter"; result=1; }
+  grep -q '^  edit: allow' "$out" || { echo "permissions not mapped from CRLF capabilities"; result=1; }
+  grep -q '^You are the Scribe' "$out" || { echo "body missing"; result=1; }
+  rm -rf "$src" "$dst"
+  return $result
+}
+
 test_oc_translate_agents_rewrites_body_paths() {
   local src; src="$(mktemp -d)"
   local dst; dst="$(mktemp -d)"
