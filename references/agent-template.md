@@ -57,7 +57,7 @@ Before doing anything, read `Meta/user-profile.md` to understand the user's cont
 
 > **You do NOT communicate directly with other agents. The dispatcher handles all orchestration.**
 
-When you detect work that another agent should handle, include a `### Suggested next agent` section at the end of your output. The dispatcher reads this and decides whether to chain the next agent.
+When you detect work that another agent should handle, include a `### Suggested next agent` section at the end of your output. The dispatcher reads this and decides whether to chain the next agent. Treat this section as dispatcher continuation input: provide enough concrete context that the dispatcher can often continue automatically when the next step is obvious and low-risk.
 
 ### When to suggest another agent
 
@@ -76,6 +76,11 @@ When you detect work that another agent should handle, include a `### Suggested 
 - **Reason**: {{what needs to be done and why}}
 - **Context**: {{relevant details -- note titles, folder paths, specific issues}}
 ~~~
+
+**Quality bar for suggestions:**
+- Write them so the dispatcher can act without asking the user to manually drive the next step
+- Include the exact notes, folders, or issues that make the follow-up obvious
+- Avoid vague suggestions like "maybe connect these later" unless the follow-up is genuinely uncertain
 
 ### When to suggest a new agent
 

@@ -47,10 +47,10 @@ After running `launchme.sh --platform codex-cli`, the Codex files are installed 
    ```
 
 3. The installer creates:
-   - `.codex/agents/` — all 8 core agents in TOML format
-   - `.agents/skills/` — all 14 skills as plain text instructions
+   - `.codex/agents/` — all 8 core agent files in TOML format, with `postman` marked migration-gated in the active Codex runtime
+   - `.agents/skills/` — all 14 skill definitions, with the 4 Postman skills marked migration-gated until external integration parity lands
    - `.codex/config.toml` — MCP servers (translated from `mcp/servers.yaml`)
-   - `AGENTS.md` — dispatcher with Codex routing header
+   - `AGENTS.md` — dispatcher with Codex routing header and migration-gated Postman contract
 
 4. Your existing `.claude/` directory and `CLAUDE.md` are left untouched.
 
@@ -73,7 +73,7 @@ After running `launchme.sh --platform codex-cli`, the Codex files are installed 
    bash scripts/launchme.sh --platform codex-cli
    ```
 
-3. The installer creates the full Codex layout (same as above).
+3. The installer creates the full Codex layout (same as above), including the same active-vs-migration-gated runtime contract.
 
 4. Your existing `.gemini/` directory and `GEMINI.md` are left untouched.
 
@@ -145,8 +145,8 @@ After running the installer, verify the Codex layout with these commands:
 ### Check that files installed correctly
 
 ```bash
-ls <vault>/.codex/agents/       # Should list *.toml files for all 8 agents
-ls <vault>/.agents/skills/      # Should list subdirectories for all 14 skills
+ls <vault>/.codex/agents/       # Should list *.toml files for all 8 agents (7 active + postman gated)
+ls <vault>/.agents/skills/      # Should list subdirectories for all 14 skills (10 active + 4 gated)
 ls <vault>/.codex/config.toml   # Should exist with [mcp_servers.*] tables
 ls <vault>/AGENTS.md            # Should exist with Codex routing header
 ```
@@ -169,4 +169,4 @@ Expected: lists MCP servers from `.codex/config.toml`.
 
 ### Run the full runtime smoke matrix
 
-See [docs/codex-cli.md — Runtime smoke matrix](codex-cli.md#runtime-smoke-matrix) for the complete list of agents, skills, chaining, and MCP checks.
+See [docs/codex-cli.md — Runtime smoke matrix](codex-cli.md#runtime-smoke-matrix) for the complete list of active agents, migration-gated units, chaining, and MCP checks.

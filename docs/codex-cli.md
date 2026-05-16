@@ -46,15 +46,23 @@ After running `launchme.sh --platform codex-cli`, your vault will contain:
 ```
 your-vault/
 ├── .codex/
-│   ├── agents/          ← 8 core crew agents (.toml format)
+│   ├── agents/          ← 8 core agent files (7 active + 1 migration-gated Postman role)
 │   ├── references/      ← shared docs the agents read
 │   └── config.toml      ← MCP server definitions + profiles + sandbox policy
 ├── .agents/
-│   └── skills/          ← 14 specialized skills (plain text instructions)
+│   └── skills/          ← 14 skill definitions (10 active + 4 migration-gated Postman skills)
 ├── Meta/
 │   └── scripts/         ← orchestra scripts (permission-free agent commands)
 └── AGENTS.md            ← dispatcher (project instructions for Codex)
 ```
+
+## Current Codex scope
+
+The current Codex runtime is intentionally narrower than the full cross-platform source tree:
+
+- Active agents: `architect`, `scribe`, `sorter`, `seeker`, `connector`, `librarian`, `transcriber`
+- Active skills: `/onboarding`, `/create-agent`, `/manage-agent`, `/defrag`, `/transcribe`, `/vault-audit`, `/deep-clean`, `/tag-garden`, `/inbox-triage`, `/contact-sync`
+- Migration-gated until external integration parity lands: `postman`, `/email-triage`, `/meeting-prep`, `/weekly-agenda`, `/deadline-radar`
 
 Key differences from other platforms:
 
@@ -137,15 +145,15 @@ Use this table to verify the Crew works correctly in a real Codex vault after in
 | Agent | Connector | `@Connector Find connections in my recent notes` | Connector analyzes the vault graph and suggests wikilinks |
 | Agent | Librarian | `@Librarian Run a vault health check` | Librarian scans for broken links, duplicates, and orphan notes |
 | Agent | Transcriber | `@Transcriber Process this transcript: [paste text]` | Transcriber generates structured meeting notes |
-| Agent | Postman | `@Postman Check my email` | Postman scans Gmail (or Hey) and saves actionable emails, or reports missing integration |
+| Agent | Postman | `@Postman Check my email` | Dispatcher explains that Postman is migration-gated in Codex and does not enter external email/calendar workflows |
 | Skill | onboarding | `/onboarding` | Architect starts the full onboarding conversation |
 | Skill | create-agent | `/create-agent` | Architect walks through designing a new custom agent |
 | Skill | manage-agent | `/manage-agent` | Architect lists, edits, or removes custom agents |
 | Skill | defrag | `/defrag` | Architect runs the 5-phase vault defragmentation |
-| Skill | email-triage | `/email-triage` | Postman scans and prioritizes unread emails |
-| Skill | meeting-prep | `/meeting-prep` | Postman generates a comprehensive meeting brief |
-| Skill | weekly-agenda | `/weekly-agenda` | Postman produces a day-by-day week overview |
-| Skill | deadline-radar | `/deadline-radar` | Postman produces a unified deadline timeline |
+| Skill | email-triage | `/email-triage` | Dispatcher explains that email triage is migration-gated in Codex |
+| Skill | meeting-prep | `/meeting-prep` | Dispatcher explains that meeting-email/calendar enrichment is migration-gated in Codex |
+| Skill | weekly-agenda | `/weekly-agenda` | Dispatcher explains that external week aggregation is migration-gated in Codex |
+| Skill | deadline-radar | `/deadline-radar` | Dispatcher explains that external deadline aggregation is migration-gated in Codex |
 | Skill | transcribe | `/transcribe` | Transcriber processes a recording or transcript into structured notes |
 | Skill | vault-audit | `/vault-audit` | Librarian runs the full 7-phase vault audit |
 | Skill | deep-clean | `/deep-clean` | Librarian runs the extended vault cleanup |
@@ -199,7 +207,7 @@ Expected: lists MCP servers from `.codex/config.toml` (e.g., `Gmail`, `Calendar`
 
 - MCP configuration lives in `.codex/config.toml` (not `.mcp.json`).
 - Check `codex -C <vault> mcp list` to see the current server status.
-- For Gmail/Calendar setup, see `docs/gws-setup-guide.md`.
+- Gmail and Google Calendar entries may still appear in `.codex/config.toml`, but the corresponding Postman workflows are migration-gated in the current Codex runtime.
 - For Apple Contacts, verify the `apple-contacts` server entry in `.codex/config.toml`.
 
 ### Codex errors about approvals
