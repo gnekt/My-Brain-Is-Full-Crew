@@ -118,19 +118,17 @@ raw source.
 
 ### Mode 1: Standard Ingest (default)
 Compile one input into patch-style updates on existing or new pages, then ask the user to
-confirm before writing.
+confirm before writing. Structured payloads (the third input type) skip the extraction
+step and go straight to matching against existing pages — same workflow, no different
+output shape.
 
-### Mode 2: Structured Payload
-Same as Standard, but the input is already an `entities`/`relations`/`claims` payload. Skip
-extraction; go straight to matching against existing pages and producing patches.
-
-### Mode 3: Dry-Run (default for the first compiles on a new installation, and on request)
+### Mode 2: Dry-Run (default for the first compiles on a new installation, and on request)
 Propose the diff **without writing anything**. Write the proposed patches to
 `_contradictions.md` (or a `inbox/_staging-{{timestamp}}.md` file) for human review. Use
 this whenever confidence is low, the affected subgraph is large, or the user has not yet
 trusted automatic writes. See PLAN §4-step9.
 
-### Mode 4: Batch Inbox Sweep
+### Mode 3: Batch Inbox Sweep
 Process every file in `inbox/` in age order (oldest first), one at a time, each through the
 Standard or Dry-Run workflow. Stop at the first item that needs human review.
 
@@ -287,7 +285,7 @@ After a run, report concisely:
 Wiki Ingest — {{date}}
 
 Input: {{file / inline / payload}}
-Mode: {{Standard | Structured | Dry-Run | Batch}}
+Mode: {{Standard | Dry-Run | Batch}}
 
 Patches proposed ({{N}}):
 - {{edit | insert | link | create}}  {{page}}  — {{one-line summary}}
@@ -300,18 +298,3 @@ Index updated: {{yes/no}}
 ```
 
 Ask for batch confirmation before writing (unless Dry-Run, which writes only the staging file).
-
----
-
-## Operating Principles
-
-1. **Conservative by default** — the Wiki is compiled memory; an overzealous rewrite is the
-   worst failure mode. When uncertain, route to review, do not write.
-2. **Patch, don't rewrite** — smallest change that records the fact. Existing prose is
-   load-bearing until proven otherwise.
-3. **Provenance is mandatory** — no source, no compile. Unsourced claims become review items.
-4. **Source-preserving** — the raw capture in `inbox/` is never modified; the Wiki points
-   back to it.
-5. **Reversible** — every write is preceded by a `.history/` snapshot.
-6. **Transparent** — show the user exactly what will change, in one batch, before writing.
-7. **Scoped** — load only the relevant subgraph; leave full-graph work to `/wiki-audit`.

@@ -28,8 +28,8 @@ Always respond to the user in their language. Match the language the user writes
 The Wiki Audit skill is one of the **only two** paths that write to
 `references/wiki/` (the other being `/wiki-ingest`). It is the Wiki's
 quality guardian: it reads the **whole graph** (it is exempt from the per-agent
-context budget — see `context-injection.md`), finds decay, and applies
-**conservative, patch-style** repairs — each snapshotted first and logged in a
+context budget — see `index.md` → *Per-Agent Context Budget*), finds decay, and
+applies **conservative, patch-style** repairs — each snapshotted first and logged in a
 machine-readable lint diff so nothing is ever silently lost.
 
 > **Single most important rule (same as ingest):** prefer leaving the Wiki
@@ -38,8 +38,8 @@ machine-readable lint diff so nothing is ever silently lost.
 > `_contradictions.md` for a human — do not auto-resolve.
 
 This skill implements the lint / audit / rollback layer the source proposal
-omitted (PLAN §3.5 / §4-step5). It complements `/wiki-ingest` (which compiles)
-and the `Meta/agent-messages.md` short-term board (which it does not replace).
+omitted. It complements `/wiki-ingest` (which compiles) and the
+`Meta/agent-messages.md` short-term board (which it does not replace).
 
 ---
 
@@ -49,8 +49,8 @@ and the `Meta/agent-messages.md` short-term board (which it does not replace).
 - **Other layout variant** (`.codex/`-prefixed canonical): `.codex/references/wiki/`
 
 The structure and rules are identical either way; only the prefix differs. Use
-whichever root exists. If neither exists, stop and tell the user — do not invent
-a location.
+whichever root exists. If neither exists, stop and tell the user — do not invent a
+location.
 
 All paths below are relative to the Wiki root.
 
@@ -117,20 +117,17 @@ wiki check".
 ### Mode 2: Full Audit (default)
 The comprehensive lint: every check in *Lint Checks* below, a health report,
 and conservative patch proposals. May write (snapshot + patch + lint diff) only
-on batch confirmation.
+on batch confirmation. This mode also covers **contradiction resolution** —
+walking `_contradictions.md` top-to-bottom, applying high-confidence
+resolutions (snapshot → patch → mark `[resolved]` with a `**Resolution**:` line)
+or leaving low-confidence items `[open]`. Never silently resolve.
 
 ### Mode 3: Rollback
 Restore one or more pages to a prior `.history/` snapshot. Always snapshots the
 *current* version first (so the rollback itself is reversible), then restores.
 Never deletes a snapshot. See *Rollback*.
 
-### Mode 4: Resolve Contradictions
-Work through `_contradictions.md`: for each `[open]` item, apply a high-
-confidence resolution (snapshot → patch → mark `[resolved]` with a
-**Resolution**:` line), or leave it `[open]` / escalate to the user. Never
-silently resolve a low-confidence item.
-
-### Mode 5: Dry-Run (default for the first audit on a new installation, and on request)
+### Mode 4: Dry-Run (default for the first audit on a new installation, and on request)
 Run the full lint, write the findings to the lint diff and/or
 `_contradictions.md`, but **write nothing** to live pages. Use whenever
 confidence is low, the graph is large, or automatic writes are not yet trusted
@@ -143,8 +140,8 @@ confidence is low, the graph is large, or automatic writes are not yet trusted
 ### Step 1 — Read the index, then the whole graph
 Read `index.md` for categories, naming, and frontmatter rules. **Unlike
 `/wiki-ingest`, you may read the entire Wiki** — coherence-critical work is the
-one place full-context is allowed (`context-injection.md`). Read
-`_contradictions.md` too. Skip `inbox/` raw captures (they are not compiled
+one place full-context is allowed (`index.md` → *Per-Agent Context Budget*).
+Read `_contradictions.md` too. Skip `inbox/` raw captures (they are not compiled
 pages) and `.history/` (snapshots, not content).
 
 ### Step 2 — Run the lint checks
@@ -171,9 +168,9 @@ snapshots are the reversibility. The two together are the design from PLAN §3.5
 
 ### Step 6 — Resolve or route contradictions
 For each contradiction: if high-confidence → snapshot, patch, mark resolved
-(Mode 4). If not → append to the **top** of `_contradictions.md` as `[open]`
-using its entry format, and do **not** touch the live page. Never silently
-resolve.
+(Mode 2 covers this). If not → append to the **top** of `_contradictions.md` as
+`[open]` using its entry format, and do **not** touch the live page. Never
+silently resolve.
 
 ### Step 7 — Emit the health report
 Produce the report in *Output to the User* and (optionally) save a copy at
@@ -250,7 +247,7 @@ Every run writes `.history/_lint/{{YYYYMMDD-HHMMSS}}--wiki-audit.md`:
 type: wiki/audit-log
 run: {{YYYYMMDD-HHMMSS}}
 agent: wiki-audit
-mode: {{Quick Lint | Full Audit | Rollback | Resolve Contradictions | Dry-Run}}
+mode: {{Quick Lint | Full Audit | Rollback | Dry-Run}}
 pages_scanned: {{N}}
 findings: {{N}}
 patches_applied: {{N}}
@@ -299,30 +296,13 @@ that run's lint diff: every *Patches Applied* line names the snapshot to restore
 
 ---
 
-## Contradiction Resolution (Mode 4)
-
-Walk `_contradictions.md` top-to-bottom. For each `[open]` item:
-
-- **High-confidence resolution** (one option is clearly correct and sourced) →
-  snapshot the affected page(s), apply the minimal patch, then change `[open]` to
-  `[resolved]` and add a `**Resolution**:` line naming the snapshot. This is the
-  only place audit may *change* a contradiction rather than just route it.
-- **Low-confidence / needs judgement** → leave `[open]`. Optionally tighten the
-  *Recommended* line or add evidence; do not resolve.
-
-Never silently drop or overwrite an item. The whole point of
-`_contradictions.md` is that ambiguous merges wait for a human.
-
----
-
 ## Context Budget
 
 Wiki Audit is **exempt** from the per-agent budget — it is one of the two
-coherence-critical full-graph readers (`context-injection.md`). Everyone else
-treats their budget as a hard ceiling. As a side effect of reading the whole
-graph, audit can also **flag agents whose observed Wiki reads chronically exceed
-their budget**, so budgets can be tuned from real usage (see the *Consistency &
-Maintenance* note in `context-injection.md`).
+coherence-critical full-graph readers (`index.md` → *Per-Agent Context Budget*).
+Everyone else treats their budget as a hard ceiling. As a side effect of reading
+the whole graph, audit can also **flag agents whose observed Wiki reads chronically
+exceed their budget**, so budgets can be tuned from real usage.
 
 ---
 
@@ -332,7 +312,7 @@ After a run, report concisely:
 
 ```
 Wiki Audit — {{date}}
-Mode: {{Quick Lint | Full Audit | Rollback | Resolve Contradictions | Dry-Run}}
+Mode: {{Quick Lint | Full Audit | Rollback | Dry-Run}}
 
 Pages scanned: {{N}}
 Findings: {{N}}
@@ -352,22 +332,3 @@ Index updated: {{yes/no}}
 Ask for batch confirmation before writing (unless Dry-Run, which writes only the
 lint diff / staging file). For Rollback mode, state exactly which snapshot is
 being restored and over what.
-
----
-
-## Operating Principles
-
-1. **Detect more than you write** — audit's value is the lint, not the edits.
-   Default to proposing; write only high-confidence, snapshotted patches.
-2. **Conservative by default** — when uncertain, route to `_contradictions.md`,
-   do not write. Same rule as `/wiki-ingest`.
-3. **Snapshot first, always** — no snapshot, no write. The snapshot precedes the
-   live-page change; that ordering is what makes updates reversible.
-4. **Patch, don't rewrite** — smallest change that fixes the defect. Existing
-   prose is load-bearing until proven otherwise; a split relocates prose verbatim.
-5. **Reversible & transparent** — every change is recorded in a machine-readable
-   lint diff and backed by a snapshot; every rollback is itself snapshotted.
-6. **Full-graph only here** — only `/wiki-audit` (and `/wiki-ingest` on its
-   subgraph) may read broadly. Flag any other agent overstepping its budget.
-7. **Never delete** — snapshots, old lint diffs, and `_contradictions.md` history
-   are the audit trail. Rollback restores; it does not destroy.
