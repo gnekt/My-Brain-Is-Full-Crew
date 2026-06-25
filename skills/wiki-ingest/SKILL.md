@@ -11,7 +11,7 @@ description: >
   "ricorda questo nel wiki", "aggiorna il wiki", "memorizza questo", "mets ça dans
   le wiki", "mets à jour le wiki", "memoriza esto", "actualiza el wiki", "merke
   dir das im Wiki", "aktualisiere das Wiki", "anota isso no wiki", "atualiza o
-  wiki", or when a capture agent (Scribe, Sorter, Postman, Transcriber, Connector)
+  wiki", or when a capture skill (inbox-triage, email-triage, transcribe, contact-sync)
   hands off an `inbox/` item or structured payload for compilation.
 ---
 
@@ -21,7 +21,7 @@ Always respond to the user in their language. Match the language the user writes
 
 The Wiki Ingest skill is the **only** routine path that writes to `references/wiki/`
 (other than `/wiki-audit`). Its job is to turn raw input — a file, inline text, or a
-structured payload from a capture agent — into durable, linked, source-cited Wiki pages,
+structured payload from a capture skill — into durable, linked, source-cited Wiki pages,
 **without ever silently rewriting what is already there**.
 
 > **Single most important rule:** prefer leaving the Wiki untouched over rewriting
@@ -29,60 +29,72 @@ structured payload from a capture agent — into durable, linked, source-cited W
 > ambiguity to `_contradictions.md` for a human.
 
 The Wiki is *compiled-wiki-first, retrieval-when-needed* long-term memory. It does not
-replace the `Meta/agent-messages.md` short-term board, search, embeddings, or MCP reads.
-See `index.md` for the routing rules and page conventions; this skill follows them exactly.
+replace search, embeddings, or MCP reads. See `index.md` for the routing rules and page
+conventions; this skill follows them exactly.
+
+---
+
+## Vault Path Resolution
+
+Read `{{meta}}/vault-map.md` to resolve any `{{...}}` vault-role tokens in this file
+(`{{inbox}}`, `{{meta}}`, etc.). Substitute only the 11 tokens defined in
+`docs/vault-mapping.md`; leave other `{{...}}` patterns (like `{{date}}`, `{{Name}}`)
+untouched — they are template placeholders.
+
+If `vault-map.md` is missing, the defaults are:
+
+| Token | Default |
+|-------|---------|
+| `{{inbox}}` | `00-Inbox` |
+| `{{meta}}` | `Meta` |
+
+The Wiki itself is at `references/wiki/` — that path is **not** tokenized, it is a
+fixed source-tree location that ships with the Crew.
+
+---
+
+## User Profile
+
+Read `{{meta}}/user-profile.md` to understand the user's context, preferences, and
+active projects. Use it to disambiguate names, choose the right project, and pick
+tags.
+
+---
+
+## Inter-Skill Coordination
+
+The dispatcher (`DISPATCHER.md`) handles all routing and chaining. **This skill does
+not communicate directly with other skills or agents.** When you detect work that
+belongs to another skill, include a `### Suggested next skill` (or `### Suggested
+next agent`) section at the end of your output. The dispatcher reads this and decides
+whether to chain.
+
+**As Wiki Ingest, you might suggest:**
+
+- **`/wiki-audit`** — when you notice orphans, broken links, duplicates, or
+  oversized pages near the pages you touched.
+- **`/connector`** (or the **connector** agent) — when you created pages that clearly
+  relate to existing notes but you didn't have budget to add all the links.
+- **The handing-off capture skill** — when an `inbox/` item was ambiguous, partial,
+  or low-confidence, so you routed it to `_contradictions.md` instead of compiling.
+  Tell them what is blocked and what extra context would unblock it.
+- **The user, via `_contradictions.md`** — for any merge/claim you could not resolve
+  with confidence. Suggest a `/wiki-audit` follow-up to resolve it later.
+
+A clean compile needs no suggestion — the page itself is the record.
+
+For full dispatcher semantics (skill-first routing, call chains, max depth), see
+`references/agent-orchestration.md`.
 
 ---
 
 ## Wiki Root & Path Convention
 
-- **Canonical root** (this repo, flat layout): `references/wiki/`
-- **Other layout variant** (`.codex/`-prefixed canonical): `.codex/references/wiki/`
-
-The structure and rules are identical either way; only the prefix differs. Use whichever
-root exists. If neither exists, stop and tell the user — do not invent a location.
+The Wiki root is the literal path `references/wiki/` (a fixed source-tree location
+that ships with the Crew). If the directory does not exist, stop and tell the user —
+do not invent a location.
 
 All paths below are relative to the Wiki root.
-
----
-
-## User Profile & Message Board
-
-Before compiling anything:
-
-1. Read `Meta/user-profile.md` to understand the user's context, preferences, and active
-   projects. Use it to disambiguate names, choose the right project, and pick tags.
-2. Open `Meta/agent-messages.md` and resolve any `⏳` / `[pending]` messages addressed
-   `→ TO: Wiki Ingest` (or to the handing-off capture agent) before starting.
-
-For message format and routing, see `.claude/references/inter-agent-messaging.md`
-(or `references/inter-agent-messaging.md` on the flat layout).
-
----
-
-## Inter-Agent Messaging Protocol
-
-### Step 0A: Check Your Messages First
-Resolve pending messages addressed to Wiki Ingest before each run (typically: a capture
-agent staged an `inbox/` file and is waiting for compilation).
-
-### Step 0B: Leave Messages When You Hand Off or Halt
-**As Wiki Ingest, you might write to:**
-
-- **The handing-off capture agent** (Scribe / Sorter / Postman / Transcriber / Connector) →
-  when an `inbox/` item was ambiguous, partial, or low-confidence, so you routed it to
-  `_contradictions.md` instead of compiling. Tell them what is blocked and what extra
-  context would unblock it.
-- **Librarian** (or `/wiki-audit`) → when you notice orphans, broken links, duplicates,
-  or oversized pages near the pages you touched.
-- **Connector** → when you created pages that clearly relate to existing notes but you did
-  not have budget to add all the links.
-- **The user, via `_contradictions.md`** → for any merge/claim you could not resolve with
-  confidence (see *Contradiction Handling*). Notify on the message board only when a
-  review item is blocking a downstream task.
-
-Notify via `Meta/agent-messages.md` **only** when a conflict or review item needs someone's
-attention. Routine successful compiles do not need a broadcast — the page itself is the record.
 
 ---
 
@@ -94,10 +106,10 @@ Accept any one of the following. Detect from the request, or let the user pass i
    file. Read it as-is. Leave the original untouched.
 2. **Inline text** — raw text pasted in chat (a quote, a decision, a fact, a thread).
 3. **Structured payload** — `entities` + `relations` handed off by a capture skill
-   (e.g., Email Triage). Example:
+   (e.g., `/email-triage`). Example:
 
    ```yaml
-   source: "[[00-Inbox/2026-06-25 — Email — Marco re pricing.md]]"
+   source: "[[{{inbox}}/2026-06-25 — Email — Marco re pricing.md]]"
    entities:
      - {kind: person, name: "Marco Rossi", alias: ["Marco"]}
      - {kind: project, name: "Q3 Pricing Revision"}
@@ -126,7 +138,7 @@ output shape.
 Propose the diff **without writing anything**. Write the proposed patches to
 `_contradictions.md` (or a `inbox/_staging-{{timestamp}}.md` file) for human review. Use
 this whenever confidence is low, the affected subgraph is large, or the user has not yet
-trusted automatic writes. See PLAN §4-step9.
+trusted automatic writes.
 
 ### Mode 3: Batch Inbox Sweep
 Process every file in `inbox/` in age order (oldest first), one at a time, each through the
@@ -190,9 +202,10 @@ Only **high-confidence, additive, well-sourced** changes are written directly.
 Present the proposed patches (and any review items) to the user as a single batch. On
 approval, in this order: **snapshot the current pages to `.history/` first (Step 6), then
 write the patches**, then update `index.md` category indexes (newest-first) if pages were
-created, and leave a message for the relevant agent if a review item is blocking. The
-snapshot must always precede the live-page change — that ordering is what makes the update
-reversible. In Dry-Run, stop after presenting — write nothing but the staging file.
+created, and leave a message for the relevant skill/agent if a review item is blocking.
+The snapshot must always precede the live-page change — that ordering is what makes the
+update reversible. In Dry-Run, stop after presenting — write nothing but the staging
+file.
 
 ---
 

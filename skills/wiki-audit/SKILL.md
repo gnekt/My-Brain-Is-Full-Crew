@@ -37,72 +37,77 @@ machine-readable lint diff so nothing is ever silently lost.
 > than it *writes*. When a fix is not high-confidence, route it to
 > `_contradictions.md` for a human — do not auto-resolve.
 
-This skill implements the lint / audit / rollback layer the source proposal
-omitted. It complements `/wiki-ingest` (which compiles) and the
-`Meta/agent-messages.md` short-term board (which it does not replace).
+This skill implements the lint / audit / rollback layer. It complements
+`/wiki-ingest` (which compiles); it does not replace search or retrieval.
+
+---
+
+## Vault Path Resolution
+
+Read `{{meta}}/vault-map.md` to resolve any `{{...}}` vault-role tokens in this file
+(`{{inbox}}`, `{{meta}}`, etc.). Substitute only the 11 tokens defined in
+`docs/vault-mapping.md`; leave other `{{...}}` patterns (like `{{date}}`, `{{Name}}`)
+untouched — they are template placeholders.
+
+If `vault-map.md` is missing, the defaults are:
+
+| Token | Default |
+|-------|---------|
+| `{{inbox}}` | `00-Inbox` |
+| `{{meta}}` | `Meta` |
+
+The Wiki itself is at `references/wiki/` — that path is **not** tokenized, it is a
+fixed source-tree location that ships with the Crew.
+
+---
+
+## User Profile
+
+Read `{{meta}}/user-profile.md` to understand the user's context, preferences, and
+active projects. Use it to judge "stale" thresholds and to avoid flagging reference
+material as stale.
+
+---
+
+## Inter-Skill Coordination
+
+The dispatcher (`DISPATCHER.md`) handles all routing and chaining. **This skill does
+not communicate directly with other skills or agents.** When you detect work that
+belongs to another skill, include a `### Suggested next skill` (or `### Suggested
+next agent`) section at the end of your output. The dispatcher reads this and decides
+whether to chain.
+
+**As Wiki Audit, you might suggest:**
+
+- **`/wiki-ingest`** — when audit reveals a source/page contradiction that needs
+  re-compilation against the raw capture in `inbox/` (ingest owns the compile path;
+  audit only patches in place).
+- **The **architect** agent** — for structural decay that is not content-level:
+  naming-convention drift, category folders missing or misused, taxonomy problems,
+  pages whose `type:` does not match their folder. Architect owns structure; you
+  detect, it resolves.
+- **The **connector** agent** — clusters of orphan pages that should be linked but
+  have no obvious home yet; hand the cluster over for bridge/constellation work
+  rather than forcing links yourself.
+- **The **scribe** agent** — pages missing required frontmatter or structurally
+  malformed (reformatting is Scribe's job, not the linter's).
+- **The user, via `_contradictions.md`** — any finding you cannot fix with high
+  confidence. Suggest a follow-up `/wiki-audit` run to resolve later.
+
+A clean audit needs no suggestion — the lint diff and health report are the record.
+
+For full dispatcher semantics (skill-first routing, call chains, max depth), see
+`references/agent-orchestration.md`.
 
 ---
 
 ## Wiki Root & Path Convention
 
-- **Canonical root** (this repo, flat layout): `references/wiki/`
-- **Other layout variant** (`.codex/`-prefixed canonical): `.codex/references/wiki/`
-
-The structure and rules are identical either way; only the prefix differs. Use
-whichever root exists. If neither exists, stop and tell the user — do not invent a
-location.
+The Wiki root is the literal path `references/wiki/` (a fixed source-tree location
+that ships with the Crew). If the directory does not exist, stop and tell the user —
+do not invent a location.
 
 All paths below are relative to the Wiki root.
-
----
-
-## User Profile & Message Board
-
-Before auditing anything:
-
-1. Read `Meta/user-profile.md` to understand the user's context, preferences,
-   and active projects. Use it to judge "stale" thresholds and to avoid
-   flagging reference material as stale.
-2. Open `Meta/agent-messages.md` and resolve any `⏳` / `[pending]` messages
-   addressed `→ TO: Wiki Audit` (or `→ TO: Librarian`) before starting.
-
-For message format and routing, see `.claude/references/inter-agent-messaging.md`
-(or `references/inter-agent-messaging.md` on the flat layout).
-
----
-
-## Inter-Agent Messaging Protocol
-
-### Step 0A: Check Your Messages First
-Resolve pending messages addressed to Wiki Audit / Librarian before each run
-(typically: `/wiki-ingest` or a capture agent flagged orphans / broken links /
-duplicates / oversized pages near pages it touched, and is waiting for cleanup).
-
-### Step 0B: Leave Messages When You Hand Off or Halt
-**As Wiki Audit, you might write to:**
-
-- **Architect** → for structural decay that is not content-level: naming-
-  convention drift, category folders missing or misused, taxonomy problems,
-  pages whose `type:` does not match their folder. The Architect owns structure;
-  you detect, it resolves.
-- **Connector** → clusters of orphan pages that should be linked but have no
-  obvious home yet; hand the cluster over for bridge/constellation work rather
-  than forcing links yourself.
-- **Sorter** → pages filed in the wrong category folder for their `type:`.
-- **Seeker** → content-level reconciliation between two pages that genuinely
-  conflict but neither is clearly wrong (deeper than a lint auto-fix).
-- **Scribe** → pages missing required frontmatter or structurally malformed
-  (reformatting is Scribe's job, not the linter's).
-- **`/wiki-ingest`** → when audit reveals a source/page contradiction that needs
-  re-compilation against the raw capture in `inbox/` (ingest owns the compile
-  path; audit only patches in place).
-- **The user, via `_contradictions.md`** → any finding you cannot fix with high
-  confidence (see *Contradiction Resolution*). Notify on the message board only
-  when a routed item is blocking a downstream task.
-
-Notify via `Meta/agent-messages.md` **only** when something needs someone's
-attention. A clean audit needs no broadcast — the lint diff and health report
-are the record.
 
 ---
 
@@ -130,8 +135,7 @@ Never deletes a snapshot. See *Rollback*.
 ### Mode 4: Dry-Run (default for the first audit on a new installation, and on request)
 Run the full lint, write the findings to the lint diff and/or
 `_contradictions.md`, but **write nothing** to live pages. Use whenever
-confidence is low, the graph is large, or automatic writes are not yet trusted
-(PLAN §4-step9).
+confidence is low, the graph is large, or automatic writes are not yet trusted.
 
 ---
 
@@ -164,7 +168,7 @@ On every run (including Dry-Run), write a lint diff to
 `.history/_lint/{{YYYYMMDD-HHMMSS}}--wiki-audit.md` recording findings, patches
 applied, items routed to review, and snapshots written (format in *Snapshot,
 Lint Diff & Rollback*). This is the machine-readable audit trail; the
-snapshots are the reversibility. The two together are the design from PLAN §3.5.
+snapshots are the reversibility.
 
 ### Step 6 — Resolve or route contradictions
 For each contradiction: if high-confidence → snapshot, patch, mark resolved
@@ -199,10 +203,10 @@ Run all of these in a Full Audit; the starred (★) ones also run in Quick Lint.
    legitimately leaf nodes).
 3. **Duplicate concepts** — two pages describing the same thing (overlapping
    `aliases:`, near-identical titles, >70% content overlap). Never auto-merge —
-   route to `_contradictions.md`; merging is a human/Seeker call.
+   route to `_contradictions.md`; merging is a human call.
 4. **★ Stale project status** — `projects/` pages where `status: active` but
    `updated:` is older than the user's threshold (default 90 days; confirm
-   against `Meta/user-profile.md`), or where prose describes completion but
+   against `{{meta}}/user-profile.md`), or where prose describes completion but
    `status:` still says `active`. Fix high-confidence cases (flip to `stale`);
    route ambiguous ones.
 5. **★ Unsupported claims** — any assertion on a page whose `sources:` is empty
@@ -226,8 +230,8 @@ Run all of these in a Full Audit; the starred (★) ones also run in Quick Lint.
    snapshot first and update inbound links).
 
 > Thresholds (90-day stale, 300-line split, >70% overlap) are defaults — state
-> them in the report and defer to `Meta/user-profile.md` or the user when they
-> conflict with context. Reference material is exempt from staleness.
+> them in the report and defer to `{{meta}}/user-profile.md` or the user when
+> they conflict with context. Reference material is exempt from staleness.
 
 ---
 
@@ -277,7 +281,7 @@ snapshots_written: {{N}}
 
 The pipe-delimited finding lines are deliberately machine-parseable (`! type |
 target | detail`) while still human-skimmable. This is the "machine-readable diff
-to `.history/`" PLAN §3.5 requires so updates are reversible and reviewable.
+to `.history/`" the Wiki design requires so updates are reversible and reviewable.
 
 ### Rollback (Mode 3)
 To roll a page back to before a given timestamp (or "undo the last change"):

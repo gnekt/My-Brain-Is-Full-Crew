@@ -68,14 +68,13 @@ synthesis agents run at the default; the two write skills are exempt.
 | **Librarian** | ~8k+ (full subgraph) | Whole Wiki during audits — coherence-critical | Running `/wiki-audit`; resolving `_contradictions.md` items |
 | **Transcriber** | ~2k | `index.md` + one hop on a named entity only when disambiguation is needed | Capture — do **not** load Wiki by default |
 | **Postman** | ~4k | `people/` (VIPs), `projects/` (thread context) | Identifying a sender, prioritizing, cross-referencing a thread |
-| **Food Coach** | ~4k | `concepts/`, `people/` for compiled food preferences and diet context | Suggesting meals; reading preferences; coordinating with Wellness Guide |
-| **Wellness Guide** | ~4k | `people/` (the user), `projects/` for prior emotional/decision context | Read-only — never writes; requests `/wiki-ingest` via Scribe |
 | **`/wiki-ingest`** | full subgraph | Affected pages + one hop of wikilinks | Compiling input — coherence-critical |
 | **`/wiki-audit`** | full graph | Whole Wiki | Lint/audit/rollback — coherence-critical |
 
-**Defaults for new agents:** ~4k unless the agent is a fast capture/streaming
-agent (use ~2k) or a coherence-critical writer (exempt). Start low; raise only
-on evidence.
+**Defaults for new agents** (including custom agents created via
+`/create-agent`): ~4k unless the agent is a fast capture/streaming agent
+(use ~2k) or a coherence-critical writer (exempt). Start low; raise only on
+evidence.
 
 ---
 
@@ -109,9 +108,8 @@ status: {{active|stale|archived}}
 
 ## Wiki Context Injection Snippet
 
-Paste this block into every Crew agent file (after *Inter-Agent Messaging
-Protocol*, before *Core Philosophy*), and append one budget line per the table
-above:
+Paste this block into every Crew agent file (after *Inter-Agent Coordination*,
+before *Core Philosophy*), and append one budget line per the table above:
 
 ```markdown
 ## Wiki Context (Long-Term Memory)
@@ -133,66 +131,32 @@ Treat it as **compiled-wiki-first, retrieval-when-needed**:
 Full-Wiki synthesis is reserved for `/wiki-ingest` and `/wiki-audit`.
 ```
 
-**For the dispatcher (`CLAUDE.md`)**, also add a one-line global note:
-
-> For tasks involving projects, people, policies, preferences, or prior
-> decisions, the chosen agent consults `references/wiki/index.md` and follows
-> only the relevant linked pages. `/wiki-ingest` compiles; `/wiki-audit`
-> maintains.
-
 ---
 
 ## Dispatcher Routing — Wiki Memory
 
-Wiki-memory routing should sit **above** generic note capture so "remember this
-in the wiki" reaches `/wiki-ingest` instead of being captured as a plain note,
-and above generic maintenance so "audit the wiki" is not swallowed by a full-
-vault audit. Add this as a new section in `CLAUDE.md` (above **scribe** and
-**librarian** in the routing-priority table):
+Add the two Wiki skills to the **skill routing table** in `DISPATCHER.md`,
+positioned above generic capture/maintenance skills so "remember this in the
+wiki" reaches `/wiki-ingest` instead of being captured as a plain note by
+`/inbox-triage`, and "audit the wiki" is not swallowed by `/vault-audit`:
 
-```markdown
-## WIKI MEMORY (compiled long-term memory)
-
-The LLM Wiki (`references/wiki/`) is the Crew's compiled long-term memory. Two
-skills write to it; everything else reads selectively (see `index.md`).
-
-### /wiki-ingest — COMPILE into the Wiki
-Activate to **record, compile, or absorb** information as durable, linked,
-source-cited Wiki pages. This is the ONLY routine compile path.
-
-Triggers: "remember this", "update the wiki", "compile this into the wiki",
-"add this to my knowledge", "absorb this", "ingest this", "learn this",
-"wire this into the wiki", "wiki this", "what do I know about X" (when the
-answer is missing/stale AND the input should be recorded), "ricorda questo nel
-wiki", "aggiorna il wiki", "memorizza questo", "mets ça dans le wiki",
-"memoriza esto", "actualiza el wiki", "merke dir das im Wiki", "anota isso no
-wiki". Also route here when a capture agent (Scribe, Sorter, Postman,
-Transcriber, Connector) hands off an `inbox/` item or structured payload for
-compilation.
-
-### /wiki-audit — LINT, REPAIR, or ROLLBACK the Wiki
-Activate for **Wiki health, cleanup, or undo**. Periodic graph hygiene and
-reversibility.
-
-Triggers: "audit the wiki", "wiki audit", "lint the wiki", "check wiki health",
-"wiki health", "clean the wiki", "fix the wiki", "are there wiki orphans?",
-"broken wiki links", "wiki duplicates", "stale wiki projects", "resolve wiki
-contradictions", "rollback the wiki", "undo wiki change", "revert a wiki page",
-"split this wiki page", "what's wrong with the wiki", "audita il wiki",
-"controlla il wiki", "pulisci il wiki", "vérifie le wiki", "nettoie le wiki",
-"audita el wiki", "limpia el wiki", "Wiki prüfen", "Wiki aufräumen", "audita o
-wiki", "limpa o wiki". Also activate when the Librarian runs periodic graph
-hygiene or resolves `_contradictions.md` items.
-```
+| # | Skill | Description | Triggers |
+|---|-------|-------------|----------|
+| 15 | `/wiki-ingest` | Compile raw input into the LLM Wiki as conservative, patch-style page updates with mandatory provenance — never full rewrites. | "remember this", "update the wiki", "compile this into the wiki", "add this to my knowledge", "absorb this", "ingest this", "learn this", "wire this into the wiki", "wiki this", "what do I know about X" (when the answer is missing/stale AND the input should be recorded), "ricorda questo nel wiki", "aggiorna il wiki", "memorizza questo", "mets ça dans le wiki", "memoriza esto", "actualiza el wiki", "merke dir das im Wiki", "anota isso no wiki". Also when a capture skill hands off an `inbox/` item or structured payload. |
+| 16 | `/wiki-audit` | Periodic lint, audit, and repair the LLM Wiki graph; roll back unwanted changes. The Wiki's quality guardian. | "audit the wiki", "wiki audit", "lint the wiki", "check wiki health", "wiki health", "clean the wiki", "fix the wiki", "are there wiki orphans?", "broken wiki links", "wiki duplicates", "stale wiki projects", "resolve wiki contradictions", "rollback the wiki", "undo wiki change", "revert a wiki page", "split this wiki page", "what's wrong with the wiki". Also when the Librarian runs periodic graph hygiene. |
 
 **One non-obvious disambiguation:** "What do I know about X?" with no record-
-intent is a **read** → route to **Seeker** (which consults the Wiki within its
+intent is a **read** → route to **seeker** (which consults the Wiki within its
 budget), not to `/wiki-ingest`. Only route to `/wiki-ingest` if the user also
 wants the answer recorded/updated.
 
-Also amend `CLAUDE.md` → *ABSOLUTE CONSTRAINT* to add `/wiki-ingest` and
-`/wiki-audit` to the sanctioned-writers list, and add their rows to the
-routing-priority table.
+Also amend `DISPATCHER.md` → *ABSOLUTE CONSTRAINT* so `/wiki-ingest` and
+`/wiki-audit` are explicitly listed as the two sanctioned Wiki writers — no
+agent writes to `references/wiki/` directly except via them.
+
+**In each agent file**, when adding the Wiki Context snippet, also add a one-
+line *Wiki memory* note to its directory entry in
+`references/agents-registry.md` (where custom agents live too).
 
 ---
 
@@ -200,9 +164,9 @@ routing-priority table.
 
 For a read-only MCP mount of the Wiki (so all agents can read it via the
 `Wiki` MCP server as a scoped retrieval fallback), see `mcp-server.md` for the
-`.mcp.json` block and the closed-world dispatcher amendment it requires. The
-mount is optional — every agent can already read the Wiki directly via its
-filesystem tools under the budget above.
+`mcp/servers.yaml` block and the closed-world dispatcher amendment it
+requires. The mount is optional — every agent can already read the Wiki
+directly via its filesystem tools under the budget above.
 
 ---
 

@@ -1,7 +1,7 @@
 ﻿---
 type: wiki/governance
 title: Wiki MCP Server — Read-Only Mount
-purpose: paste-ready .mcp.json block + the closed-world dispatcher amendment it requires
+purpose: paste-ready mcp/servers.yaml block + the closed-world dispatcher amendment it requires
 updated: 2026-06-25
 ---
 
@@ -35,56 +35,58 @@ already gates to them alone.
 
 ---
 
-## Config — Flat Layout
+## Config — Add to `mcp/servers.yaml`
 
-The vault ships `.mcp.json` at the vault root with HTTP-type servers (Gmail,
-Google Calendar). The filesystem server is a **stdio** server, so it uses
-`command`/`args` instead of `url`. **Merge** the `Wiki` key in alongside the
-existing entries — do not overwrite the file:
+The Crew centralises MCP servers in `mcp/servers.yaml` at the repo root.
+Append a new entry to the `servers:` list:
 
-```json
-{
-  "mcpServers": {
-    "Gmail": {
-      "type": "http",
-      "url": "https://gmail.mcp.claude.com/mcp"
-    },
-    "Google Calendar": {
-      "type": "http",
-      "url": "https://gcal.mcp.claude.com/mcp"
-    },
-    "Wiki": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "--readonly", "references/wiki"]
-    }
-  }
-}
+```yaml
+servers:
+  - name: Gmail
+    type: http
+    url: "https://gmail.mcp.claude.com/mcp"
+    env: {}
+    exclude: []
+  - name: Google-Calendar
+    type: http
+    url: "https://gcal.mcp.claude.com/mcp"
+    env: {}
+    exclude: []
+  - name: Wiki
+    type: stdio
+    command: "npx"
+    args: ["-y", "@modelcontextprotocol/server-filesystem@<pinned>", "--readonly", "references/wiki"]
+    env: {}
+    exclude: []
 ```
 
-The path is `references/wiki` and is relative to the vault root — where
-`.mcp.json` lives and where the server process is launched.
+The `args` path is `references/wiki` and is relative to the vault root — where
+`mcp/servers.yaml` lives and where the server process is launched. The exact
+YAML key shape (top-level `servers:` vs nested) follows the current
+`mcp/servers.yaml` schema — adapt to whatever your installed platform version
+parses.
 
 ---
 
 ## The Closed-World Dispatcher Constraint
 
-The Crew dispatcher runs a **closed world** on MCP. The live `CLAUDE.md`
-states, under *ABSOLUTE CONSTRAINT: ONLY agents from THIS project*:
+The Crew dispatcher runs a **closed world** on MCP. The live `DISPATCHER.md`
+states, under *ABSOLUTE CONSTRAINT: ONLY skills and agents from THIS project*:
 
-> NEVER USE: External plugins, third-party tools, skills, or MCP servers not
-> defined here … If something is not defined in this project's files, IT DOES
-> NOT EXIST.
+> NEVER USE: External plugins, third-party tools, or MCP servers not defined
+> here … If something is not defined in this project's files, IT DOES NOT
+> EXIST.
 
-So adding the Wiki server to `.mcp.json` alone is **not enough** — the
+So adding the `Wiki` server to `mcp/servers.yaml` alone is **not enough** — the
 dispatcher would still refuse to touch it. Enabling the mount requires two
 more coordinated edits:
 
-1. **Amend `CLAUDE.md` → *ABSOLUTE CONSTRAINT*** so the `Wiki` MCP server is
-   named as an approved MCP server (alongside Gmail and Google Calendar).
+1. **Amend `DISPATCHER.md` → *ABSOLUTE CONSTRAINT*** so the `Wiki` MCP server
+   is named as an approved MCP server (alongside Gmail and Google-Calendar).
    Without this, the closed-world rule kills it.
 2. **Add a one-line retrieval-fallback note** beside the Wiki-memory routing
-   block in `CLAUDE.md` (see `index.md` → *Dispatcher Routing*): the Wiki is
-   also readable via the `Wiki` MCP server.
+   block in `DISPATCHER.md` (see `index.md` → *Dispatcher Routing*): the Wiki
+   is also readable via the `Wiki` MCP server.
 
 If the host platform is not MCP-capable, or the closed-world amendment is not
 desired, **skip this entirely** — every agent can already read the Wiki
