@@ -37,6 +37,9 @@ EOF
   return $result
 }
 
+# Assert PreToolUse, PostToolUse, and Notification wrappers are written with
+# $CLAUDE_PROJECT_DIR-prefixed commands, and that those commands run from a
+# subdirectory of the vault (cwd ≠ project root).
 test_translate_hooks_creates_files() {
   local src; src="$(mktemp -d)"
   local dst; dst="$(mktemp -d)"
@@ -48,10 +51,26 @@ triggers:
   - event: before-tool-use
     match-tool: [edit, write]
 EOF
+  cat > "$src/hooks/validate.hook.yaml" <<'EOF'
+name: validate
+script: validate.sh
+triggers:
+  - event: after-tool-use
+    match-tool: [write]
+EOF
+  cat > "$src/hooks/notify.hook.yaml" <<'EOF'
+name: notify
+script: notify.sh
+triggers:
+  - event: on-notification
+EOF
   cat > "$src/hooks/protect.sh" <<'EOF'
 #!/usr/bin/env bash
+cat >/dev/null
 exit 0
 EOF
+  cp "$src/hooks/protect.sh" "$src/hooks/validate.sh"
+  cp "$src/hooks/protect.sh" "$src/hooks/notify.sh"
   adapter_translate_hooks "$src/hooks" "$dst"
   local result=0
   [[ -f "$dst/.claude/hooks/protect.sh" ]] || { echo "protect.sh missing"; result=1; }
@@ -59,6 +78,29 @@ EOF
   [[ -f "$dst/.claude/settings.json" ]] || { echo "settings.json missing"; result=1; }
   grep -q "PreToolUse" "$dst/.claude/settings.json" || { echo "PreToolUse not in settings"; result=1; }
   grep -q "Edit|Write" "$dst/.claude/settings.json" || { echo "matcher missing"; result=1; }
+  local expected_pre='bash "$CLAUDE_PROJECT_DIR/.claude/hooks/protect-wrapper.sh"'
+  local expected_post='bash "$CLAUDE_PROJECT_DIR/.claude/hooks/validate-wrapper.sh"'
+  local expected_notif='bash "$CLAUDE_PROJECT_DIR/.claude/hooks/notify-wrapper.sh"'
+  jq -e --arg c "$expected_pre" '.hooks.PreToolUse[0].hooks[0].command == $c' \
+    "$dst/.claude/settings.json" >/dev/null \
+    || { echo "PreToolUse command wrong: $(cat "$dst/.claude/settings.json")"; result=1; }
+  jq -e --arg c "$expected_post" '.hooks.PostToolUse[0].hooks[0].command == $c' \
+    "$dst/.claude/settings.json" >/dev/null \
+    || { echo "PostToolUse command wrong: $(cat "$dst/.claude/settings.json")"; result=1; }
+  jq -e --arg c "$expected_notif" '.hooks.Notification[0].hooks[0].command == $c' \
+    "$dst/.claude/settings.json" >/dev/null \
+    || { echo "Notification command wrong: $(cat "$dst/.claude/settings.json")"; result=1; }
+
+  mkdir -p "$dst/nested"
+  local event cmd
+  for event in PreToolUse PostToolUse Notification; do
+    cmd="$(jq -r --arg ev "$event" '.hooks[$ev][0].hooks[0].command' "$dst/.claude/settings.json")"
+    if ! (cd "$dst/nested" && CLAUDE_PROJECT_DIR="$dst" eval "$cmd" <<<'{}'); then
+      echo "hook command for $event failed from nested cwd: $cmd"
+      result=1
+    fi
+  done
+
   rm -rf "$src" "$dst"
   return $result
 }

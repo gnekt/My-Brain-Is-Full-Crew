@@ -147,6 +147,10 @@ cc_model_to_native() {
 }
 
 # adapter_translate_hooks <source_hooks_dir> <dest_root>
+#
+# Copy hook scripts, generate Claude Code wrappers, and write .claude/settings.json.
+# Wrapper commands use $CLAUDE_PROJECT_DIR so they resolve when tool cwd is not
+# the vault root.
 adapter_translate_hooks() {
   local src="$1" dst="$2"
   [[ -d "$src" ]] || return 0
@@ -181,10 +185,12 @@ adapter_translate_hooks() {
     # Build the settings.json entry for this hook
     local matcher=""
     [[ -n "$match_tool" ]] && matcher="$(cc_match_tool_to_matcher "$match_tool")"
+    # Claude Code hook cwd is the invoking tool's cwd, not always the vault
+    # root. $CLAUDE_PROJECT_DIR is always the project root, so quote it.
     local entry; entry="$(jq -cn \
-      --arg cmd ".claude/hooks/${name}-wrapper.sh" \
+      --arg cmd "\$CLAUDE_PROJECT_DIR/.claude/hooks/${name}-wrapper.sh" \
       --arg matcher "$matcher" \
-      '{matcher: $matcher, hooks: [{type: "command", command: ("bash " + $cmd)}]}')"
+      '{matcher: $matcher, hooks: [{type: "command", command: ("bash \"" + $cmd + "\"")}]}')"
 
     case "$cc_event" in
       PreToolUse)        pre_entries="$pre_entries$entry"$'\n' ;;
