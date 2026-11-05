@@ -34,9 +34,10 @@ tools: {{tool list}}
 #                              or CLI tool access (e.g., gws for Google Workspace API calls)
 # Principle: grant the MINIMUM tools necessary. Read-only agents should NOT have Write/Edit.
 
-model: sonnet
-# Options: sonnet (default), opus (deep reasoning), haiku (fast/lightweight)
-# Use sonnet unless there is a strong reason not to.
+# model: leave UNSET so the agent inherits the session's model.
+# Only set one if the user explicitly asks. Prefer the neutral tiers
+# (low / mid / high): adapters translate them per platform, and skip any
+# model the local install cannot reach instead of pinning a broken id.
 ---
 
 # {{Agent Name}} -- {{Short Subtitle}}
