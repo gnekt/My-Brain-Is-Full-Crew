@@ -71,6 +71,36 @@ oc_model_to_provider() {
   esac
 }
 
+# Providers this machine can actually reach, read from the auth store that
+# `opencode auth login` writes. Empty output means "cannot determine" — callers
+# must then keep the legacy behavior instead of guessing.
+#
+# Why this exists: oc_model_to_provider maps the neutral tiers low/mid/high to
+# anthropic/*. On a machine with no Anthropic credentials that id is unresolvable,
+# and OpenCode refuses to start the subagent with "Model unavailable" before it
+# reads a single line of the prompt. Dropping the line makes the agent inherit
+# the session model, which always works.
+oc_configured_providers() {
+  local auth="${OPENCODE_AUTH_FILE:-$HOME/.local/share/opencode/auth.json}"
+  [[ -f "$auth" ]] || return 0
+  if command -v jq >/dev/null 2>&1; then
+    jq -r 'keys[]' "$auth" 2>/dev/null && return 0
+  fi
+  # No jq: fall back to top-level keys only (0 or 2 spaces of indentation).
+  sed -n 's/^[[:space:]]\{0,2\}"\([^"]*\)"[[:space:]]*:.*/\1/p' "$auth" | sort -u
+}
+
+# True when a qualified "provider/model" id points at a provider this install
+# does not have credentials for. Returns false when the provider list is
+# unknown, so an unreadable auth store never silently unpins every agent.
+oc_model_unavailable() {
+  local qualified="$1" provider="${1%%/*}" known
+  known="$(oc_configured_providers)"
+  [[ -n "$known" ]] || return 1
+  printf '%s\n' "$known" | grep -qxF "$provider" && return 1
+  return 0
+}
+
 # adapter_translate_dispatcher <source_dispatcher_md> <dest_dir>
 # Copies the source DISPATCHER.md to dest_dir/AGENTS.md (opencode's vault-root
 # dispatcher filename). Rewrites .platform/ and DISPATCHER.md to opencode paths.
@@ -133,6 +163,11 @@ adapter_translate_agents() {
     local caps; caps="$(parse_capabilities "$agent")"
 
     local model_out; model_out="$(oc_model_to_provider "$model_raw")"
+    if [[ -n "$model_out" ]] && oc_model_unavailable "$model_out"; then
+      printf '  ! %s: model %s skipped (provider %s not configured — inherits session model)\n' \
+        "$(basename "$agent")" "$model_out" "${model_out%%/*}" >&2
+      model_out=""
+    fi
     local mode_out="${mode_raw:-subagent}"
 
     # Build a unique permission list
@@ -154,7 +189,9 @@ adapter_translate_agents() {
       # Copy description block verbatim (may be folded YAML with continuation lines)
       awk '{ sub(/\r$/, "") } /^---$/{n++; next} n==1 && /^description:/{print; in_desc=1; next} n==1 && in_desc && /^[[:space:]]/{print; next} n==1 && in_desc && !/^[[:space:]]/{in_desc=0} n>=2{exit}' "$agent"
       echo "mode: $mode_out"
-      echo "model: $model_out"
+      if [[ -n "$model_out" ]]; then
+        echo "model: $model_out"
+      fi
       if [[ -z "$perms" ]]; then
         echo "permission: {}"
       else

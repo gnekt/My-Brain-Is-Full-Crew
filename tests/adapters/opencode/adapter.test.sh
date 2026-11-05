@@ -4,6 +4,12 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 source "$ROOT/adapters/lib.sh"
 source "$ROOT/adapters/opencode/adapter.sh"
 
+# Keep model-resolution tests hermetic: an absent auth store means "cannot
+# determine", which preserves the legacy anthropic mapping. Tests that need
+# credentials point OPENCODE_AUTH_FILE at their own fixture instead of relying
+# on whoever runs the suite.
+export OPENCODE_AUTH_FILE="${TMPDIR:-/tmp}/mbifc-opencode-test-no-auth.json"
+
 test_oc_translate_dispatcher_renames_to_agents_md() {
   local src; src="$(mktemp -d)"
   local dst; dst="$(mktemp -d)"
@@ -429,6 +435,100 @@ EOF
   [[ -f "$dst/.opencode/hooks/protect.sh" ]]                  || { echo "hook script missing"; result=1; }
   [[ -f "$dst/.opencode/plugins/mbifc-hooks.js" ]]            || { echo "plugin missing"; result=1; }
   [[ -f "$dst/opencode.json" ]]                               || { echo "opencode.json missing"; result=1; }
+
+  rm -rf "$src" "$dst"
+  return $result
+}
+
+# ── model pinning ─────────────────────────────────────────────────────────────
+# A pinned model whose provider has no credentials makes OpenCode refuse to
+# start the subagent ("Model unavailable"), so the build must drop that line
+# and let the agent inherit the session model.
+
+_oc_agent_fixture() {
+  local src model="$1"
+  src="$(mktemp -d)"
+  mkdir -p "$src/agents"
+  cat > "$src/agents/scribe.md" <<EOF
+---
+name: scribe
+description: Test scribe
+model: $model
+mode: subagent
+capabilities: [read]
+---
+
+body
+EOF
+  printf '%s\n' "$src"
+}
+
+test_oc_agent_model_dropped_when_provider_missing() {
+  local src dst auth result=0
+  src="$(_oc_agent_fixture mid)"
+  dst="$(mktemp -d)"
+  auth="$(mktemp)"
+  printf '{"deepseek":{"type":"api","key":"x"}}\n' > "$auth"
+
+  OPENCODE_AUTH_FILE="$auth" adapter_translate_agents "$src/agents" "$dst" 2>/dev/null
+  local out="$dst/.opencode/agents/scribe.md"
+  [[ -f "$out" ]] || { echo "agent file missing"; result=1; }
+  grep -q '^model:' "$out" && { echo "model line should be dropped"; cat "$out"; result=1; }
+  grep -q '^mode: subagent' "$out" || { echo "mode should survive the drop"; result=1; }
+
+  rm -rf "$src" "$dst" "$auth"
+  return $result
+}
+
+test_oc_agent_model_kept_when_provider_configured() {
+  local src dst auth result=0
+  src="$(_oc_agent_fixture mid)"
+  dst="$(mktemp -d)"
+  auth="$(mktemp)"
+  printf '{"anthropic":{"type":"api","key":"x"}}\n' > "$auth"
+
+  OPENCODE_AUTH_FILE="$auth" adapter_translate_agents "$src/agents" "$dst" 2>/dev/null
+  local out="$dst/.opencode/agents/scribe.md"
+  grep -q '^model: anthropic/claude-sonnet-4-5' "$out" \
+    || { echo "model should be kept when provider is configured"; cat "$out"; result=1; }
+
+  rm -rf "$src" "$dst" "$auth"
+  return $result
+}
+
+test_oc_agent_model_kept_when_auth_store_unknown() {
+  local src dst result=0
+  src="$(_oc_agent_fixture high)"
+  dst="$(mktemp -d)"
+
+  OPENCODE_AUTH_FILE="$dst/absent-auth.json" adapter_translate_agents "$src/agents" "$dst" 2>/dev/null
+  local out="$dst/.opencode/agents/scribe.md"
+  grep -q '^model: anthropic/claude-opus-4-5' "$out" \
+    || { echo "unreadable auth store must not unpin every agent"; cat "$out"; result=1; }
+
+  rm -rf "$src" "$dst"
+  return $result
+}
+
+test_oc_agent_without_model_emits_no_model_line() {
+  local src dst result=0
+  src="$(mktemp -d)"
+  dst="$(mktemp -d)"
+  mkdir -p "$src/agents"
+  cat > "$src/agents/scribe.md" <<'EOF'
+---
+name: scribe
+description: No model
+mode: subagent
+capabilities: [read]
+---
+
+body
+EOF
+
+  adapter_translate_agents "$src/agents" "$dst"
+  local out="$dst/.opencode/agents/scribe.md"
+  grep -q '^model:' "$out" && { echo "empty model must not emit a model line"; cat "$out"; result=1; }
 
   rm -rf "$src" "$dst"
   return $result
